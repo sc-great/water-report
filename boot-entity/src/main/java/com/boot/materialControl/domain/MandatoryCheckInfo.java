@@ -1,0 +1,203 @@
+package com.boot.materialControl.domain;
+
+import java.util.List;
+
+import com.boot.common.core.domain.BaseEntity;
+
+/**
+ * 强制检测填报信息表 m_mandatory_check_info
+ * 
+ * @author yangxiaojun
+ * @date 2020-04-24
+ */
+public class MandatoryCheckInfo extends BaseEntity {
+	private static final long serialVersionUID = 1L;
+
+	/** 编号 */
+	private String id;
+
+	/** 填报日期 */
+	private String fillDate;
+
+	/** 填报时间 */
+	private String fillTime;
+
+	/** 检测日期 */
+	private String checkDate;
+
+	/** 检测周期(天) */
+	private Integer checkCycle;
+
+	/** 下次检测日期 */
+	private String nextCheckDate;
+
+	/** 检测项目 */
+	private String checkProject;
+
+	/** 检测内容 */
+	private String checkInfo;
+
+	/** 检测结果 */
+	private String checkResult;
+
+	/** 备注 */
+	private String note;
+
+	/** 所属水厂 */
+	private String factoryId;
+
+	/** 所属水厂 */
+	private String factoryName;
+
+	/** 所属区域 */
+	private String areaId;
+
+	/** 填报人编号 */
+	private String fillUserId;
+
+	/** 填报人 */
+	private String fillUserName;
+
+	/** 有效标识(1-有效 2-无效 ) */
+	private String effectIcon;
+
+	/** 处理同一天多条检查信息*/
+	private List<MandatoryCheckInfo> manList;
+
+	public List<MandatoryCheckInfo> getManList() {
+		return manList;
+	}
+
+	public void setManList(List<MandatoryCheckInfo> manList) {
+		this.manList = manList;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getFillDate() {
+		return fillDate;
+	}
+
+	public void setFillDate(String fillDate) {
+		this.fillDate = fillDate;
+	}
+
+	public String getFillTime() {
+		return fillTime;
+	}
+
+	public void setFillTime(String fillTime) {
+		this.fillTime = fillTime;
+	}
+
+	public String getCheckDate() {
+		return checkDate;
+	}
+
+	public void setCheckDate(String checkDate) {
+		this.checkDate = checkDate;
+	}
+
+	public Integer getCheckCycle() {
+		return checkCycle;
+	}
+
+	public void setCheckCycle(Integer checkCycle) {
+		this.checkCycle = checkCycle;
+	}
+
+	public String getNextCheckDate() {
+		return nextCheckDate;
+	}
+
+	public void setNextCheckDate(String nextCheckDate) {
+		this.nextCheckDate = nextCheckDate;
+	}
+
+	public String getCheckProject() {
+		return checkProject;
+	}
+
+	public void setCheckProject(String checkProject) {
+		this.checkProject = checkProject;
+	}
+
+	public String getCheckInfo() {
+		return checkInfo;
+	}
+
+	public void setCheckInfo(String checkInfo) {
+		this.checkInfo = checkInfo;
+	}
+
+	public String getCheckResult() {
+		return checkResult;
+	}
+
+	public void setCheckResult(String checkResult) {
+		this.checkResult = checkResult;
+	}
+
+	public String getNote() {
+		return note;
+	}
+
+	public void setNote(String note) {
+		this.note = note;
+	}
+
+	public String getFactoryId() {
+		return factoryId;
+	}
+
+	public void setFactoryId(String factoryId) {
+		this.factoryId = factoryId;
+	}
+
+	public String getFactoryName() {
+		return factoryName;
+	}
+
+	public void setFactoryName(String factoryName) {
+		this.factoryName = factoryName;
+	}
+
+	public String getAreaId() {
+		return areaId;
+	}
+
+	public void setAreaId(String areaId) {
+		this.areaId = areaId;
+	}
+
+	public String getFillUserId() {
+		return fillUserId;
+	}
+
+	public void setFillUserId(String fillUserId) {
+		this.fillUserId = fillUserId;
+	}
+
+	public String getFillUserName() {
+		return fillUserName;
+	}
+
+	public void setFillUserName(String fillUserName) {
+		this.fillUserName = fillUserName;
+	}
+
+	public String getEffectIcon() {
+		return effectIcon;
+	}
+
+	public void setEffectIcon(String effectIcon) {
+		this.effectIcon = effectIcon;
+	}
+
+}

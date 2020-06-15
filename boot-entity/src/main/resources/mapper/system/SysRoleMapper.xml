@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.system.mapper.SysRoleMapper">
+	<insert id="insert" parameterType="SysRole">
+		insert into sys_role(
+		<if test="roleId != null">role_id,</if>
+		<if test="roleCode != null">role_code,</if>
+		<if test="roleName != null">role_name,</if>
+		<if test="roleKey != null">role_key,</if>
+		<if test="roleSort != null">role_sort,</if>
+		<if test="dataScope != null">data_scope,</if>
+		<if test="roleStatus != null">role_status,</if>
+		<if test="remark != null">remark,</if>
+		create_time
+		)values(
+		<if test="roleId != null">#{roleId},</if>
+		<if test="roleCode != null">#{roleCode},</if>
+		<if test="roleName != null">#{roleName},</if>
+		<if test="roleKey != null">#{roleKey},</if>
+		<if test="roleSort != null">#{roleSort},</if>
+		<if test="dataScope != null">#{dataScope},</if>
+		<if test="roleStatus != null">#{roleStatus},</if>
+		<if test="remark != null">#{remark},</if>
+		sysdate()
+		)
+	</insert>
+
+	<update id="update" parameterType="SysRole">
+		update sys_role
+		<set>
+			<if test="roleCode != null">role_code = #{roleCode},</if>
+			<if test="roleName != null">role_name = #{roleName},</if>
+			<if test="roleKey != null">role_key = #{roleKey},</if>
+			<if test="roleSort != null">role_sort = #{roleSort},</if>
+			<if test="dataScope != null">data_scope = #{dataScope},</if>
+			<if test="roleStatus != null">role_status = #{roleStatus},</if>
+			<if test="remark != null">remark=#{remark},</if>
+		</set>
+		where role_id = #{roleId}
+	</update>
+	<resultMap type="SysRole" id="SysRoleResult">
+		<id property="roleId" column="role_id"/>
+		<result property="roleCode" column="role_code"/>
+		<result property="roleName" column="role_name"/>
+		<result property="roleKey" column="role_key"/>
+		<result property="roleSort" column="role_sort"/>
+		<result property="dataScope" column="data_scope"/>
+		<result property="roleStatus" column="role_status"/>
+		<result property="remark" column="remark"/>
+		<result property="createTime" column="create_time"/>
+		<result property="delFlag" column="del_flag"/>
+	</resultMap>
+	<sql id="where">
+		<if test="params.orgId!=null and params.orgId!=''">
+			RIGHT JOIN(
+				SELECT r.role_id FROM sys_role_org r WHERE r.org_id IN(
+					SELECT org_id FROM sys_org WHERE FIND_IN_SET( '${params.orgId}' ,REPLACE (org_id_path,'/',','))
+				) GROUP BY role_id
+			)o ON t.role_id=o.role_id
+		</if>
+		<!-- 数据范围过滤 -->
+		<if test="params.dataScope!=null and params.dataScope!=''">
+			RIGHT JOIN(
+				select role_id from sys_user_role t where 1=1
+				${params.dataScope} GROUP BY role_id
+			) r on r.role_id=t.role_id
+		</if>
+		<where>
+			t.del_flag = '0'
+			<if test="roleId != null and roleId != ''">
+				AND t.role_id = #{roleId}
+			</if>
+			<if test="roleCode != null and roleCode != ''">
+				AND t.role_code =#{role_code}
+			</if>
+			<if test="roleName != null and roleName != ''">
+				AND t.role_name =#{roleName}
+			</if>
+			<if test="roleStatus != null and roleStatus != ''">
+				AND t.role_status = #{roleStatus}
+			</if>
+			<if test="roleKey != null and roleKey != ''">
+				AND t.role_key =#{roleKey}
+			</if>
+			<if test="dataScope != null and dataScope != ''">
+				AND t.data_scope = #{dataScope}
+			</if>
+			<if test="searchValue!=null and searchValue!=''">
+				and (
+				t.role_code like concat('%',#{searchValue}, '%')
+				or t.role_name like concat('%',#{searchValue}, '%')
+				or t.role_key like concat('%',#{searchValue}, '%')
+				)
+			</if>
+			<if test="params.notRoleId!=null and params.notRoleId!=''">
+				AND t.role_id !='${params.notRoleId}'
+			</if>
+		</where>
+		<choose>
+			<when test="params.orderBy != null and params.orderBy !=''">
+				order by ${params.orderBy}
+			</when>
+			<otherwise>
+				order by role_sort
+			</otherwise>
+		</choose>
+		<if test="params.limit != null and params.limit !=''">
+			limit ${params.limit}
+		</if>
+	</sql>
+	<select id="getCount" parameterType="SysRole" resultType="int">
+		select count(t.role_id) from sys_role t
+		<include refid="where"/>
+	</select>
+	<select id="getEntity" parameterType="SysRole" resultMap="SysRoleResult">
+		select t.* from sys_role t
+		<include refid="where"/>
+		limit 1
+	</select>
+	<select id="findList" parameterType="SysRole" resultMap="SysRoleResult">
+		select t.* from sys_role t
+		<include refid="where"/>
+	</select>
+ 	<delete id="delete" parameterType="SysRole">
+ 	    update sys_role t set t.del_flag = '1'
+		<include refid="where"/>
+ 	</delete>
+	<select id="getRoleListByUserId" parameterType="String" resultMap="SysRoleResult">
+		SELECT r.* FROM sys_user_role t
+		right JOIN sys_role r ON r.role_id=t.role_id
+		<if test="userId!=null and userId!=''">
+			where t.user_id=#{userId}
+		</if>
+	</select>
+	<select id="getRoleListByOrgId" parameterType="String" resultMap="SysRoleResult">
+		SELECT r.* FROM sys_role_org t
+		right JOIN sys_role r ON r.role_id =t.role_id
+		<if test="orgId!=null and orgId!=''">
+			where t.org_id=#{orgId}
+		</if>
+	</select>
+</mapper> 

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${packageName}.mapper.${ClassName}Mapper">
+    <resultMap type="${ClassName}" id="resultMapping">
+#foreach ($column in $columns)
+        <result property="${column.javaField}"    column="${column.columnName}"    />
+#end
+#if($table.tree)
+        <result property="parentName" column="parent_name" />
+#end
+    </resultMap>
+
+    <insert id="insert" parameterType="${ClassName}"#if($pkColumn.increment) useGeneratedKeys="true" keyProperty="$pkColumn.javaField"#end>
+        <selectKey keyProperty="id" resultType="String" order="BEFORE">
+            select replace(uuid(),'-','') from dual
+        </selectKey>
+        insert into ${tableName}
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+    #foreach($column in $columns)
+        #if($column.columnName != $pkColumn.columnName || !$pkColumn.increment)
+            <if test="$column.javaField != null #if($column.javaType == 'String' )#end">$column.columnName,</if>
+        #end
+    #end
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+    #foreach($column in $columns)
+        #if($column.columnName != $pkColumn.columnName || !$pkColumn.increment)
+            <if test="$column.javaField != null #if($column.javaType == 'String' )#end">#{$column.javaField},</if>
+        #end
+    #end
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="${ClassName}">
+        update ${tableName}
+        <trim prefix="SET" suffixOverrides=",">
+    #foreach($column in $columns)
+        #if($column.columnName != $pkColumn.columnName)
+            <if test="$column.javaField != null #if($column.javaType == 'String' )#end">$column.columnName = #{$column.javaField},</if>
+        #end
+    #end
+        </trim>
+        where ${pkColumn.columnName} = #{${pkColumn.javaField}}
+    </update>
+
+    <sql id="where">
+        <where>
+            <if test="${pkColumn.javaField}!=null #if($pkColumn.javaType == 'String' ) and $pkColumn.javaField != ''#end">
+                and t.${pkColumn.columnName}=#{${pkColumn.javaField}}
+            </if>
+    #foreach($column in $columns)
+        #set($queryType=$column.queryType)
+        #set($javaField=$column.javaField)
+        #set($javaType=$column.javaType)
+        #set($columnName=$column.columnName)
+        #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+        #if($column.query)
+            #if($column.queryType == "EQ")
+                <if test="$javaField != null #if($javaType == 'String' ) and $javaField.trim() != ''#end">
+                 and t.$columnName = #{$javaField}
+                </if>
+            #elseif($queryType == "NE")
+                <if test="$javaField != null #if($javaType == 'String' ) and $javaField.trim() != ''#end">
+                 and t.$columnName != #{$javaField}
+                </if>
+            #elseif($queryType == "GT")
+                <if test="$javaField != null #if($javaType == 'String' ) and $javaField.trim() != ''#end">
+                 and t.$columnName &gt; #{$javaField}
+                </if>
+            #elseif($queryType == "GTE")
+                <if test="$javaField != null #if($javaType == 'String' ) and $javaField.trim() != ''#end">
+                 and t.$columnName &gt;= #{$javaField}
+                </if>
+            #elseif($queryType == "LT")
+                <if test="$javaField != null #if($javaType == 'String' ) and $javaField.trim() != ''#end">
+                 and t.$columnName &lt; #{$javaField}
+                </if>
+            #elseif($queryType == "LTE")
+                <if test="$javaField != null #if($javaType == 'String' ) and $javaField.trim() != ''#end">
+                 and t.$columnName &lt;= #{$javaField}
+                </if>
+            #elseif($queryType == "LIKE")
+                <if test="$javaField != null #if($javaType == 'String' ) and $javaField.trim() != ''#end">
+                 and t.$columnName like concat('%', #{$javaField}, '%')
+                </if>
+            #elseif($queryType == "BETWEEN")
+                <if test="params.begin$AttrName != null and params.begin$AttrName != '' and params.end$AttrName != null and params.end$AttrName != ''">
+                 and t.$columnName between #{params.begin$AttrName} and #{params.end$AttrName}
+                </if>
+            #end
+        #end
+    #end
+            <if test="params.ids!=null">
+                and t.id in
+                <foreach collection="params.ids" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+            <!-- 数据范围过滤 -->
+            ${params.dataScope}
+        </where>
+        #if($table.tree)
+            order by ${tree_parent_code}
+        #end
+    </sql>
+
+    <delete id="delete" parameterType="${ClassName}">
+        delete t from ${tableName} t
+        <include refid="where"/>
+    </delete>
+
+    <select id="getCount" parameterType="${ClassName}" resultType="int">
+        select count(*) from ${tableName} t
+        <include refid="where"/>
+    </select>
+
+    <sql id="select">
+        select t.* from ${tableName} t
+    </sql>
+
+    <select id="getEntity" parameterType="${ClassName}" resultMap="resultMapping">
+        #if($table.crud)
+            <include refid="select"/>
+        #elseif($table.tree)
+            select t.*,p.${tree_name} as parent_name
+            from ${tableName} t
+            left join ${tableName} p on p.${pkColumn.columnName} = t.${tree_parent_code}
+        #end
+        <include refid="where"/>
+        LIMIT 1
+    </select>
+
+    <select id="getList" parameterType="${ClassName}" resultMap="resultMapping">
+        <include refid="select"/>
+        <include refid="where"/>
+    </select>
+</mapper>

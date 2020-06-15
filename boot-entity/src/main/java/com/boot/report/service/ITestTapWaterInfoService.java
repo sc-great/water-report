@@ -1,0 +1,63 @@
+package com.boot.report.service;
+
+import java.util.List;
+
+import com.boot.report.domain.TestTapWaterInfo;
+
+/**
+ * 水厂化验数据信息（自来水厂/给水厂）Service接口
+ * 
+ * @author EPL
+ * @date 2020-03-24
+ */
+public interface ITestTapWaterInfoService {
+	/**
+	 * 新增水厂化验数据信息（自来水厂/给水厂）
+	 *
+	 * @param goodWaterHealthInfo 水厂化验数据信息（自来水厂/给水厂）
+	 * @return 结果
+	 */
+	public int add(TestTapWaterInfo testTapWaterInfo);
+
+	/**
+	 * 修改水厂化验数据信息（自来水厂/给水厂）
+	 *
+	 * @param goodWaterHealthInfo 水厂化验数据信息（自来水厂/给水厂）
+	 * @return 结果
+	 */
+	public int update(TestTapWaterInfo testTapWaterInfo);
+
+	/**
+	 * 批量删除水厂化验数据信息（自来水厂/给水厂）
+	 *
+	 * @param ids 需要删除的数据ID
+	 * @return 结果
+	 */
+	public int deleteByIds(String ids);
+
+	/**
+	 * 查询水厂化验数据信息（自来水厂/给水厂）数量
+	 *
+	 * @param goodWaterHealthInfo 查询条件
+	 * @return 水厂化验数据信息（自来水厂/给水厂）数量
+	 */
+	public int getCount(TestTapWaterInfo testTapWaterInfo);
+
+	/**
+	 * 获取水厂化验数据信息（自来水厂/给水厂）实体对象
+	 * 
+	 * @param id 水厂化验数据信息（自来水厂/给水厂）ID
+	 * @return 水厂化验数据信息（自来水厂/给水厂）
+	 */
+	public TestTapWaterInfo getEntityById(String id);
+
+	public TestTapWaterInfo getEntity(TestTapWaterInfo testTapWaterInfo);
+
+	/**
+	 * 查询水厂化验数据信息（自来水厂/给水厂）列表
+	 * 
+	 * @param goodWaterHealthInfo 水厂化验数据信息（自来水厂/给水厂）
+	 * @return 水厂化验数据信息（自来水厂/给水厂）集合
+	 */
+	public List<TestTapWaterInfo> getList(TestTapWaterInfo testTapWaterInfo);
+}

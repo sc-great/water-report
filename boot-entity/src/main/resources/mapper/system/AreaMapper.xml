@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.system.mapper.AreaMapper">
+    <resultMap type="Area" id="resultMapping">
+        <result property="areaId"    column="area_id"/>
+        <result property="areaName"  column="area_name"/>
+        <result property="remark"    column="remark"/>
+        <result property="groupType" column="group_type"/>
+        <result property="sortNo"    column="sort_no"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="Area">
+        <selectKey keyProperty="areaId" resultType="String" order="BEFORE">
+            select replace(uuid(),'-','') from dual
+        </selectKey>
+        insert into r_area
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="areaId != null ">area_id,</if>
+            <if test="areaName != null ">area_name,</if>
+            <if test="remark != null ">remark,</if>
+            <if test="groupType != null ">group_type,</if>
+            <if test="sortNo != null ">sort_no,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="areaId != null ">#{areaId},</if>
+            <if test="areaName != null ">#{areaName},</if>
+            <if test="remark != null ">#{remark},</if>
+            <if test="groupType != null ">#{groupType},</if>
+            <if test="sortNo != null ">#{sortNo},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="Area">
+        update r_area
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="areaName != null ">area_name = #{areaName},</if>
+            <if test="remark != null ">remark = #{remark},</if>
+            <if test="groupType != null ">group_type = #{groupType},</if>
+            <if test="sortNo != null ">sort_no = #{sortNo},</if>
+        </trim>
+        where area_id = #{areaId}
+    </update>
+
+    <sql id="where">
+        <where>
+            <if test="areaId!=null  and areaId != ''">
+                and t.area_id=#{areaId}
+            </if>
+            <if test="groupType != null  and groupType != ''">
+                and t.group_type = #{groupType}
+            </if>
+            <if test="searchValue != null and searchValue != ''">
+                and t.area_name like concat('%',#{searchValue}, '%')
+            </if>
+            <if test="params.ids!=null">
+                and t.area_id in
+                <foreach collection="params.ids" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="params.areaIds != null and params.areaIds != ''">
+				and FIND_IN_SET(t.area_id, '${params.areaIds}')
+			</if>
+            <!-- 数据范围过滤 -->
+            ${params.dataScope}
+        </where>
+    </sql>
+
+    <sql id="orderBy">
+        <choose>
+            <when test="sortName != null and sortName !=''">
+                order by ${sortName}
+                <choose>
+                    <when test="sortOrder!=null and sortOrder!=''">
+                        ${sortOrder}
+                    </when>
+                    <otherwise>
+                        asc
+                    </otherwise>
+                </choose>
+            </when>
+            <otherwise>
+                order by t.sort_no asc
+            </otherwise>
+        </choose>
+    </sql>
+
+    <delete id="delete" parameterType="Area">
+        delete t from r_area t
+        <include refid="where"/>
+    </delete>
+
+    <select id="getCount" parameterType="Area" resultType="int">
+        select count(*) from r_area t
+        <include refid="where"/>
+    </select>
+
+    <sql id="select">
+        select t.* from r_area t
+    </sql>
+
+    <select id="getEntity" parameterType="Area" resultMap="resultMapping">
+        <include refid="select"/>
+        <include refid="where"/>
+        <include refid="orderBy"/>
+        LIMIT 1
+    </select>
+
+    <select id="getList" parameterType="Area" resultMap="resultMapping">
+        <include refid="select"/>
+        <include refid="where"/>
+        <include refid="orderBy"/>
+    </select>
+</mapper>

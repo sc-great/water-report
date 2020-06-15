@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.system.mapper.SysRoleOrgScopeMapper">
+
+    <insert id="insert" parameterType="SysRoleOrgScope">
+        insert into sys_role_org_scope(
+        <if test="roleId != null">role_id,</if>
+        <if test="orgId != null">org_id,</if>
+        )values(
+        <if test="roleId != null">#{roleId},</if>
+        <if test="orgId != null">#{orgId},</if>
+        )
+    </insert>
+    <insert id="batch">
+        insert into sys_role_org_scope(role_id, org_id) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (#{item.roleId},#{item.orgId})
+        </foreach>
+    </insert>
+    <resultMap type="SysRoleOrgScope" id="SysRoleOrgScopeResult">
+        <result property="roleId" column="role_id"/>
+        <result property="orgId" column="org_id"/>
+    </resultMap>
+    <sql id="where">
+        <where>
+            <if test="roleId != null and roleId != ''">
+                and t.role_id=#{roleId}
+            </if>
+            <if test="orgId != null and orgId != ''">
+                and t.org_id=#{orgId}
+            </if>
+        </where>
+    </sql>
+    <select id="findList" parameterType="SysRoleOrgScope" resultMap="SysRoleOrgScopeResult">
+        select t.* from sys_role_org_scope t
+        <include refid="where"/>
+    </select>
+
+    <delete id="delete" parameterType="SysRoleOrgScope">
+        delete t from sys_role_org_scope t
+        <include refid="where"/>
+    </delete>
+</mapper>

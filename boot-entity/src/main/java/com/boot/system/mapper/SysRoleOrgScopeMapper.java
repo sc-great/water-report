@@ -1,0 +1,42 @@
+package com.boot.system.mapper;
+
+import com.boot.system.domain.SysRoleOrgScope;
+import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Component
+@Mapper
+public interface SysRoleOrgScopeMapper {
+    /**
+     * 添加
+     *
+     * @param sysRoleOrgScope 机构岗位信息
+     * @return 影响行数
+     */
+    public int insert(SysRoleOrgScope sysRoleOrgScope);
+    /**
+     * 批量添加
+     *
+     * @param sysRoleOrgScopes 机构岗位信息
+     * @return 影响行数
+     */
+    public int batch(List<SysRoleOrgScope> sysRoleOrgScopes);
+
+    /**
+     * 删除
+     *
+     * @param sysRoleOrgScope 删除条件
+     * @return 影响行数
+     */
+    public int delete(SysRoleOrgScope sysRoleOrgScope);
+
+    /**
+     * 查询集合
+     *
+     * @param sysRoleOrgScope 查询条件
+     * @return 集合
+     */
+    public List<SysRoleOrgScope> findList(SysRoleOrgScope sysRoleOrgScope);
+}

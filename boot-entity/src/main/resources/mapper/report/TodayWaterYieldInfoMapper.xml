@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.report.mapper.TodayWaterYieldInfoMapper">
+	<resultMap type="TodayWaterYieldInfo" id="resultMapping">
+		<result property="id" 			column="id" />
+		<result property="fillDate" 	column="fill_date" />
+		<result property="fillTime" 	column="fill_time" />
+		<result property="todayIn" 		column="today_in" />
+		<result property="todayOut" 	column="today_out" />
+		<result property="totalIn" 		column="total_in" />
+		<result property="totalOut" 	column="total_out" />
+		<result property="factoryId" 	column="factory_id" />
+		<result property="areaId" 		column="area_id" />
+		<result property="fillUserId"   column="fill_user_id" />
+		<result property="fillUserName" column="fill_user_name" />
+		<result property="effectIcon"   column="effect_icon" />
+	</resultMap>
+
+	<insert id="insert" parameterType="TodayWaterYieldInfo">
+		<selectKey keyProperty="id" resultType="String" order="BEFORE">
+			select replace(uuid(),'-','') from dual
+		</selectKey>
+		insert into r_today_water_yield_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null ">id,</if>
+			fill_date,
+			fill_time,
+			<if test="todayIn != null ">today_in,</if>
+			<if test="todayOut != null ">today_out,</if>
+			<if test="totalIn != null ">total_in,</if>
+			<if test="totalOut != null ">total_out,</if>
+			<if test="factoryId != null ">factory_id,</if>
+			<if test="areaId != null ">area_id,</if>
+			<if test="fillUserId != null ">fill_user_id,</if>
+			<if test="fillUserName != null ">fill_user_name,</if>
+			effect_icon
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null ">#{id},</if>
+			CURDATE(),
+			NOW(),
+			<if test="todayIn != null ">#{todayIn},</if>
+			<if test="todayOut != null ">#{todayOut},</if>
+			<if test="totalIn != null ">#{totalIn},</if>
+			<if test="totalOut != null ">#{totalOut},</if>
+			<if test="factoryId != null ">#{factoryId},</if>
+			<if test="areaId != null ">#{areaId},</if>
+			<if test="fillUserId != null ">#{fillUserId},</if>
+			<if test="fillUserName != null ">#{fillUserName},</if>
+			'1'
+		</trim>
+	</insert>
+
+	<update id="update" parameterType="TodayWaterYieldInfo">
+		update r_today_water_yield_info
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="todayIn != null ">today_in = #{todayIn},</if>
+			<if test="todayOut != null ">today_out = #{todayOut},</if>
+			<if test="totalIn != null ">total_in = #{totalIn},</if>
+			<if test="totalOut != null ">total_out = #{totalOut},</if>
+			<if test="effectIcon != null ">effect_icon = #{effectIcon},</if>
+		</trim>
+		where id = #{id}
+	</update>
+
+	<sql id="where">
+		<where>
+			<if test="id != null and id != ''">
+				and t.id=#{id}
+			</if>
+			<if test="fillDate != null and fillDate != ''">
+				and t.fill_date = #{fillDate}
+			</if>
+			<if test="factoryId != null and factoryId != ''">
+				and t.factory_id = #{factoryId}
+			</if>
+			<if test="fillUserId != null and fillUserId != ''">
+				and t.fill_user_id = #{fillUserId}
+			</if>
+			<if test="areaId != null and areaId != ''">
+				and t.area_id = #{areaId}
+			</if>
+			<if test="effectIcon != null and effectIcon != ''">
+				and t.effect_icon = #{effectIcon}
+			</if>
+			<if test="params.ids != null">
+				and t.id in
+				<foreach collection="params.ids" item="id" open="("
+					separator="," close=")">
+					#{id}
+				</foreach>
+			</if>
+			<if test="params.factoryIds != null and params.factoryIds != ''">
+				and FIND_IN_SET(t.factory_id,'${params.factoryIds}')
+			</if>
+			<if test="params.companyId != null and params.companyId != ''">
+				and t.factory_id IN(
+					SELECT org_id FROM sys_org WHERE parent_id = '${params.companyId}' AND org_type = '3'
+				)
+			</if>
+			<if test="params.areaIds != null and params.areaIds != ''">
+				and FIND_IN_SET(t.area_id, '${params.areaIds}')
+			</if>
+			<!-- 数据范围过滤 -->
+			${params.dataScope}
+		</where>
+	</sql>
+
+	<delete id="delete" parameterType="TodayWaterYieldInfo">
+		delete t from r_today_water_yield_info t
+		<include refid="where" />
+	</delete>
+
+	<select id="getCount" parameterType="TodayWaterYieldInfo" resultType="int">
+		select count(*) from r_today_water_yield_info t
+		<include refid="where" />
+	</select>
+	<!-- 手机端实际处理累计 -->
+	<select id="getWaterYieldOutSumByApp" parameterType="TodayWaterYieldInfo" resultType="Double">
+		select IFNULL(SUM(t.today_out),0) from r_today_water_yield_info t
+		<include refid="where" />
+	</select>
+
+	<sql id="select">
+		select t.* from r_today_water_yield_info t
+	</sql>
+
+	<select id="getEntity" parameterType="TodayWaterYieldInfo" resultMap="resultMapping">
+		<include refid="select" />
+		<include refid="where" />
+		LIMIT 1
+	</select>
+
+	<select id="getList" parameterType="TodayWaterYieldInfo" resultMap="resultMapping">
+		<include refid="select" />
+		<include refid="where" />
+		order by t.fill_date desc
+	</select>
+	
+	<!--水量求和 -->
+	<select id="getSum" parameterType="TodayWaterYieldInfo" resultType="map">
+		SELECT IFNULL(SUM(t.today_in),0) AS totalTodayIn,
+		IFNULL(SUM(t.today_out),0) AS totalTodayOut,
+		IFNULL(SUM(t.total_in),0) AS totalIn,
+		IFNULL(SUM(t.total_out),0) AS totalOut
+		FROM
+		r_today_water_yield_info t
+		<where>
+			<if test="fillDate != null and fillDate != ''">
+				and t.fill_date = #{fillDate}
+			</if>
+			<if test="areaId != null and areaId != ''">
+				and t.area_id = #{areaId}
+			</if>
+			<if test="params.areaIds != null and params.areaIds != ''">
+				and FIND_IN_SET(t.area_id,'${params.areaIds}')
+			</if>
+			<if test="effectIcon != null and effectIcon != ''">
+				and t.effect_icon = #{effectIcon}
+			</if>
+			<if test="factoryId != null and factoryId != ''">
+				and t.factory_id = #{factoryId}
+			</if>
+			<if test="params.companyId != null and params.companyId != ''">
+				and t.factory_id IN(
+					SELECT org_id FROM sys_org WHERE parent_id='${params.companyId}' AND org_type='3'
+				)
+			</if>
+		</where>
+	</select>
+	<!-- 手机端水量统计：公司级水量分析页面的当前所选日期以前的累计量 ,水厂级页面通用 -->
+	<select id="getSumByAppArea_company_Before" parameterType="TodayWaterYieldInfo" resultType="map">
+		SELECT 
+		IFNULL(SUM(t.today_in),0) AS totalTodayIn,
+		IFNULL(SUM(t.today_out),0) AS totalTodayOut
+		FROM
+		r_today_water_yield_info t
+		<where>
+			<if test="fillDate != null and fillDate != ''">
+				and t.fill_date &lt; #{fillDate}
+			</if>
+
+			<if test="effectIcon != null and effectIcon != ''">
+				and t.effect_icon = #{effectIcon}
+			</if>
+			<if test="factoryId != null  and factoryId != ''">
+				and t.factory_id = #{factoryId}
+			</if>
+			<if test="params.companyId != null and params.companyId != ''">
+				and t.factory_id IN(
+					SELECT org_id FROM sys_org WHERE parent_id='${params.companyId}' AND org_type='3'
+				)
+			</if>
+		</where>
+	</select>
+
+	<!-- 手机端水量统计详情页面：区域分析 -->
+	<select id="getSumByAppArea" parameterType="TodayWaterYieldInfo" resultType="map">
+		SELECT 
+		IFNULL(SUM(t.today_in),0) AS totalTodayIn,
+		IFNULL(SUM(t.today_out),0) AS totalTodayOut,
+		IFNULL(SUM(t.total_in),0) AS totalIn,
+		IFNULL(SUM(t.total_out),0) AS totalOut
+		FROM
+		r_today_water_yield_info t
+		<where>
+			<if test="fillDate != null and fillDate != ''">
+				and t.fill_date = #{fillDate}
+			</if>
+
+			<if test="areaId != null and areaId != ''">
+				and t.area_id = #{areaId}
+			</if>
+
+			<if test="effectIcon != null and effectIcon != ''">
+				and t.effect_icon = #{effectIcon}
+			</if>
+		</where>
+	</select>
+	
+	<!-- 手机端水量统计详情页面：区域分析 当日以前累计量 ,单位是 :吨 -->
+	<select id="getSumByAppAreaBefore" parameterType="TodayWaterYieldInfo" resultType="map">
+		SELECT 
+		IFNULL(SUM(t.today_in),0) AS totalTodayIn,
+		IFNULL(SUM(t.today_out),0) AS totalTodayOut
+		FROM
+		r_today_water_yield_info t
+		<where>
+			<if test="fillDate != null and fillDate != ''">
+				and t.fill_date &lt; #{fillDate}
+			</if>
+
+			<if test="areaId != null and areaId != ''">
+				and t.area_id=#{areaId}
+			</if>
+
+			<if test="effectIcon != null and effectIcon != ''">
+				and t.effect_icon = #{effectIcon}
+			</if>
+		</where>
+	</select>
+
+	<!-- 手机端登录后的水量统计 :当日前累计的进水总量 和出水总量 -->
+	<select id="getSumByApp" parameterType="TodayWaterYieldInfo" resultType="map">
+		SELECT 
+		IFNULL(SUM(t.today_in),0) AS totalTodayIn,
+		IFNULL(SUM(t.today_out),0) AS totalTodayOut
+		FROM
+		r_today_water_yield_info t
+		<where>
+			<if test="fillDate != null and fillDate != ''">
+				and t.fill_date &lt; CURDATE()
+			</if>
+			<if test="params.areaIds != null and params.areaIds != ''">
+				and FIND_IN_SET(t.area_id,'${params.areaIds}')
+			</if>
+			<if test="effectIcon != null and effectIcon != ''">
+				and t.effect_icon = #{effectIcon}
+			</if>
+			<if test="factoryId != null and factoryId != ''">
+				and t.factory_id = #{factoryId}
+			</if>
+		</where>
+	</select>
+
+	<!-- 添加页面中显示的当日前累计的进水总量 和出水总量(万吨) -->
+	<select id="getSumAddInOut" parameterType="TodayWaterYieldInfo" resultType="map">
+		SELECT 
+		IFNULL(SUM(t.today_in),0)/10000 AS totalTodayIn,
+		IFNULL(SUM(t.today_out),0)/10000 AS totalTodayOut
+		FROM
+		r_today_water_yield_info t
+		where
+		t.effect_icon='1'
+		and t.fill_date &lt; CURDATE()
+		and t.factory_id = #{factoryId}
+	</select>
+
+	<!--水量当日查询：APP上面的折线图统计 -->
+	<select id="getTodayForChart" parameterType="TodayWaterYieldInfo" resultType="map">
+		SELECT
+		IFNULL(SUM(t.today_in), 0) AS todayIn,
+		IFNULL(SUM(t.today_out), 0) AS todayOut
+		FROM r_today_water_yield_info t
+		<where>
+			<if test="fillDate != null and fillDate != ''">
+				and t.fill_date = #{fillDate}
+			</if>
+			<if test="effectIcon != null and effectIcon != ''">
+				and t.effect_icon = #{effectIcon}
+			</if>
+			<if test="params.areaIds != null and params.areaIds != ''">
+				and FIND_IN_SET(t.area_id, '${params.areaIds}')
+			</if>
+			<if test="factoryId != null and factoryId != ''">
+				and t.factory_id = #{factoryId}
+			</if>
+		</where>
+	</select>
+
+	<!--污泥求和：APP上面的折线图统计，展示一段时间的数据，如果某一天的数据未填报，累计数据不能为0，所以采用累加的方式查询 -->
+	<select id="getSumForChart" parameterType="TodayWaterYieldInfo" resultType="map">
+		SELECT
+		IFNULL(SUM(t.today_in), 0) AS totalIn,
+		IFNULL(SUM(t.today_out), 0) AS totalOut
+		FROM r_today_water_yield_info t
+		<where>
+			<if test="fillDate != null and fillDate != ''">
+				and t.fill_date &lt;= #{fillDate}
+			</if>
+			<if test="effectIcon != null and effectIcon != ''">
+				and t.effect_icon = #{effectIcon}
+			</if>
+			<if test="params.areaIds != null and params.areaIds != ''">
+				and FIND_IN_SET(t.area_id, '${params.areaIds}')
+			</if>
+			<if test="factoryId != null and factoryId != ''">
+				and t.factory_id = #{factoryId}
+			</if>
+		</where>
+	</select>
+</mapper>

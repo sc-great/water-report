@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.report.mapper.BadWaterQualityInfoMapper">
+    <resultMap type="BadWaterQualityInfo" id="resultMapping">
+        <result property="id"           column="id"/>
+        <result property="fillDate"     column="fill_date"/>
+        <result property="fillTime"     column="fill_time"/>
+        <result property="codIn"        column="COD_in"/>
+        <result property="codOut"       column="COD_out"/>
+        <result property="nh3NIn"       column="NH3_N_in"/>
+        <result property="nh3NOut"      column="NH3_N_out"/>
+        <result property="ssIn"         column="SS_in"/>
+        <result property="ssOut"        column="SS_out"/>
+        <result property="phIn"         column="PH_in"/>
+        <result property="phOut"        column="PH_out"/>
+        <result property="tpIn"         column="TP_in"/>
+        <result property="tpOut"        column="TP_out"/>
+        <result property="tnIn"         column="TN_in"/>
+        <result property="tnOut"        column="TN_out"/>
+        <result property="mlssIn"       column="MLSS_in"/>
+        <result property="mlssOut"      column="MLSS_out"/>
+        <result property="sv30In"       column="SV30_in"/>
+        <result property="sv30Out"      column="SV30_out"/>
+        <result property="factoryId"    column="factory_id"/>
+        <result property="areaId"       column="area_id"/>
+        <result property="fillUserId"   column="fill_user_id"/>
+        <result property="fillUserName" column="fill_user_name"/>
+        <result property="effectIcon"   column="effect_icon"/>
+        <result property="passFlag"     column="pass_flag"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="BadWaterQualityInfo">
+        <selectKey keyProperty="id" resultType="String" order="BEFORE">
+            select replace(uuid(),'-','') from dual
+        </selectKey>
+        insert into r_bad_water_quality_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null ">id,</if>
+            <if test="fillDate != null">fill_date,</if>
+            fill_time,
+            <if test="codIn != null">COD_in,</if>
+            <if test="codOut != null">COD_out,</if>
+            <if test="nh3NIn != null">NH3_N_in,</if>
+            <if test="nh3NOut != null">NH3_N_out,</if>
+            <if test="ssIn != null">SS_in,</if>
+            <if test="ssOut != null">SS_out,</if>
+            <if test="phIn != null">PH_in,</if>
+            <if test="phOut != null">PH_out,</if>
+            <if test="tpIn != null">TP_in,</if>
+            <if test="tpOut != null">TP_out,</if>
+            <if test="tnIn != null">TN_in,</if>
+            <if test="tnOut != null">TN_out,</if>
+            <if test="mlssIn != null">MLSS_in,</if>
+            <if test="mlssOut != null">MLSS_out,</if>
+            <if test="sv30In != null">SV30_in,</if>
+            <if test="sv30Out != null">SV30_out,</if>
+            <if test="factoryId != null">factory_id,</if>
+            <if test="areaId != null">area_id,</if>
+            <if test="fillUserId != null">fill_user_id,</if>
+            <if test="fillUserName != null">fill_user_name,</if>
+            effect_icon,
+            <if test="passFlag != null">pass_flag</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="fillDate != null">#{fillDate},</if>
+            NOW(),
+            <if test="codIn != null">#{codIn},</if>
+            <if test="codOut != null">#{codOut},</if>
+            <if test="nh3NIn != null">#{nh3NIn},</if>
+            <if test="nh3NOut != null">#{nh3NOut},</if>
+            <if test="ssIn != null">#{ssIn},</if>
+            <if test="ssOut != null">#{ssOut},</if>
+            <if test="phIn != null">#{phIn},</if>
+            <if test="phOut != null">#{phOut},</if>
+            <if test="tpIn != null">#{tpIn},</if>
+            <if test="tpOut != null">#{tpOut},</if>
+            <if test="tnIn != null">#{tnIn},</if>
+            <if test="tnOut != null">#{tnOut},</if>
+            <if test="mlssIn != null">#{mlssIn},</if>
+            <if test="mlssOut != null">#{mlssOut},</if>
+            <if test="sv30In != null">#{sv30In},</if>
+            <if test="sv30Out != null">#{sv30Out},</if>
+            <if test="factoryId != null">#{factoryId},</if>
+            <if test="areaId != null">#{areaId},</if>
+            <if test="fillUserId != null">#{fillUserId},</if>
+            <if test="fillUserName != null">#{fillUserName},</if>
+            '1',
+             <if test="passFlag != null">#{passFlag}</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="BadWaterQualityInfo">
+        update r_bad_water_quality_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="codIn != null">COD_in = #{codIn},</if>
+            <if test="codOut != null">COD_out = #{codOut},</if>
+            <if test="nh3NIn != null">NH3_N_in = #{nh3NIn},</if>
+            <if test="nh3NOut != null">NH3_N_out = #{nh3NOut},</if>
+            <if test="ssIn != null">SS_in = #{ssIn},</if>
+            <if test="ssOut != null">SS_out = #{ssOut},</if>
+            <if test="phIn != null">PH_in = #{phIn},</if>
+            <if test="phOut != null">PH_out = #{phOut},</if>
+            <if test="tpIn != null">TP_in = #{tpIn},</if>
+            <if test="tpOut != null">TP_out = #{tpOut},</if>
+            <if test="tnIn != null">TN_in = #{tnIn},</if>
+            <if test="tnOut != null">TN_out = #{tnOut},</if>
+            <if test="mlssIn != null">MLSS_in = #{mlssIn},</if>
+            <if test="mlssOut != null">MLSS_out = #{mlssOut},</if>
+            <if test="sv30In != null">SV30_in = #{sv30In},</if>
+            <if test="sv30Out != null">SV30_out = #{sv30Out},</if>
+            <if test="effectIcon != null">effect_icon = #{effectIcon},</if>
+            <if test="passFlag != null">pass_flag = #{passFlag},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <sql id="where">
+        <where>
+            <if test="id != null and id != ''">
+                and t.id = #{id}
+            </if>
+            <if test="fillDate != null and fillDate != ''">
+                and t.fill_date = #{fillDate}
+            </if>
+            <if test="factoryId != null and factoryId != ''">
+                and t.factory_id = #{factoryId}
+            </if>
+            <if test="areaId != null and areaId != ''">
+                and t.area_id = #{areaId}
+            </if>
+            <if test="fillUserId != null and fillUserId != ''">
+                and t.fill_user_id = #{fillUserId}
+            </if>
+            <if test="effectIcon != null and effectIcon != ''">
+                and t.effect_icon = #{effectIcon}
+            </if>
+            <if test="passFlag != null and passFlag != ''">
+                and t.pass_flag = #{passFlag}
+            </if>
+            <if test="params.ids != null">
+                and t.id in
+                <foreach collection="params.ids" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="params.areaIds != null and params.areaIds != ''">
+                and FIND_IN_SET(t.area_id,'${params.areaIds}')
+            </if>
+            <!-- 数据范围过滤 -->
+            ${params.dataScope}
+        </where>
+    </sql>
+
+    <delete id="delete" parameterType="BadWaterQualityInfo">
+        delete t from r_bad_water_quality_info t
+        <include refid="where"/>
+    </delete>
+
+    <select id="getCount" parameterType="BadWaterQualityInfo" resultType="int">
+        select count(*) from r_bad_water_quality_info t
+        <include refid="where"/>
+    </select>
+
+    <sql id="select">
+        SELECT * FROM r_bad_water_quality_info t
+    </sql>
+
+    <select id="getEntity" parameterType="BadWaterQualityInfo" resultMap="resultMapping">
+        <include refid="select"/>
+        <include refid="where"/>
+        LIMIT 1
+    </select>
+
+    <select id="getList" parameterType="BadWaterQualityInfo" resultMap="resultMapping">
+        <include refid="select"/>
+        <include refid="where"/>
+        order by t.fill_date desc
+    </select>
+    
+    <!-- 手机端：运营能力二级页面，列表展示不合格的污水和自来水的单位和填报日期 -->
+    <select id="getNotPassBadWaterListByApp" parameterType="BadWaterQualityInfo" resultType="map">
+		SELECT
+			b.org_name,
+			t.fill_date 
+		FROM
+			r_bad_water_quality_info t,
+			sys_org b 
+		WHERE
+			t.pass_flag = '2' 
+			AND t.factory_id = b.org_id 
+		ORDER BY
+			b.org_name,
+			t.fill_date DESC 
+			LIMIT 100
+	</select>
+    
+    <select id="getOverNorm" parameterType="BadWaterQualityInfo" resultType="int">
+		SELECT
+			COUNT( t.a ) 
+		FROM
+			( SELECT
+				COUNT( * ) AS a 
+			FROM
+				r_bad_water_quality_info 
+			WHERE
+				<if test="params.areaId != null and params.areaId != ''">
+				area_id = '${params.areaId}' 
+				</if>
+				<if test="params.areaIds != null and params.areaIds != ''">
+				FIND_IN_SET( area_id, '${params.areaIds}' )
+				</if>
+				<if test="params.orgId != null and params.orgId != ''">
+				factory_id = '${params.orgId}' 
+				</if>
+				<if test="params.dateSta != null and params.dateSta != ''">
+				and fill_date &gt;= '${params.dateSta}'
+				</if>
+				<if test="params.dateEnd != null and params.dateEnd != ''">
+				and fill_date &lt;= '${params.dateEnd}'
+				</if>
+				AND effect_icon = '1' 
+				AND pass_flag = '2' 
+			GROUP BY
+				fill_date ) t
+	</select>
+</mapper>

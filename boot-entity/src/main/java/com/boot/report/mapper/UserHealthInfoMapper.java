@@ -1,0 +1,61 @@
+package com.boot.report.mapper;
+
+import com.boot.report.domain.UserHealthInfo;
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Component;
+
+/**
+ * 员工健康信息Mapper接口
+ * 
+ * @author EPL
+ * @date 2020-03-24
+ */
+@Component
+@Mapper
+public interface UserHealthInfoMapper {
+    /**
+     * 新增员工健康信息
+     *
+     * @param userHealthInfo 员工健康信息
+     * @return 结果
+     */
+    public int insert(UserHealthInfo userHealthInfo);
+    /**
+     * 修改员工健康信息
+     *
+     * @param userHealthInfo 员工健康信息
+     * @return 结果
+     */
+    public int update(UserHealthInfo userHealthInfo);
+    public int updateByWhere(UserHealthInfo userHealthInfo);
+    /**
+     * 批量删除员工健康信息
+     *
+     * @param userHealthInfo 删除条件
+     * @return 结果
+     */
+    public int delete(UserHealthInfo userHealthInfo);
+    /**
+     * 获取员工健康信息数量
+     *
+     * @param userHealthInfo 查询条件
+     * @return 结果
+     */
+    public int getCount(UserHealthInfo userHealthInfo);
+    /**
+     * 获取员工健康信息对象
+     * 
+     * @param userHealthInfo 查询条件
+     * @return 员工健康信息
+     */
+    public UserHealthInfo getEntity(UserHealthInfo userHealthInfo);
+    /**
+     * 查询员工健康信息列表
+     * 
+     * @param userHealthInfo 查询条件
+     * @return 员工健康信息集合
+     */
+    public List<UserHealthInfo> getList(UserHealthInfo userHealthInfo);
+}

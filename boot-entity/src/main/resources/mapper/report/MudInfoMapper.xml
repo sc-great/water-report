@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.report.mapper.MudInfoMapper">
+    <resultMap type="MudInfo" id="resultMapping">
+        <result property="id"           column="id"/>
+        <result property="fillDate"     column="fill_date"/>
+        <result property="fillTime"     column="fill_time"/>
+        <result property="todayMud"     column="today_mud"/>
+        <result property="totalMud"     column="total_mud"/>
+        <result property="waterIn"     	column="water_in"/>
+        <result property="dryMud"       column="dry_mud"/>
+        <result property="dryMudTotal"  column="dry_mud_total"/>
+        <result property="factoryId"    column="factory_id"/>
+        <result property="areaId"       column="area_id"/>
+        <result property="fillUserId"   column="fill_user_id"/>
+        <result property="fillUserName" column="fill_user_name"/>
+        <result property="effectIcon"   column="effect_icon"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="MudInfo">
+        <selectKey keyProperty="id" resultType="String" order="BEFORE">
+            select replace(uuid(),'-','') from dual
+        </selectKey>
+        insert into r_mud_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null ">id,</if>
+            fill_date,
+            fill_time,
+            <if test="todayMud != null ">today_mud,</if>
+            <if test="totalMud != null ">total_mud,</if>
+            <if test="waterIn != null ">water_in,</if>
+            <if test="dryMud != null ">dry_mud,</if>
+            <if test="dryMudTotal != null ">dry_mud_total,</if>
+            <if test="factoryId != null ">factory_id,</if>
+            <if test="areaId != null ">area_id,</if>
+            <if test="fillUserId != null ">fill_user_id,</if>
+            <if test="fillUserName != null ">fill_user_name,</if>
+            effect_icon
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null ">#{id},</if>
+            CURDATE(),
+            NOW(),
+            <if test="todayMud != null ">#{todayMud},</if>
+            <if test="totalMud != null ">#{totalMud},</if>
+            <if test="waterIn != null ">#{waterIn},</if>
+            <if test="dryMud != null ">#{dryMud},</if>
+            <if test="dryMudTotal != null ">#{dryMudTotal},</if>
+            <if test="factoryId != null ">#{factoryId},</if>
+            <if test="areaId != null ">#{areaId},</if>
+            <if test="fillUserId != null ">#{fillUserId},</if>
+            <if test="fillUserName != null ">#{fillUserName},</if>
+            '1'
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="MudInfo">
+        update r_mud_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="todayMud != null ">today_mud = #{todayMud},</if>
+            <if test="totalMud != null ">total_mud = #{totalMud},</if>
+            <if test="waterIn != null ">water_in = #{waterIn},</if>
+            <if test="dryMud != null ">dry_mud = #{dryMud},</if>
+            <if test="dryMudTotal != null ">dry_mud_total = #{dryMudTotal},</if>
+            <if test="effectIcon != null ">effect_icon = #{effectIcon},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <sql id="where">
+        <where>
+            <if test="id != null and id != ''">
+                and t.id=#{id}
+            </if>
+            <if test="fillDate != null and fillDate != ''">
+                and t.fill_date = #{fillDate}
+            </if>
+            <if test="factoryId != null and factoryId != ''">
+                and t.factory_id = #{factoryId}
+            </if>
+            <if test="fillUserId != null and fillUserId != ''">
+                and t.fill_user_id = #{fillUserId}
+            </if>
+            <if test="effectIcon != null and effectIcon != ''">
+                and t.effect_icon = #{effectIcon}
+            </if>
+            <if test="areaId != null and areaId != ''">
+                and t.area_id = #{areaId}
+            </if>
+            <if test="params.ids != null">
+                and t.id in
+                <foreach collection="params.ids" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="params.factoryIds != null and params.factoryIds != ''">
+                and FIND_IN_SET(t.factory_id,'${params.factoryIds}')
+            </if>
+            <if test="params.companyId != null and params.companyId != ''">
+                and t.factory_id IN(
+                SELECT org_id FROM sys_org WHERE parent_id='${params.companyId}' AND org_type='3'
+                )
+            </if>
+            <if test="params.areaIds != null and params.areaIds != ''">
+                and FIND_IN_SET(t.area_id,'${params.areaIds}')
+            </if>
+            <if test="params.date != null and params.date != ''">
+                and t.fill_date &lt;= '${params.date}'
+            </if>
+            <!-- 数据范围过滤 -->
+            ${params.dataScope}
+        </where>
+    </sql>
+
+    <delete id="delete" parameterType="MudInfo">
+        delete t from r_mud_info t
+        <include refid="where"/>
+    </delete>
+
+    <select id="getCount" parameterType="MudInfo" resultType="int">
+        select count(*) from r_mud_info t
+        <include refid="where"/>
+    </select>
+
+    <sql id="select">
+        select t.* from r_mud_info t
+    </sql>
+
+    <select id="getEntity" parameterType="MudInfo" resultMap="resultMapping">
+        <include refid="select"/>
+        <include refid="where"/>
+        LIMIT 1
+    </select>
+
+    <select id="getList" parameterType="MudInfo" resultMap="resultMapping">
+        <include refid="select"/>
+        <include refid="where"/>
+        order by t.fill_date desc
+    </select>
+    <!--污泥求和-->
+    <select id="getSum" parameterType="MudInfo" resultType="map">
+        SELECT 
+        IFNULL(SUM(t.today_mud),0) AS sumTodayMud, IFNULL(SUM(t.total_mud),0) AS sumTotalMud, 
+        IFNULL(SUM(t.dry_mud),0) AS sumDryMud, IFNULL(SUM(t.dry_mud_total),0) AS dryMudTotal 
+        FROM r_mud_info t
+        <where>
+			<if test="fillDate != null  and fillDate != ''">
+				and t.fill_date = #{fillDate}
+			</if>
+
+			<if test="params.areaIds != null  and params.areaIds != ''">
+				and FIND_IN_SET(t.area_id,'${params.areaIds}')
+			</if>
+
+			<if test="effectIcon != null  and effectIcon != ''">
+				and t.effect_icon = #{effectIcon}
+			</if>
+
+			<if test="areaId != null  and areaId != ''">
+				and t.area_id=#{areaId}
+			</if>
+			<if test="factoryId != null  and factoryId != ''">
+				and t.factory_id = #{factoryId}
+			</if>
+			<if test="params.companyId != null  and params.companyId != ''">
+				and t.factory_id IN(
+				SELECT org_id FROM sys_org WHERE parent_id='${params.companyId}' AND
+				org_type='3'
+				)
+			</if>
+
+		</where>
+    </select>
+    
+    <!-- 手机端污泥情况：区域、公司、厂区所选页面日期以前的累计量统计 -->
+    
+    <select id="getSumByAppArea" parameterType="MudInfo" resultType="map">
+        SELECT 
+        IFNULL(SUM(t.today_mud),0) AS sumTodayMud, 
+        
+        IFNULL(SUM(t.dry_mud),0) AS sumDryMud
+        
+        FROM r_mud_info t
+       <where>
+			<if test="fillDate != null  and fillDate != ''">
+				and t.fill_date &lt; #{fillDate}
+			</if>
+
+			<if test="params.areaIds != null  and params.areaIds != ''">
+				and FIND_IN_SET(t.area_id,'${params.areaIds}')
+			</if>
+
+			<if test="effectIcon != null  and effectIcon != ''">
+				and t.effect_icon = #{effectIcon}
+			</if>
+			<if test="areaId != null  and areaId != ''">
+				and t.area_id=#{areaId}
+			</if>
+
+			<if test="factoryId != null  and factoryId != ''">
+				and t.factory_id = #{factoryId}
+			</if>
+
+			<if test="params.companyId != null  and params.companyId != ''">
+				and t.factory_id IN(
+				SELECT org_id FROM sys_org WHERE parent_id='${params.companyId}' AND
+				org_type='3'
+				)
+			</if>
+		</where>
+    </select>
+    
+    <select id="getLatest" parameterType="MudInfo" resultMap="resultMapping">
+        <include refid="select"/>
+        where t.fill_date &lt; #{fillDate} and t.factory_id = #{factoryId} and t.effect_icon = #{effectIcon}
+        order by t.fill_time desc LIMIT 1
+    </select>
+    
+    <!--污泥当日查询：APP上面的折线图统计-->
+    <select id="getTodayForChart" parameterType="MudInfo" resultType="map">
+        SELECT 
+        IFNULL(SUM(t.today_mud), 0) AS todayMud, 
+        IFNULL(SUM(t.dry_mud), 0) AS dryMud
+        FROM r_mud_info t
+        <where>
+        	<if test="fillDate != null and fillDate != ''">
+                and t.fill_date = #{fillDate}
+            </if>
+            <if test="effectIcon != null and effectIcon != ''">
+                and t.effect_icon = #{effectIcon}
+            </if>
+            <if test="params.areaIds != null and params.areaIds != ''">
+                and FIND_IN_SET(t.area_id, '${params.areaIds}')
+            </if>
+            <if test="factoryId != null and factoryId != ''">
+                and t.factory_id = #{factoryId}
+            </if>
+        </where>
+    </select>
+    
+    <!--污泥求和：APP上面的折线图统计，展示一段时间的数据，如果某一天的数据未填报，累计数据不能为0，所以采用累加的方式查询-->
+    <select id="getSumForChart" parameterType="MudInfo" resultType="map">
+        SELECT 
+        IFNULL(SUM(t.today_mud), 0) AS totalMud, 
+        IFNULL(SUM(t.dry_mud), 0) AS dryMudTotal
+        FROM r_mud_info t
+        <where>
+            <if test="fillDate != null and fillDate != ''">
+                and t.fill_date &lt;= #{fillDate}
+            </if>
+            <if test="effectIcon != null and effectIcon != ''">
+                and t.effect_icon = #{effectIcon}
+            </if>
+            <if test="params.areaIds != null and params.areaIds != ''">
+                and FIND_IN_SET(t.area_id, '${params.areaIds}')
+            </if>
+            <if test="factoryId != null and factoryId != ''">
+                and t.factory_id = #{factoryId}
+            </if>
+        </where>
+    </select>
+</mapper>

@@ -1,0 +1,98 @@
+package com.boot.system.mapper;
+
+import java.util.List;
+import java.util.Map;
+
+import com.boot.system.domain.SysRoleOrg;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import com.boot.system.domain.SysOrg;
+import org.springframework.stereotype.Component;
+
+/**
+ * 部门管理 数据层
+ * 
+ * @author epl
+ */
+@Component
+@Mapper
+public interface SysOrgMapper
+{
+    /**
+     * 新增
+     *
+     * @param sysOrg 机构信息
+     * @return 影响行数
+     */
+    public int insert(SysOrg sysOrg);
+    /**
+     * 删除
+     *
+     * @param sysOrg 条件
+     * @return 结果
+     */
+    public int delete(SysOrg sysOrg);
+    /**
+     * 删除全部（物理删除）
+     *
+     * */
+    public int deleteAll();
+    /**
+     * 修改
+     *
+     * @param sysOrg 机构信息
+     * @return 影响行数
+     */
+    public int update(SysOrg sysOrg);
+    /**
+     * 查询数量
+     * 
+     * @param sysOrg 条件
+     * @return 结果
+     */
+    public int getCount(SysOrg sysOrg);
+
+    /**
+     * 查询实体对象
+     * 
+     * @param sysOrg 条件
+     * @return 实体对象
+     */
+    public SysOrg getEntity(SysOrg sysOrg);
+
+    /**
+     * 查询对象集合
+     * 
+     * @param sysOrg 条件
+     * @return 集合
+     */
+    public List<SysOrg> findList(SysOrg sysOrg);
+    /**
+     * 查询组织机构
+     *
+     * @param orgIds 条件
+     * @return 集合
+     */
+    public List<SysOrg> findListByIds(@Param("orgIds") String[] orgIds);
+
+    /**
+     * 查询用户所属机构集合
+     *
+     * @param userId 用户ID
+     * @return 机构集合
+     */
+    public List<SysOrg> getOrgListByUserId(@Param("userId") String userId);
+    /**
+     * 查询角色所属机构集合
+     *
+     * @param roleId 角色ID
+     * @return 机构集合
+     */
+    public List<SysOrg> getOrgListByRoleId(@Param("roleId") String roleId);
+    /**
+     * 区域下的水厂机构
+     * @param sysOrg
+     * @return
+     */
+    public List<SysOrg> findListByFactory(SysOrg sysOrg);
+}

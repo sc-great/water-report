@@ -1,0 +1,321 @@
+package com.boot.report.domain;
+
+import com.boot.common.core.domain.BaseEntity;
+
+/**
+ * 水厂当日用药信息填报对象 TodayMedicineInfo
+ *
+ * @author EPL
+ * @date 2020-03-24
+ */
+public class TodayMedicineInfo extends BaseEntity{
+    private static final long serialVersionUID = 1L;
+
+    /** 编号 */
+    private String id;
+
+    /** 填报日期 */
+    private String fillDate;
+
+    /** 填报时间 */
+    private String fillTime;
+
+    /** 当日PAC */
+    private Double todayPac;
+
+    /** 累计PAC */
+    private Double totalPac;
+
+    /** 当日PAM阴离子 */
+    private Double todayPamYin;
+
+    /** 累计PAM阴离子 */
+    private Double totalPamYin;
+
+    /** 当日PAM阳离子 */
+    private Double todayPamYang;
+
+    /** 累计PAM阳离子 */
+    private Double totalPamYang;
+
+    /** 当日复核除磷剂 */
+    private Double todayPhosphorus;
+
+    /** 累计复核除磷剂 */
+    private Double totalPhosphorus;
+
+    /** 当日NaCLO */
+    private Double todayNaclo;
+
+    /** 累计NaCLO */
+    private Double totalNaclo;
+
+    /** 当日石灰 */
+    private Double todayLime;
+
+    /** 累计石灰 */
+    private Double totalLime;
+
+    /** 当日葡萄糖 */
+    private Double todayGlucose;
+
+    /** 累计葡萄糖 */
+    private Double totalGlucose;
+
+    /** 当日氯酸钠 */
+    private Double todaySc;
+
+    /** 累计氯酸钠 */
+    private Double totalSc;
+
+    /** 当日乙酸钠 */
+    private Double todaySa;
+
+    /** 累计乙酸钠 */
+    private Double totalSa;
+
+    /** 当日氯化氢 */
+    private Double todayHCL;
+
+    /** 累计氯化氢 */
+    private Double totalHCL;
+
+    /** 所属水厂 */
+    private String factoryId;
+
+    /** 所属区域 */
+    private String areaId;
+
+    /** 填报人编号 */
+    private String fillUserId;
+
+    /** 填报人 */
+    private String fillUserName;
+
+    /** 有效标识(1-有效 2-无效 ) */
+    private String effectIcon;
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setFillDate(String fillDate) {
+        this.fillDate = fillDate;
+    }
+
+    public String getFillDate() {
+        return fillDate;
+    }
+
+    public void setFillTime(String fillTime) {
+        this.fillTime = fillTime;
+    }
+
+    public String getFillTime() {
+        return fillTime;
+    }
+
+    public void setTodayPac(Double todayPac) {
+        this.todayPac = todayPac;
+    }
+
+    public Double getTodayPac() {
+        return todayPac;
+    }
+
+    public void setTotalPac(Double totalPac) {
+        this.totalPac = totalPac;
+    }
+
+    public Double getTotalPac() {
+        return totalPac;
+    }
+
+    public void setTodayPamYin(Double todayPamYin) {
+        this.todayPamYin = todayPamYin;
+    }
+
+    public Double getTodayPamYin() {
+        return todayPamYin;
+    }
+
+    public void setTotalPamYin(Double totalPamYin) {
+        this.totalPamYin = totalPamYin;
+    }
+
+    public Double getTotalPamYin() {
+        return totalPamYin;
+    }
+
+    public void setTodayPamYang(Double todayPamYang) {
+        this.todayPamYang = todayPamYang;
+    }
+
+    public Double getTodayPamYang() {
+        return todayPamYang;
+    }
+
+    public void setTotalPamYang(Double totalPamYang) {
+        this.totalPamYang = totalPamYang;
+    }
+
+    public Double getTotalPamYang() {
+        return totalPamYang;
+    }
+
+    public void setTodayPhosphorus(Double todayPhosphorus) {
+        this.todayPhosphorus = todayPhosphorus;
+    }
+
+    public Double getTodayPhosphorus() {
+        return todayPhosphorus;
+    }
+
+    public void setTotalPhosphorus(Double totalPhosphorus) {
+        this.totalPhosphorus = totalPhosphorus;
+    }
+
+    public Double getTotalPhosphorus() {
+        return totalPhosphorus;
+    }
+
+    public void setTodayNaclo(Double todayNaclo) {
+        this.todayNaclo = todayNaclo;
+    }
+
+    public Double getTodayNaclo() {
+        return todayNaclo;
+    }
+
+    public void setTotalNaclo(Double totalNaclo) {
+        this.totalNaclo = totalNaclo;
+    }
+
+    public Double getTotalNaclo() {
+        return totalNaclo;
+    }
+
+    public void setTodayLime(Double todayLime) {
+        this.todayLime = todayLime;
+    }
+
+    public Double getTodayLime() {
+        return todayLime;
+    }
+
+    public void setTotalLime(Double totalLime) {
+        this.totalLime = totalLime;
+    }
+
+    public Double getTotalLime() {
+        return totalLime;
+    }
+
+    public Double getTodayGlucose() {
+        return todayGlucose;
+    }
+
+    public void setTodayGlucose(Double todayGlucose) {
+        this.todayGlucose = todayGlucose;
+    }
+
+    public Double getTotalGlucose() {
+        return totalGlucose;
+    }
+
+    public void setTotalGlucose(Double totalGlucose) {
+        this.totalGlucose = totalGlucose;
+    }
+
+    public void setTodaySc(Double todaySc) {
+        this.todaySc = todaySc;
+    }
+
+    public Double getTodaySc() {
+        return todaySc;
+    }
+
+    public void setTotalSc(Double totalSc) {
+        this.totalSc = totalSc;
+    }
+
+    public Double getTotalSc() {
+        return totalSc;
+    }
+
+    public void setTodaySa(Double todaySa) {
+        this.todaySa = todaySa;
+    }
+
+    public Double getTodaySa() {
+        return todaySa;
+    }
+
+    public void setTotalSa(Double totalSa) {
+        this.totalSa = totalSa;
+    }
+
+    public Double getTotalSa() {
+        return totalSa;
+    }
+
+    public void setFactoryId(String factoryId) {
+        this.factoryId = factoryId;
+    }
+
+    public String getFactoryId() {
+        return factoryId;
+    }
+
+    public void setAreaId(String areaId) {
+        this.areaId = areaId;
+    }
+
+    public String getAreaId() {
+        return areaId;
+    }
+
+    public void setFillUserId(String fillUserId) {
+        this.fillUserId = fillUserId;
+    }
+
+    public String getFillUserId() {
+        return fillUserId;
+    }
+
+    public void setFillUserName(String fillUserName) {
+        this.fillUserName = fillUserName;
+    }
+
+    public String getFillUserName() {
+        return fillUserName;
+    }
+
+    public void setEffectIcon(String effectIcon) {
+        this.effectIcon = effectIcon;
+    }
+
+    public String getEffectIcon() {
+        return effectIcon;
+    }
+
+    public Double getTodayHCL() {
+        return todayHCL;
+    }
+
+    public void setTodayHCL(Double todayHCL) {
+        this.todayHCL = todayHCL;
+    }
+
+    public Double getTotalHCL() {
+        return totalHCL;
+    }
+
+    public void setTotalHCL(Double totalHCL) {
+        this.totalHCL = totalHCL;
+    }
+}

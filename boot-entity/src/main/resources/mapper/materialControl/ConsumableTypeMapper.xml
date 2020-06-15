@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.materialControl.mapper.ConsumableTypeMapper">
+    <resultMap type="ConsumableType" id="resultMapping">
+        <result property="id"           column="id"/>
+        <result property="name"     	column="t_name"/>
+        <result property="model"     	column="t_model"/>
+        <result property="unit"     	column="t_unit"/>
+        <result property="createTime"  	column="create_time"/>
+        <result property="updateTime"	column="update_time"/>
+        <result property="note"    		column="t_note"/>
+        <result property="info"  		column="t_info"/>
+    </resultMap>
+    
+    <sql id="select">
+        select t.* from m_consumable_type t
+    </sql>
+    
+    <sql id="where">
+        <where>
+            <if test="id != null and id != ''">
+                and t.id = #{id}
+            </if>
+            <if test="name != null and name != ''">
+                and t.t_name = #{name}
+            </if>
+            <if test="model != null and model != ''">
+                and t.t_model = #{model}
+            </if>
+            <if test="unit != null and unit != ''">
+                and t.t_unit = #{unit}
+            </if>
+            <if test="param != null and param != ''">
+                and (
+                	t.t_name like concat('%', #{param}, '%')
+                	or t.t_model like concat('%', #{param}, '%')
+                	or t.create_time like concat('', #{param}, '%')
+                	or t.update_time like concat('', #{param}, '%')
+                	or t.t_note like concat('%', #{param}, '%')
+                	or t.t_info like concat('%', #{param}, '%')
+                )
+            </if>
+            <if test="params.updateId != null and params.updateId != ''">
+                and t.id != #{params.updateId}
+            </if>
+            <if test="params.ids != null">
+                and t.id in
+                <foreach collection="params.ids" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+            <!-- 数据范围过滤 -->
+            ${params.dataScope}
+        </where>
+    </sql>
+    
+    <select id="getList" parameterType="ConsumableType" resultMap="resultMapping">
+        <include refid="select"/>
+        <include refid="where"/>
+        order by t.t_name, t.t_model asc
+    </select>
+    
+    <insert id="insert" parameterType="ConsumableType">
+        <selectKey keyProperty="id" resultType="String" order="BEFORE">
+            select replace(uuid(),'-','') from dual
+        </selectKey>
+        insert into m_consumable_type
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null ">id,</if>
+            <if test="name != null ">t_name,</if>
+            <if test="model != null and model != ''">t_model,</if>
+            <if test="unit != null and unit != ''">t_unit,</if>
+            <if test="note != null and note != ''">t_note,</if>
+            <if test="info != null and info != ''">t_info,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null ">#{id},</if>
+            <if test="name != null ">#{name},</if>
+            <if test="model != null and model != ''">#{model},</if>
+            <if test="unit != null and unit != ''">#{unit},</if>
+            <if test="note != null and note != ''">#{note},</if>
+            <if test="info != null and info != ''">#{info},</if>
+            NOW()
+        </trim>
+    </insert>
+    
+    <select id="getEntity" parameterType="ConsumableType" resultMap="resultMapping">
+        <include refid="select"/>
+        <include refid="where"/>
+        LIMIT 1
+    </select>
+    
+    <select id="getById" parameterType="ConsumableType" resultMap="resultMapping">
+        <include refid="select"/>
+        where id = #{id}
+    </select>
+    
+    <update id="update" parameterType="ConsumableType">
+        update m_consumable_type
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null ">t_name = #{name},</if>
+            <if test="model != null ">t_model = #{model},</if>
+            <if test="unit != null ">t_unit = #{unit},</if>
+            <if test="note != null ">t_note = #{note},</if>
+            <if test="info != null ">t_info = #{info},</if>
+            update_time = NOW()
+        </trim>
+        where id = #{id}
+    </update>
+    
+    <delete id="delete" parameterType="ConsumableType">
+        delete t from m_consumable_type t
+        <include refid="where"/>
+    </delete>
+</mapper>

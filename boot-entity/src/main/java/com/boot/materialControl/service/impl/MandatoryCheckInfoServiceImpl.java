@@ -1,0 +1,127 @@
+package com.boot.materialControl.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.boot.common.core.text.Convert;
+import com.boot.materialControl.domain.MandatoryCheckInfo;
+import com.boot.materialControl.mapper.MandatoryCheckInfoMapper;
+import com.boot.materialControl.service.IMandatoryCheckInfoService;
+import com.boot.report.domain.AlarmInfo;
+import com.boot.report.mapper.AlarmInfoMapper;
+
+/**
+ * 强制检测Service业务层处理
+ * 
+ * @author yangxiaojun
+ * @date 2020-04-24
+ */
+@Service
+public class MandatoryCheckInfoServiceImpl implements IMandatoryCheckInfoService {
+	@Autowired
+	private MandatoryCheckInfoMapper mandatoryCheckInfoMapper;
+	@Autowired
+	private AlarmInfoMapper alarmInfoMapper;
+
+	/**
+	 * 新增强制检测
+	 *
+	 * @param mandatoryCheckInfo
+	 * @return 结果
+	 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public int add(MandatoryCheckInfo mandatoryCheckInfo) {
+		return mandatoryCheckInfoMapper.insert(mandatoryCheckInfo);
+	}
+
+	/**
+	 * 修改强制检测
+	 *
+	 * @param mandatoryCheckInfo
+	 * @return 结果
+	 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public int update(MandatoryCheckInfo mandatoryCheckInfo) {
+		return mandatoryCheckInfoMapper.update(mandatoryCheckInfo);
+	}
+
+	/**
+	 * 删除强制检测
+	 *
+	 * @param ids 需要删除的数据ID
+	 * @return 结果
+	 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public int deleteByIds(String ids) {
+		int result = 0;
+		if (!ids.isEmpty()) {
+			// 报警数据删除
+			AlarmInfo alarmInfo = new AlarmInfo();
+			alarmInfo.getParams().put("objIds", Convert.toStrArray(ids));
+			alarmInfoMapper.delete(alarmInfo);
+			// 强制检测删除
+			MandatoryCheckInfo mandatoryCheckInfo = new MandatoryCheckInfo();
+			mandatoryCheckInfo.getParams().put("ids", Convert.toStrArray(ids));
+			result = mandatoryCheckInfoMapper.delete(mandatoryCheckInfo);
+		}
+		return result;
+	}
+
+	/**
+	 * 查询强制检测数量
+	 *
+	 * @param mandatoryCheckInfo 查询条件
+	 * @return 强制检测数量
+	 */
+	@Override
+	public int getCount(MandatoryCheckInfo mandatoryCheckInfo) {
+		return mandatoryCheckInfoMapper.getCount(mandatoryCheckInfo);
+	}
+
+	/**
+	 * 获取强制检测实体对象
+	 * 
+	 * @param id 强制检测ID
+	 * @return 强制检测对象
+	 */
+	@Override
+	public MandatoryCheckInfo getEntityById(String id) {
+		MandatoryCheckInfo testInfo = new MandatoryCheckInfo();
+		testInfo.setId(id);
+		return mandatoryCheckInfoMapper.getEntity(testInfo);
+	}
+
+	@Override
+	public MandatoryCheckInfo getEntity(MandatoryCheckInfo mandatoryCheckInfo) {
+		return mandatoryCheckInfoMapper.getEntity(mandatoryCheckInfo);
+	}
+
+	/**
+	 * 查询强制检测列表
+	 * 
+	 * @param mandatoryCheckInfo
+	 * @return 强制检测列表
+	 */
+	@Override
+	public List<MandatoryCheckInfo> getList(MandatoryCheckInfo mandatoryCheckInfo) {
+		return mandatoryCheckInfoMapper.getList(mandatoryCheckInfo);
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public int doDispose(MandatoryCheckInfo mandatoryCheckInfo) {
+		// 旧数据处理
+		MandatoryCheckInfo tempParam = new MandatoryCheckInfo();
+		tempParam.setId(mandatoryCheckInfo.getId());
+		tempParam.setEffectIcon("2");
+		mandatoryCheckInfoMapper.update(tempParam);
+		// 新数据添加
+		return mandatoryCheckInfoMapper.insert(mandatoryCheckInfo);
+	}
+}

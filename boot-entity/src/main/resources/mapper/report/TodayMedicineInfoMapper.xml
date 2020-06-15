@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.boot.report.mapper.TodayMedicineInfoMapper">
+	<resultMap type="TodayMedicineInfo" id="resultMapping">
+		<result property="id" 				column="id" />
+		<result property="fillDate" 		column="fill_date" />
+		<result property="fillTime" 		column="fill_time" />
+		<result property="todayPac" 		column="today_PAC" />
+		<result property="totalPac" 		column="total_PAC" />
+		<result property="todayPamYin" 		column="today_PAM_yin" />
+		<result property="totalPamYin" 		column="total_PAM_yin" />
+		<result property="todayPamYang"		column="today_PAM_yang" />
+		<result property="totalPamYang" 	column="total_PAM_yang" />
+		<result property="todayPhosphorus" 	column="today_phosphorus" />
+		<result property="totalPhosphorus" 	column="total_phosphorus" />
+		<result property="todayNaclo" 		column="today_NaCLO" />
+		<result property="totalNaclo" 		column="total_NaCLO" />
+		<result property="todayLime" 		column="today_lime" />
+		<result property="totalLime" 		column="total_lime" />
+		<result property="todayGlucose" 	column="today_glucose" />
+		<result property="totalGlucose" 	column="total_glucose" />
+		<result property="todaySc" 			column="today_SC" />
+		<result property="totalSc" 			column="total_SC" />
+		<result property="todaySa" 			column="today_SA" />
+		<result property="totalSa" 			column="total_SA" />
+		<result property="todayHCL" 		column="today_HCL" />
+		<result property="totalHCL" 		column="total_HCL" />
+		<result property="factoryId" 		column="factory_id" />
+		<result property="areaId" 			column="area_id" />
+		<result property="fillUserId" 		column="fill_user_id" />
+		<result property="fillUserName" 	column="fill_user_name" />
+		<result property="effectIcon" 		column="effect_icon" />
+	</resultMap>
+
+	<insert id="insert" parameterType="TodayMedicineInfo">
+		<selectKey keyProperty="id" resultType="String" order="BEFORE">
+			select replace(uuid(),'-','') from dual
+		</selectKey>
+		insert into r_today_medicine_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null ">id,</if>
+			fill_date,
+			fill_time,
+			<if test="todayPac != null">today_PAC,</if>
+			<if test="totalPac != null">total_PAC,</if>
+			<if test="todayPamYin != null">today_PAM_yin,</if>
+			<if test="totalPamYin != null">total_PAM_yin,</if>
+			<if test="todayPamYang != null">today_PAM_yang,</if>
+			<if test="totalPamYang != null">total_PAM_yang,</if>
+			<if test="todayPhosphorus != null">today_phosphorus,</if>
+			<if test="totalPhosphorus != null">total_phosphorus,</if>
+			<if test="todayNaclo != null">today_NaCLO,</if>
+			<if test="totalNaclo != null">total_NaCLO,</if>
+			<if test="todayLime != null">today_lime,</if>
+			<if test="totalLime != null">total_lime,</if>
+			<if test="todayGlucose != null">today_glucose,</if>
+			<if test="totalGlucose != null">total_glucose,</if>
+			<if test="todaySc != null">today_SC,</if>
+			<if test="totalSc != null">total_SC,</if>
+			<if test="todaySa != null">today_SA,</if>
+			<if test="totalSa != null">total_SA,</if>
+			<if test="todayHCL != null">today_HCL,</if>
+			<if test="totalHCL != null">total_HCL,</if>
+			<if test="factoryId != null">factory_id,</if>
+			<if test="areaId != null">area_id,</if>
+			<if test="fillUserId != null">fill_user_id,</if>
+			<if test="fillUserName != null">fill_user_name,</if>
+			effect_icon
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null ">#{id},</if>
+			CURDATE(),
+			NOW(),
+			<if test="todayPac != null">#{todayPac},</if>
+			<if test="totalPac != null">#{totalPac},</if>
+			<if test="todayPamYin != null">#{todayPamYin},</if>
+			<if test="totalPamYin != null">#{totalPamYin},</if>
+			<if test="todayPamYang != null">#{todayPamYang},</if>
+			<if test="totalPamYang != null">#{totalPamYang},</if>
+			<if test="todayPhosphorus != null">#{todayPhosphorus},</if>
+			<if test="totalPhosphorus != null">#{totalPhosphorus},</if>
+			<if test="todayNaclo != null">#{todayNaclo},</if>
+			<if test="totalNaclo != null">#{totalNaclo},</if>
+			<if test="todayLime != null">#{todayLime},</if>
+			<if test="totalLime != null">#{totalLime},</if>
+			<if test="todayGlucose != null">#{todayGlucose},</if>
+			<if test="totalGlucose != null">#{totalGlucose},</if>
+			<if test="todaySc != null">#{todaySc},</if>
+			<if test="totalSc != null">#{totalSc},</if>
+			<if test="todaySa != null">#{todaySa},</if>
+			<if test="totalSa != null">#{totalSa},</if>
+			<if test="todayHCL != null">#{todayHCL},</if>
+			<if test="totalHCL != null">#{totalHCL},</if>
+			<if test="factoryId != null">#{factoryId},</if>
+			<if test="areaId != null">#{areaId},</if>
+			<if test="fillUserId != null">#{fillUserId},</if>
+			<if test="fillUserName != null">#{fillUserName},</if>
+			'1'
+		</trim>
+	</insert>
+
+	<update id="update" parameterType="TodayMedicineInfo">
+		update r_today_medicine_info
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="todayPac != null">today_PAC = #{todayPac},</if>
+			<if test="totalPac != null">total_PAC = #{totalPac},</if>
+			<if test="todayPamYin != null">today_PAM_yin = #{todayPamYin},</if>
+			<if test="totalPamYin != null">total_PAM_yin = #{totalPamYin},</if>
+			<if test="todayPamYang != null">today_PAM_yang = #{todayPamYang},</if>
+			<if test="totalPamYang != null">total_PAM_yang = #{totalPamYang},</if>
+			<if test="todayPhosphorus != null">today_phosphorus = #{todayPhosphorus},</if>
+			<if test="totalPhosphorus != null">total_phosphorus = #{totalPhosphorus},</if>
+			<if test="todayNaclo != null">today_NaCLO = #{todayNaclo},</if>
+			<if test="totalNaclo != null">total_NaCLO = #{totalNaclo},</if>
+			<if test="todayLime != null">today_lime = #{todayLime},</if>
+			<if test="totalLime != null">total_lime = #{totalLime},</if>
+			<if test="todayGlucose != null">today_glucose = #{todayGlucose},</if>
+			<if test="totalGlucose != null">total_glucose = #{totalGlucose},</if>
+			<if test="todaySc != null">today_SC = #{todaySc},</if>
+			<if test="totalSc != null">total_SC = #{totalSc},</if>
+			<if test="todaySa != null">today_SA = #{todaySa},</if>
+			<if test="totalSa != null">total_SA = #{totalSa},</if>
+			<if test="todayHCL != null">today_HCL = #{todayHCL},</if>
+			<if test="totalHCL != null">total_HCL = #{totalHCL},</if>
+			<if test="effectIcon != null">effect_icon = #{effectIcon},</if>
+		</trim>
+		where id = #{id}
+	</update>
+
+	<sql id="where">
+		<where>
+			<if test="id != null and id != ''">
+				and t.id=#{id}
+			</if>
+			<if test="fillDate != null and fillDate != ''">
+				and t.fill_date = #{fillDate}
+			</if>
+			<if test="factoryId != null and factoryId != ''">
+				and t.factory_id = #{factoryId}
+			</if>
+			<if test="areaId != null and areaId != ''">
+				and t.area_id = #{areaId}
+			</if>
+			<if test="fillUserId != null and fillUserId != ''">
+				and t.fill_user_id = #{fillUserId}
+			</if>
+			<if test="effectIcon != null and effectIcon != ''">
+				and t.effect_icon = #{effectIcon}
+			</if>
+			<if test="params.ids != null">
+				and t.id in
+				<foreach collection="params.ids" item="id" open="(" separator="," close=")">
+					#{id}
+				</foreach>
+			</if>
+			<if test="params.factoryIds != null and params.factoryIds != ''">
+				and FIND_IN_SET(t.factory_id,'${params.factoryIds}')
+			</if>
+			<if test="params.companyId != null and params.companyId != ''">
+				and t.factory_id IN(
+					SELECT org_id FROM sys_org WHERE parent_id='${params.companyId}' AND org_type='3'
+				)
+			</if>
+			<if test="params.areaIds != null and params.areaIds != ''">
+				and FIND_IN_SET(t.area_id,'${params.areaIds}')
+			</if>
+			<!-- 数据范围过滤 -->
+			${params.dataScope}
+		</where>
+	</sql>
+
+	<delete id="delete" parameterType="TodayMedicineInfo">
+		delete t from r_today_medicine_info t
+		<include refid="where" />
+	</delete>
+
+	<select id="getCount" parameterType="TodayMedicineInfo"
+		resultType="int">
+		select count(*) from r_today_medicine_info t
+		<include refid="where" />
+	</select>
+
+	<sql id="select">
+		select t.* from r_today_medicine_info t
+	</sql>
+
+	<select id="getEntity" parameterType="TodayMedicineInfo" resultMap="resultMapping">
+		<include refid="select" />
+		<include refid="where" />
+		LIMIT 1
+	</select>
+
+	<select id="getList" parameterType="TodayMedicineInfo" resultMap="resultMapping">
+		<include refid="select" />
+		<include refid="where" />
+		order by t.fill_date desc
+	</select>
+
+	<!--药耗求和 -->
+	<select id="getSum" parameterType="TodayMedicineInfo" resultType="map">
+		SELECT
+		IFNULL(SUM(t.today_PAC),0) AS sumTodayPAC,
+		IFNULL(SUM(t.total_PAC),0) AS sumTotalPAC,
+
+		IFNULL(SUM(t.today_PAM_yin),0) AS sumTodayPAMYin,
+		IFNULL(SUM(t.total_PAM_yin),0) AS sumTotalPAMYin,
+
+		IFNULL(SUM(t.today_PAM_yang),0) AS sumTodayPAMYang,
+		IFNULL(SUM(t.total_PAM_yang),0) AS sumTotalPAMYang,
+
+		IFNULL(SUM(t.today_phosphorus),0) AS sumTodayPhosphorus,
+		IFNULL(SUM(t.total_phosphorus),0) AS sumTotalPhosphorus,
+
+		IFNULL(SUM(t.today_NaCLO),0) AS sumTodayNaCLO,
+		IFNULL(SUM(t.total_NaCLO),0) AS sumTotalNaCLO,
+
+		IFNULL(SUM(t.today_lime),0) AS sumTodayLime,
+		IFNULL(SUM(t.total_lime),0) AS sumTotalLime,
+
+		IFNULL(SUM(t.today_glucose),0) AS sumTodayGlucose,
+		IFNULL(SUM(t.total_glucose),0) AS sumTotalGlucose,
+
+		IFNULL(SUM(t.today_SC),0) AS sumTodaySC,
+		IFNULL(SUM(t.total_SC),0) AS
+		sumTotalSC,
+
+		IFNULL(SUM(t.today_SA),0) AS sumTodaySA,
+		IFNULL(SUM(t.total_SA),0) AS sumTotalSA,
+
+		IFNULL(SUM(t.today_HCL),0) AS
+		sumTodayHCL,
+		IFNULL(SUM(t.total_HCL),0) AS sumTotalHCL
+		FROM
+		r_today_medicine_info t
+		<where>
+			<if test="fillDate != null and fillDate != ''">
+				and t.fill_date = #{fillDate}
+			</if>
+			<if test="params.areaIds != null and params.areaIds != ''">
+				and FIND_IN_SET(t.area_id,'${params.areaIds}')
+			</if>
+
+			<if test="effectIcon != null and effectIcon != ''">
+				and t.effect_icon = #{effectIcon}
+			</if>
+			<if test="areaId != null and areaId != ''">
+				and t.area_id=#{areaId}
+			</if>
+			<if test="factoryId != null and factoryId != ''">
+				and t.factory_id = #{factoryId}
+			</if>
+			<if test="params.companyId != null and params.companyId != ''">
+				and t.factory_id IN(
+					SELECT org_id FROM sys_org WHERE parent_id='${params.companyId}' AND org_type='3'
+				)
+			</if>
+		</where>
+	</select>
+	<!-- 手机端药量统计:区域、公司、工厂所选日期前的累计药量 -->
+	<select id="getSumByAppBefore" parameterType="TodayMedicineInfo" resultType="map">
+		SELECT
+		IFNULL(SUM(t.today_PAC),0) AS sumTodayPAC,
+		IFNULL(SUM(t.today_PAM_yin),0) AS sumTodayPAMYin,
+		IFNULL(SUM(t.today_PAM_yang),0) AS sumTodayPAMYang,
+		IFNULL(SUM(t.today_phosphorus),0) AS sumTodayPhosphorus,
+		IFNULL(SUM(t.today_NaCLO),0) AS sumTodayNaCLO,
+		IFNULL(SUM(t.today_lime),0) AS sumTodayLime,
+		IFNULL(SUM(t.today_glucose),0) AS sumTodayGlucose,
+		IFNULL(SUM(t.today_SC),0) AS sumTodaySC,
+		IFNULL(SUM(t.today_SA),0) AS
+		sumTodaySA,
+		IFNULL(SUM(t.today_HCL),0) AS sumTodayHCL
+		FROM
+		r_today_medicine_info t
+		<where>
+			<if test="fillDate != null and fillDate != ''">
+				and t.fill_date &lt; #{fillDate}
+			</if>
+			<if test="params.areaIds != null and params.areaIds != ''">
+				and FIND_IN_SET(t.area_id,'${params.areaIds}')
+			</if>
+			<if test="effectIcon != null and effectIcon != ''">
+				and t.effect_icon = #{effectIcon}
+			</if>
+			<if test="areaId != null and areaId != ''">
+				and t.area_id=#{areaId}
+			</if>
+			<if test="factoryId != null and factoryId != ''">
+				and t.factory_id = #{factoryId}
+			</if>
+			<if test="params.companyId != null and params.companyId != ''">
+				and t.factory_id IN(
+					SELECT org_id FROM sys_org WHERE parent_id='${params.companyId}' AND org_type='3'
+				)
+			</if>
+		</where>
+	</select>
+
+	<!-- 手机端登录后的水量统计 :当日前累计的药量 -->
+	<select id="getSumByApp" parameterType="TodayMedicineInfo" resultType="map">
+		SELECT
+		IFNULL(SUM(t.today_PAC),0) AS sumTodayPAC,
+		IFNULL(SUM(t.today_PAM_yin),0) AS sumTodayPAMYin,
+		IFNULL(SUM(t.today_PAM_yang),0) AS sumTodayPAMYang,
+		IFNULL(SUM(t.today_phosphorus),0) AS sumTodayPhosphorus,
+		IFNULL(SUM(t.today_NaCLO),0) AS sumTodayNaCLO,
+		IFNULL(SUM(t.today_lime),0) AS sumTodayLime,
+		IFNULL(SUM(t.today_glucose),0) AS sumTodayGlucose,
+		IFNULL(SUM(t.today_SC),0) AS sumTodaySC,
+		IFNULL(SUM(t.today_SA),0) AS
+		sumTodaySA,
+		IFNULL(SUM(t.today_HCL),0) AS sumTodayHCL
+		FROM
+		r_today_medicine_info t
+		<where>
+			<if test="fillDate != null and fillDate != ''">
+				and t.fill_date &lt; CURDATE()
+			</if>
+
+			<if test="params.areaIds != null and params.areaIds != ''">
+				and FIND_IN_SET(t.area_id,'${params.areaIds}')
+			</if>
+			<if test="effectIcon != null and effectIcon != ''">
+				and t.effect_icon = #{effectIcon}
+			</if>
+            <if test="factoryId != null  and factoryId != ''">
+				and t.factory_id = #{factoryId}
+			</if>
+		</where>
+	</select>
+
+	<!--查最新数据 -->
+	<select id="getLatest" parameterType="TodayMedicineInfo" resultMap="resultMapping">
+		<include refid="select" />
+		<where>
+			<if test="fillDate != null and fillDate != ''">
+				and t.fill_date &lt; #{fillDate}
+			</if>
+			<if test="factoryId != null and factoryId != ''">
+				and t.factory_id = #{factoryId}
+			</if>
+			<if test="effectIcon != null and effectIcon != ''">
+				and t.effect_icon = #{effectIcon}
+			</if>
+		</where>
+		order by t.fill_time desc limit 1
+	</select>
+	
+	<!--药量当日查询：APP上面的折线图统计-->
+	<select id="getTodayForChart" parameterType="TodayMedicineInfo" resultType="map">
+		SELECT
+		IFNULL(SUM(t.today_PAC), 0) AS todayPac,
+		IFNULL(SUM(t.today_PAM_yin), 0) AS todayPamYin,
+		IFNULL(SUM(t.today_PAM_yang), 0) AS todayPamYang,
+		IFNULL(SUM(t.today_phosphorus), 0) AS todayPhosphorus,
+		IFNULL(SUM(t.today_NaCLO), 0) AS todayNaclo,
+		IFNULL(SUM(t.today_lime), 0) AS todayLime,
+		IFNULL(SUM(t.today_glucose), 0) AS todayGlucose,
+		IFNULL(SUM(t.today_SC), 0) AS todaySc,
+		IFNULL(SUM(t.today_SA), 0) AS todaySa,
+		IFNULL(SUM(t.today_HCL), 0) AS todayHCL
+		FROM
+		r_today_medicine_info t
+		<where>
+            <if test="fillDate != null and fillDate != ''">
+                and t.fill_date = #{fillDate}
+            </if>
+            <if test="effectIcon != null and effectIcon != ''">
+                and t.effect_icon = #{effectIcon}
+            </if>
+            <if test="params.areaIds != null and params.areaIds != ''">
+                and FIND_IN_SET(t.area_id, '${params.areaIds}')
+            </if>
+            <if test="factoryId != null and factoryId != ''">
+                and t.factory_id = #{factoryId}
+            </if>
+        </where>
+	</select>
+
+	<!--药量求和：APP上面的折线图统计，展示一段时间的数据，如果某一天的数据未填报，累计数据不能为0，所以采用累加的方式查询-->
+	<select id="getSumForChart" parameterType="TodayMedicineInfo" resultType="map">
+		SELECT
+		IFNULL(SUM(t.today_PAC), 0) AS totalPac,
+		IFNULL(SUM(t.today_PAM_yin), 0) AS totalPamYin,
+		IFNULL(SUM(t.today_PAM_yang), 0) AS totalPamYang,
+		IFNULL(SUM(t.today_phosphorus), 0) AS totalPhosphorus,
+		IFNULL(SUM(t.today_NaCLO), 0) AS totalNaclo,
+		IFNULL(SUM(t.today_lime), 0) AS totalLime,
+		IFNULL(SUM(t.today_glucose), 0) AS totalGlucose,
+		IFNULL(SUM(t.today_SC), 0) AS totalSc,
+		IFNULL(SUM(t.today_SA), 0) AS totalSa,
+		IFNULL(SUM(t.today_HCL), 0) AS totalHCL
+		FROM
+		r_today_medicine_info t
+		<where>
+            <if test="fillDate != null and fillDate != ''">
+                and t.fill_date &lt;= #{fillDate}
+            </if>
+            <if test="effectIcon != null and effectIcon != ''">
+                and t.effect_icon = #{effectIcon}
+            </if>
+            <if test="params.areaIds != null and params.areaIds != ''">
+                and FIND_IN_SET(t.area_id, '${params.areaIds}')
+            </if>
+            <if test="factoryId != null and factoryId != ''">
+                and t.factory_id = #{factoryId}
+            </if>
+        </where>
+	</select>
+</mapper>

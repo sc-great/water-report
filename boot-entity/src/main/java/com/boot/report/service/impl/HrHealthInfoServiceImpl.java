@@ -1,0 +1,114 @@
+package com.boot.report.service.impl;
+
+import java.util.List;
+
+import com.boot.common.utils.DateUtils;
+import com.boot.common.utils.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.boot.report.mapper.HrHealthInfoMapper;
+import com.boot.report.domain.HrHealthInfo;
+import com.boot.report.service.IHrHealthInfoService;
+import com.boot.common.core.text.Convert;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 水厂人力资源健康情况信息Service业务层处理
+ * 
+ * @author EPL
+ * @date 2020-03-24
+ */
+@Service
+public class HrHealthInfoServiceImpl implements IHrHealthInfoService {
+	@Autowired
+	private HrHealthInfoMapper hrHealthInfoMapper;
+
+	/**
+	 * 新增水厂人力资源健康情况信息
+	 *
+	 * @param hrHealthInfo 水厂人力资源健康情况信息
+	 * @return 结果
+	 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public int add(HrHealthInfo hrHealthInfo) {
+		// 若是二次填报，则把第一次填报的信息改为不可用标识
+		Object iconObj = hrHealthInfo.getParams().get("icon");
+		if (StringUtils.isNotNullAndNotEmpty(iconObj) && ("2").equals(iconObj.toString())) {
+			HrHealthInfo hrHealthParam = new HrHealthInfo();
+			hrHealthParam.setFactoryId(hrHealthInfo.getFactoryId());
+			hrHealthParam.setFillDate(DateUtils.getDate());
+			hrHealthParam.setEffectIcon("1");
+			HrHealthInfo originHrHealthInfo = hrHealthInfoMapper.getEntity(hrHealthParam);
+			originHrHealthInfo.setEffectIcon("2");
+			hrHealthInfoMapper.update(originHrHealthInfo);
+		}
+		// 添加新数据
+		return hrHealthInfoMapper.insert(hrHealthInfo);
+	}
+
+	/**
+	 * 修改水厂人力资源健康情况信息
+	 *
+	 * @param hrHealthInfo 水厂人力资源健康情况信息
+	 * @return 结果
+	 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public int update(HrHealthInfo hrHealthInfo) {
+		return hrHealthInfoMapper.update(hrHealthInfo);
+	}
+
+	/**
+	 * 删除水厂人力资源健康情况信息对象
+	 *
+	 * @param ids 需要删除的数据ID
+	 * @return 结果
+	 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public int deleteByIds(String ids) {
+		int result = 0;
+		if (!ids.isEmpty()) {
+			HrHealthInfo hrHealthInfo = new HrHealthInfo();
+			hrHealthInfo.getParams().put("ids", Convert.toStrArray(ids));
+			result = hrHealthInfoMapper.delete(hrHealthInfo);
+		}
+		return result;
+	}
+
+	/**
+	* 查询水厂人力资源健康情况信息数量
+	*
+	* @param hrHealthInfo 查询条件
+	* @return 水厂人力资源健康情况信息数量
+	*/
+	@Override
+	public int getCount(HrHealthInfo hrHealthInfo) {
+		return hrHealthInfoMapper.getCount(hrHealthInfo);
+	}
+
+	/**
+	 * 获取水厂人力资源健康情况信息实体对象
+	 * 
+	 * @param id 水厂人力资源健康情况信息ID
+	 * @return 水厂人力资源健康情况信息
+	 */
+	@Override
+	public HrHealthInfo getEntityById(String id) {
+		HrHealthInfo hrHealthInfo = new HrHealthInfo();
+		hrHealthInfo.setId(id);
+		return hrHealthInfoMapper.getEntity(hrHealthInfo);
+	}
+
+	/**
+	 * 查询水厂人力资源健康情况信息列表
+	 * 
+	 * @param hrHealthInfo 水厂人力资源健康情况信息
+	 * @return 水厂人力资源健康情况信息
+	 */
+	@Override
+	public List<HrHealthInfo> getList(HrHealthInfo hrHealthInfo) {
+		return hrHealthInfoMapper.getList(hrHealthInfo);
+	}
+}

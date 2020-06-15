@@ -1,0 +1,62 @@
+package com.boot.system.domain;
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+import com.boot.common.annotation.Excel;
+import com.boot.common.core.domain.BaseEntity;
+
+/**
+ * 省市县数据对象 province_city_district
+ *
+ * @author EPL
+ * @date 2019-09-11
+ */
+public class SysDistrict extends BaseEntity{
+    private static final long serialVersionUID = 1L;
+
+    /** 地区代码 */
+    private String id;
+
+    /** 当前地区的上一级地区代码 */
+    private String pid;
+
+    /** 地区名称 */
+    private String name;
+
+    public void setId(String id)
+    {
+        this.id = id;
+    }
+
+    public String getId()
+    {
+        return id;
+    }
+    public void setPid(String pid)
+    {
+        this.pid = pid;
+    }
+
+    public String getPid()
+    {
+        return pid;
+    }
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
+                .append("id", getId())
+                .append("pid", getPid())
+                .append("name", getName())
+                .toString();
+    }
+}

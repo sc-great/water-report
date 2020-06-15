@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.report.mapper.ReportDateInfoMapper">
+    <resultMap type="ReportDateInfo" id="resultMapping">
+        <result property="id"         column="id"/>
+        <result property="reportDate" column="report_date"/>
+        <result property="factoryId"  column="factory_id"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="ReportDateInfo">
+        <selectKey keyProperty="id" resultType="String" order="BEFORE">
+            select replace(uuid(),'-','') from dual
+        </selectKey>
+        insert into r_report_date_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null ">id,</if>
+            <if test="reportDate != null ">report_date,</if>
+            <if test="factoryId != null ">factory_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null ">#{id},</if>
+            <if test="reportDate != null ">#{reportDate},</if>
+            <if test="factoryId != null ">#{factoryId},</if>
+        </trim>
+    </insert>
+
+    <sql id="where">
+        <where>
+            <if test="id!=null  and id != ''">
+                and t.id=#{id}
+            </if>
+            <if test="reportDate != null  and reportDate != ''">
+                and t.report_date = #{reportDate}
+            </if>
+            <if test="factoryId != null  and factoryId != ''">
+                and t.factory_id = #{factoryId}
+            </if>
+            <!-- 数据范围过滤 -->
+            ${params.dataScope}
+        </where>
+    </sql>
+
+    <select id="getCount" parameterType="ReportDateInfo" resultType="int">
+        select count(*) from r_report_date_info t
+        <include refid="where"/>
+    </select>
+</mapper>

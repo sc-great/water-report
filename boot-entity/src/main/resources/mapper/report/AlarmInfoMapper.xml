@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.report.mapper.AlarmInfoMapper">
+	<resultMap type="AlarmInfo" id="resultMapping">
+		<result property="id" column="id" />
+		<result property="fillDate" column="fill_date" />
+		<result property="fillTime" column="fill_time" />
+		<result property="updateTime" column="update_time" />
+		<result property="orgId" column="org_id" />
+		<result property="areaId" column="area_id" />
+		<result property="alarmType" column="alarm_type" />
+		<result property="alarmItem" column="alarm_item" />
+		<result property="effectIcon" column="effect_icon" />
+		<result property="objId" column="obj_id" />
+		<result property="value" column="obj_value" />
+	</resultMap>
+
+	<insert id="insert" parameterType="AlarmInfo">
+		<selectKey keyProperty="id" resultType="String"
+			order="BEFORE">
+			SELECT REPLACE ( uuid( ), '-', '' ) FROM DUAL
+		</selectKey>
+		insert into alarm_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null ">id,</if>
+			fill_date,
+			fill_time,
+			<if test="orgId != null ">org_id,</if>
+			<if test="areaId != null ">area_id,</if>
+			<if test="alarmType != null ">alarm_type,</if>
+			<if test="alarmItem != null ">alarm_item,</if>
+			<if test="objId != null ">obj_id,</if>
+			<if test="value != null ">obj_value,</if>
+			effect_icon
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null ">#{id},</if>
+			CURDATE(),
+			NOW(),
+			<if test="orgId != null ">#{orgId},</if>
+			<if test="areaId != null ">#{areaId},</if>
+			<if test="alarmType != null ">#{alarmType},</if>
+			<if test="alarmItem != null ">#{alarmItem},</if>
+			<if test="objId != null ">#{objId},</if>
+			<if test="value != null ">#{value},</if>
+			'1'
+		</trim>
+	</insert>
+
+	<update id="update" parameterType="AlarmInfo">
+		update alarm_info
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="effectIcon != null ">effect_icon = #{effectIcon},</if>
+			update_time = NOW(),
+		</trim>
+		where id = #{id}
+	</update>
+
+	<!--报警推送时新的记录时，逻缉删除掉相同单位相同业务类型以前的记录 -->
+	<update id="updateByOrgIdAndAlarmType" parameterType="AlarmInfo">
+		update alarm_info t
+		<trim prefix="SET" suffixOverrides=",">
+			t.effect_icon = '2',
+			t.update_time = NOW()
+		</trim>
+		<where>
+			<if test="orgId != null and orgId != ''">
+				and t.org_id = #{orgId}
+			</if>
+			<if test="alarmType != null and alarmType != ''">
+				and t.alarm_type = #{alarmType}
+			</if>
+			<if test="fillDate != null and fillDate != ''">
+				and t.fill_date &lt;= #{fillDate}
+			</if>
+		</where>
+	</update>
+
+	<sql id="where">
+		<where>
+			<if test="id != null and id != ''">
+				and t.id = #{id}
+			</if>
+			<if test="fillDate != null and fillDate != ''">
+				and t.fill_date = #{fillDate}
+			</if>
+			<if test="orgId != null and orgId != ''">
+				and t.org_id = #{orgId}
+			</if>
+			<if test="areaId != null and areaId != ''">
+				and t.area_id = #{areaId}
+			</if>
+			<if test="effectIcon != null and effectIcon != ''">
+				and t.effect_icon = #{effectIcon}
+			</if>
+			<if test="alarmType != null and alarmType != ''">
+				and t.alarm_type = #{alarmType}
+			</if>
+			<if test="objId != null and objId != ''">
+				and t.obj_id = #{objId}
+			</if>
+			<if test="params.ids != null">
+				and t.id in
+				<foreach collection="params.ids" item="id" open="("
+					separator="," close=")">
+					#{id}
+				</foreach>
+			</if>
+			<if test="params.objIds != null">
+				and t.obj_id in
+				<foreach collection="params.objIds" item="id" open="("
+					separator="," close=")">
+					#{id}
+				</foreach>
+			</if>
+			<if test="params.orgIds != null and params.orgIds != ''">
+				and FIND_IN_SET( t.org_id, '${params.orgIds}' )
+			</if>
+			<if test="params.areaIds != null and params.areaIds != ''">
+				and FIND_IN_SET( t.area_id, '${params.areaIds}' )
+			</if>
+			<if test="params.dateSta != null and params.dateSta != ''">
+				and t.fill_date &gt;= '${params.dateSta}'
+			</if>
+			<if test="params.dateEnd != null and params.dateEnd != ''">
+				and t.fill_date &lt;= '${params.dateEnd}'
+			</if>
+			<!-- 数据范围过滤 -->
+			${params.dataScope}
+		</where>
+	</sql>
+
+	<delete id="delete" parameterType="AlarmInfo">
+		delete t from alarm_info t
+		<include refid="where" />
+	</delete>
+
+	<sql id="select">
+		SELECT
+		t.*,
+		o.org_name AS orgName,
+		o.factory_type AS
+		factoryType,
+		( SELECT org_name FROM sys_org WHERE org_id = o.parent_id
+		) AS
+		paOrgName,
+		( SELECT a.area_name FROM r_area a WHERE a.area_id =
+		t.area_id ) AS
+		areaName
+		FROM
+		alarm_info t
+		LEFT JOIN sys_org o ON o.org_id
+		= t.org_id
+	</sql>
+
+	<select id="getEntity" parameterType="AlarmInfo"
+		resultMap="resultMapping">
+		<include refid="select" />
+		<include refid="where" />
+		LIMIT 1
+	</select>
+
+	<select id="getList" parameterType="AlarmInfo"
+		resultMap="resultMapping">
+		<include refid="select" />
+		<include refid="where" />
+		order by t.fill_time desc
+	</select>
+</mapper>

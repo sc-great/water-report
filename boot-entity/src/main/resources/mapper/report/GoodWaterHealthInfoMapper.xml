@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.report.mapper.GoodWaterHealthInfoMapper">
+	<resultMap type="GoodWaterHealthInfo" id="resultMapping">
+		<result property="id" 			column="id" />
+		<result property="fillDate" 	column="fill_date" />
+		<result property="fillTime" 	column="fill_time" />
+		<result property="ntuIn" 		column="NTU_in" />
+		<result property="ntuOut" 		column="NTU_out" />
+		<result property="phIn" 		column="PH_in" />
+		<result property="phOut" 		column="PH_out" />
+		<result property="col2Out" 		column="COL2_out" />
+		<result property="germOut" 		column="germ_out" />
+		<result property="factoryId" 	column="factory_id" />
+		<result property="areaId" 		column="area_id" />
+		<result property="fillUserId" 	column="fill_user_id" />
+		<result property="fillUserName" column="fill_user_name" />
+		<result property="effectIcon" 	column="effect_icon" />
+		<result property="passFlag" 	column="pass_flag" />		
+	</resultMap>
+
+	<insert id="insert" parameterType="GoodWaterHealthInfo">
+		<selectKey keyProperty="id" resultType="String" order="BEFORE">
+			select replace(uuid(),'-','') from dual
+		</selectKey>
+		insert into r_good_water_health_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">id,</if>
+			fill_date,
+			fill_time,
+			<if test="ntuIn != null">NTU_in,</if>
+			<if test="ntuOut != null">NTU_out,</if>
+			<if test="phIn != null">PH_in,</if>
+			<if test="phOut != null">PH_out,</if>
+			<if test="col2Out != null">COL2_out,</if>
+			<if test="germOut != null">germ_out,</if>
+			<if test="factoryId != null">factory_id,</if>
+			<if test="areaId != null">area_id,</if>
+			<if test="fillUserId != null">fill_user_id,</if>
+			<if test="fillUserName != null">fill_user_name,</if>
+			effect_icon,
+			<if test="passFlag != null">pass_flag</if>		
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">#{id},</if>
+			CURDATE(),
+			NOW(),
+			<if test="ntuIn != null">#{ntuIn},</if>
+			<if test="ntuOut != null">#{ntuOut},</if>
+			<if test="phIn != null">#{phIn},</if>
+			<if test="phOut != null">#{phOut},</if>
+			<if test="col2Out != null">#{col2Out},</if>
+			<if test="germOut != null">#{germOut},</if>
+			<if test="factoryId != null">#{factoryId},</if>
+			<if test="areaId != null">#{areaId},</if>
+			<if test="fillUserId != null">#{fillUserId},</if>
+			<if test="fillUserName != null">#{fillUserName},</if>
+			'1',
+			<if test="passFlag != null">#{passFlag}</if>
+			
+		</trim>
+	</insert>
+
+	<update id="update" parameterType="GoodWaterHealthInfo">
+		update r_good_water_health_info
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="ntuIn != null">NTU_in = #{ntuIn},</if>
+			<if test="ntuOut != null">NTU_out = #{ntuOut},</if>
+			<if test="phIn != null">PH_in = #{phIn},</if>
+			<if test="phOut != null">PH_out = #{phOut},</if>
+			<if test="col2Out != null">COL2_out = #{col2Out},</if>
+			<if test="germOut != null">germ_out = #{germOut},</if>
+			<if test="effectIcon != null">effect_icon = #{effectIcon},</if>
+			<if test="passFlag != null">pass_flag = #{passFlag},</if>			
+		</trim>
+		where id = #{id}
+	</update>
+
+	<sql id="where">
+		<where>
+			<if test="id != null and id != ''">
+				and t.id = #{id}
+			</if>
+			<if test="fillDate != null and fillDate != ''">
+				and t.fill_date = #{fillDate}
+			</if>
+			<if test="factoryId != null and factoryId != ''">
+				and t.factory_id = #{factoryId}
+			</if>
+			<if test="areaId != null and areaId != ''">
+				and t.area_id = #{areaId}
+			</if>
+			<if test="fillUserId != null and fillUserId != ''">
+				and t.fill_user_id = #{fillUserId}
+			</if>
+			<if test="effectIcon != null and effectIcon != ''">
+				and t.effect_icon = #{effectIcon}
+			</if>
+			<if test="passFlag != null and passFlag != ''">
+				and t.pass_flag = #{passFlag}
+			</if>
+			<if test="params.ids != null">
+				and t.id in
+				<foreach collection="params.ids" item="id" open="(" separator="," close=")">
+					#{id}
+				</foreach>
+			</if>
+			<if test="params.areaIds != null and params.areaIds != ''">
+				and FIND_IN_SET(t.area_id, '${params.areaIds}')
+			</if>
+			<!-- 数据范围过滤 -->
+			${params.dataScope}
+		</where>
+	</sql>
+
+	<delete id="delete" parameterType="GoodWaterHealthInfo">
+		delete t from r_good_water_health_info t
+		<include refid="where" />
+	</delete>
+
+	<select id="getCount" parameterType="GoodWaterHealthInfo" resultType="int">
+		select count(*) from r_good_water_health_info t
+		<include refid="where" />
+	</select>
+
+	<sql id="select">
+		SELECT * FROM r_good_water_health_info t
+	</sql>
+
+	<select id="getEntity" parameterType="GoodWaterHealthInfo"
+		resultMap="resultMapping">
+		<include refid="select" />
+		<include refid="where" />
+		LIMIT 1
+	</select>
+
+	<select id="getList" parameterType="GoodWaterHealthInfo" resultMap="resultMapping">
+		<include refid="select" />
+		<include refid="where" />
+		order by t.fill_date desc
+	</select>
+
+	<select id="getOverNorm" parameterType="GoodWaterHealthInfo" resultType="int">
+		SELECT
+			COUNT( t.a ) 
+		FROM
+			( SELECT
+				COUNT( * ) AS a 
+			FROM
+				r_good_water_health_info 
+			WHERE
+				<if test="params.areaId != null and params.areaId != ''">
+				area_id = '${params.areaId}' 
+				</if>
+				<if test="params.areaIds != null and params.areaIds != ''">
+				FIND_IN_SET( area_id, '${params.areaIds}' )
+				</if>
+				<if test="params.orgId != null and params.orgId != ''">
+				factory_id = '${params.orgId}' 
+				</if>
+				<if test="params.dateSta != null and params.dateSta != ''">
+				and fill_date &gt;= '${params.dateSta}'
+				</if>
+				<if test="params.dateEnd != null and params.dateEnd != ''">
+				and fill_date &lt;= '${params.dateEnd}'
+				</if>
+				AND effect_icon = '1' 
+				AND pass_flag = '2' 
+			GROUP BY
+				fill_date ) t
+	</select>
+</mapper>

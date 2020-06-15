@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.report.mapper.TodayInfoMapper">
+    <!--结果集-->
+    <resultMap type="map" id="resultMapping">
+        <result property="id"                  column="id"/>
+        <result property="reportDate"          column="report_date"/>
+        <result property="factoryId"           column="factory_id"/>
+
+        <result property="todayIn"             column="today_in"/>
+        <result property="todayOut"            column="today_out"/>
+        <result property="totalIn"             column="total_in"/>
+        <result property="totalOut"            column="total_out"/>
+
+        <result property="todayElectricity"    column="today_electricity"/>
+        <result property="totalElectricity"    column="total_electricity"/>
+        <result property="pumpTodayEletricity" column="pump_today_eletricity"/>
+        <result property="pumpTotalEletricity" column="pump_total_eletricity"/>
+
+        <result property="todayPac"        column="today_PAC"/>
+        <result property="totalPac"        column="total_PAC"/>
+        <result property="todayPamYin"     column="today_PAM_yin"/>
+        <result property="totalPamYin"     column="total_PAM_yin"/>
+        <result property="todayPamYang"    column="today_PAM_yang"/>
+        <result property="totalPamYang"    column="total_PAM_yang"/>
+        <result property="todayPhosphorus" column="today_phosphorus"/>
+        <result property="totalPhosphorus" column="total_phosphorus"/>
+        <result property="todayNaclo"      column="today_NaCLO"/>
+        <result property="totalNaclo"      column="total_NaCLO"/>
+        <result property="todayLime"       column="today_lime"/>
+        <result property="totalLime"       column="total_lime"/>
+        <result property="todayGlucose"    column="today_glucose"/>
+        <result property="totalGlucose"    column="total_glucose"/>
+        <result property="todaySc"         column="today_SC"/>
+        <result property="totalSc"         column="total_SC"/>
+        <result property="todaySa"         column="today_SA"/>
+        <result property="totalSa"         column="total_SA"/>
+        <result property="todayHCL"        column="today_HCL"/>
+        <result property="totalHCL"        column="total_HCL"/>
+    </resultMap>
+
+    <select id="getList" parameterType="ReportDateInfo" resultMap="resultMapping">
+		SELECT 
+		
+		rd.id, rd.report_date, rd.factory_id,
+		<if test="params.type == 1">
+        bw.COD_in,  bw.NH3_N_in,  bw.SS_in,  bw.PH_in,  bw.TP_in,  bw.TN_in,  bw.MLSS_in,
+        bw.COD_out, bw.NH3_N_out, bw.SS_out, bw.PH_out, bw.TP_out, bw.TN_out, bw.SV30_in, 
+      	</if>
+       	<if test="params.type == 2">
+        gw.NTU_in, gw.NTU_out, gw.PH_in, gw.PH_out, gw.COL2_out, gw.germ_out,
+      	</if>
+        mu.today_mud, mu.total_mud,     
+     
+        te.today_electricity, te.total_electricity, te.pump_today_eletricity, te.pump_total_eletricity,   
+     
+        tm.today_PAC, tm.total_PAC, tm.today_PAM_yin, tm.total_PAM_yin, tm.today_PAM_yang, tm.total_PAM_yang, tm.today_phosphorus, 
+        tm.total_phosphorus, tm.today_NaCLO, tm.total_NaCLO,tm.today_lime, tm.total_lime, tm.today_glucose, tm.total_glucose, tm.today_SC, 
+        tm.total_SC, tm.today_SA, tm.total_SA, tm.today_HCL, tm.total_HCL
+        
+        FROM r_report_date_info rd
+        <if test="params.type == 1">
+        LEFT JOIN r_bad_water_quality_info bw ON rd.report_date = bw.fill_date AND bw.factory_id = rd.factory_id AND bw.effect_icon = '1'
+        </if>
+        <if test="params.type == 2">
+        LEFT JOIN r_good_water_health_info gw ON rd.report_date = gw.fill_date AND gw.factory_id = rd.factory_id AND gw.effect_icon = '1'
+        </if>
+        LEFT JOIN r_mud_info mu               ON rd.report_date = mu.fill_date AND mu.factory_id = rd.factory_id AND mu.effect_icon = '1'
+        LEFT JOIN r_today_electricity_info te ON rd.report_date = te.fill_date AND rd.factory_id = te.factory_id AND te.effect_icon = '1'    
+        LEFT JOIN r_today_medicine_info tm    ON rd.report_date = tm.fill_date AND rd.factory_id = tm.factory_id AND tm.effect_icon = '1'
+        
+        WHERE
+        
+        rd.factory_id = #{factoryId}
+        
+        <if test="params.ids != null">
+            and rd.id in
+            <foreach collection="params.ids" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+        <if test="reportDate != null and reportDate != ''">
+            and rd.report_date = #{reportDate}
+        </if>
+        order by rd.report_date desc
+    </select>
+    
+    <select id="getSumData" parameterType="ReportDateInfo" resultType="map">
+		SELECT
+			rd.id AS id,
+			rd.report_date AS reportDate,
+			rd.factory_id AS factoryId,
+			
+			Sum( IFNULL( wy.today_in, 0 ) ) AS totalIn,
+			Sum( IFNULL( wy.today_out, 0 ) ) AS totalOut,
+			
+			Sum( IFNULL( ei.today_electricity, 0 ) + IFNULL( ei.pump_today_eletricity, 0 ) ) AS totalElec,
+			
+			Sum( IFNULL( mi.today_mud, 0 ) ) AS totalMud,
+			Sum( IFNULL( mi.dry_mud, 0 ) ) AS totalDryMud,
+			
+			Sum( IFNULL( md.today_PAM_yang, 0 ) ) AS totalPAMYang,
+			Sum( IFNULL( md.today_PAM_yin, 0 ) ) AS totalPAMYin,
+			Sum( IFNULL( md.today_PAC, 0 ) ) AS totalPAC,
+			Sum( IFNULL( md.today_lime, 0 ) ) AS totalLime,
+			Sum( IFNULL( md.today_phosphorus, 0 ) ) AS totalPhosphorus,
+			Sum( IFNULL( md.today_HCL, 0 ) ) AS totalHCL,
+			Sum( IFNULL( md.today_SC, 0 ) ) AS totalSC,
+			Sum( IFNULL( md.today_NaCLO, 0 ) ) AS totalNaCLO,
+			Sum( IFNULL( md.today_glucose, 0 ) ) AS totalGlucose,
+			Sum( IFNULL( md.today_SA, 0 ) ) AS totalSA,
+			
+			(
+			SELECT
+				Sum( IFNULL( fi.ton, 0 ) )
+			FROM
+				sys_factory_info AS fi 
+			<if test="params.admin == null || !params.admin">
+				WHERE
+					fi.org_id IN ( SELECT o.org_id FROM sys_org AS o WHERE 
+					<if test="params.parentId != null and params.parentId != ''">
+						o.parent_id = '${params.parentId}' 
+					</if>
+					<if test="params.orgId != null and params.orgId != ''">
+						o.org_id = '${params.orgId}' 
+					</if>
+					<if test="params.areaId != null and params.areaId != ''">
+						o.area_id = '${params.areaId}' 
+					</if>
+					) 
+			</if>
+			) AS ton,
+			fi.price AS price,
+			Sum( IFNULL( wy.today_out, 0 ) * IFNULL( fi.price, 0 ) ) AS account
+		FROM
+			r_report_date_info AS rd
+			LEFT JOIN r_today_water_yield_info AS wy ON wy.fill_date = rd.report_date AND wy.factory_id = rd.factory_id AND wy.effect_icon = '1' 
+			LEFT JOIN r_today_electricity_info AS ei ON ei.fill_date = rd.report_date AND ei.factory_id = rd.factory_id AND ei.effect_icon = '1'
+			LEFT JOIN r_mud_info			   AS mi ON mi.fill_date = rd.report_date AND mi.factory_id = rd.factory_id AND mi.effect_icon = '1'
+			LEFT JOIN r_today_medicine_info    AS md ON md.fill_date = rd.report_date AND md.factory_id = rd.factory_id AND md.effect_icon = '1'
+			LEFT JOIN sys_factory_info		   AS fi ON fi.org_id = rd.factory_id
+		WHERE
+			rd.factory_id IN ( SELECT o.org_id FROM sys_org AS o 
+				<if test="params.admin == null || !params.admin">
+					WHERE 
+					<if test="params.parentId != null and params.parentId != ''">
+						o.parent_id = '${params.parentId}' 
+					</if>
+					<if test="params.orgId != null and params.orgId != ''">
+						o.org_id = '${params.orgId}' 
+					</if>
+					<if test="params.areaId != null and params.areaId != ''">
+						o.area_id = '${params.areaId}' 
+					</if>
+				</if>
+			)
+			<if test="params.dateSta != null and params.dateSta != ''">
+				and rd.report_date &gt;= '${params.dateSta}'
+			</if>
+			<if test="params.dateEnd != null and params.dateEnd != ''">
+				and rd.report_date &lt;= '${params.dateEnd}'
+			</if>
+    </select>
+    
+    <select id="getDailyReport" parameterType="ReportDateInfo" resultType="map">
+    	SELECT
+			rd.id AS id,
+			rd.report_date AS reportDate,
+			rd.factory_id AS factoryId,
+			
+			IFNULL( wy.today_out, 0 ) AS todayOut,
+			
+			IFNULL( mi.today_mud, 0 ) AS todayMud,
+			IFNULL( mi.dry_mud, 0 ) AS dryMud,
+			
+			IFNULL( ei.today_electricity, 0 ) AS todayElec,
+			IFNULL( ei.pump_today_eletricity, 0 ) AS pumpElec,
+			
+			IFNULL( md.today_PAM_yang, 0 ) AS todayPAMYang,
+			IFNULL( md.today_PAM_yin, 0 ) AS todayPAMYin,
+			IFNULL( md.today_PAC, 0 ) AS todayPAC,
+			IFNULL( md.today_lime, 0 ) AS todayLime,
+			IFNULL( md.today_phosphorus, 0 ) AS todayPhosphorus,
+			IFNULL( md.today_HCL, 0 ) AS todayHCL,
+			IFNULL( md.today_SC, 0 ) AS todaySC,
+			IFNULL( md.today_NaCLO, 0 ) AS todayNaCLO,
+			IFNULL( md.today_glucose, 0 ) AS todayGlucose,
+			IFNULL( md.today_SA, 0 ) AS todaySA,
+			<if test="params.type == 1">
+			IFNULL( tb.cod_in, 0 ) AS codIn,
+			IFNULL( tb.bod5_in, 0 ) AS bod5In,
+			IFNULL( tb.adan_in, 0 ) AS adanIn,
+			IFNULL( tb.zdan_in, 0 ) AS zdanIn,
+			IFNULL( tb.zlin_in, 0 ) AS zlinIn,
+			IFNULL( tb.xfu_in, 0 ) AS xfuIn,
+			IFNULL( tb.ph_in, 0 ) AS phIn,
+			IFNULL( tb.temp_in, 0 ) AS tempIn,
+			
+			IFNULL( tb.cod_out, 0 ) AS codOut,
+			IFNULL( tb.bod5_out, 0 ) AS bod5Out,
+			IFNULL( tb.adan_out, 0 ) AS adanOut,
+			IFNULL( tb.zdan_out, 0 ) AS zdanOut,
+			IFNULL( tb.zlin_out, 0 ) AS zlinOut,
+			IFNULL( tb.xfu_out, 0 ) AS xfuOut,
+			IFNULL( tb.ph_out, 0 ) AS phOut,
+			IFNULL( tb.temp_out, 0 ) AS tempOut,
+			IFNULL( tb.feng_jun, 0 ) AS fengJun,
+			
+			IFNULL( tb.mlss, 0 ) AS mlss,
+			IFNULL( tb.mlvss, 0 ) AS mlvss,
+			IFNULL( tb.test_do, 0 ) AS testDo,
+			IFNULL( tb.sv30, 0 ) AS sv30,
+			IFNULL( tb.water_sludge, 0 ) AS waterSludge,
+			
+			IFNULL( wq.COD_in, 0 ) AS CODIn,
+			IFNULL( wq.NH3_N_in, 0 ) AS NH3NIn,
+			IFNULL( wq.TP_in, 0 ) AS TPIn,
+			IFNULL( wq.TN_in, 0 ) AS TNIn,
+			IFNULL( wq.SS_in, 0 ) AS SSIn,
+			
+			IFNULL( wq.COD_out, 0 ) AS CODOut,
+			IFNULL( wq.NH3_N_out, 0 ) AS NH3NOut,
+			IFNULL( wq.TP_out, 0 ) AS TPOut,
+			IFNULL( wq.TN_out, 0 ) AS TNOut,
+			IFNULL( wq.SS_out, 0 ) AS SSOut,
+			
+			IFNULL( wq.pass_flag, 0 ) AS passFlag
+			</if>
+			<if test="params.type == 2">
+			IFNULL( tt.eye_out, 0 ) AS eyeOut,
+			IFNULL( tt.colour_out, 0 ) AS colourOut,
+			IFNULL( tt.cw_out, 0 ) AS cwOut,
+			IFNULL( tt.two_out, 0 ) AS twoOut,
+			IFNULL( tt.ntu_out, 0 ) AS ntuOut,
+			IFNULL( tt.temp_out, 0 ) AS tempOut,
+			IFNULL( tt.zdj_out, 0 ) AS zdjOut,
+			IFNULL( tt.xjzs_out, 0 ) AS xjzsOut,
+			
+			IFNULL( gw.PH_in, 0 ) AS PHIn,
+			IFNULL( gw.NTU_in, 0 ) AS NTUIn,
+			IFNULL( gw.PH_out, 0 ) AS PHOut,
+			IFNULL( gw.NTU_out, 0 ) AS NTUOut,
+			IFNULL( gw.COL2_out, 0 ) AS COL2Out,
+			IFNULL( gw.germ_out, 0 ) AS germOut,
+			
+			IFNULL( gw.pass_flag, 0 ) AS passFlag
+			</if>
+		FROM
+			r_report_date_info AS rd
+			LEFT JOIN r_today_water_yield_info AS wy ON wy.fill_date = rd.report_date AND wy.factory_id = rd.factory_id AND wy.effect_icon = '1'
+			LEFT JOIN r_mud_info			   AS mi ON mi.fill_date = rd.report_date AND mi.factory_id = rd.factory_id AND mi.effect_icon = '1'
+			LEFT JOIN r_today_electricity_info AS ei ON ei.fill_date = rd.report_date AND ei.factory_id = rd.factory_id AND ei.effect_icon = '1'
+			LEFT JOIN r_today_medicine_info    AS md ON md.fill_date = rd.report_date AND md.factory_id = rd.factory_id AND md.effect_icon = '1' 
+			<if test="params.type == 1">
+			LEFT JOIN r_test_bad_water_info    AS tb ON tb.fill_date = rd.report_date AND tb.factory_id = rd.factory_id AND tb.effect_icon = '1' 
+			LEFT JOIN r_bad_water_quality_info AS wq ON wq.fill_date = rd.report_date AND wq.factory_id = rd.factory_id AND wq.effect_icon = '1' 
+			</if>
+			<if test="params.type == 2">
+			LEFT JOIN r_test_tap_water_info    AS tt ON tt.fill_date = rd.report_date AND tt.factory_id = rd.factory_id AND tt.effect_icon = '1' 
+			LEFT JOIN r_good_water_health_info AS gw ON gw.fill_date = rd.report_date AND gw.factory_id = rd.factory_id AND gw.effect_icon = '1' 
+			</if>
+		WHERE
+			rd.factory_id = #{factoryId}
+			<if test="params.dateSta != null and params.dateSta != ''">
+				and rd.report_date &gt;= '${params.dateSta}'
+			</if>
+			<if test="params.dateEnd != null and params.dateEnd != ''">
+				and rd.report_date &lt;= '${params.dateEnd}'
+			</if>
+    </select>
+</mapper>

@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.system.mapper.SysUserMapper">
+
+    <insert id="insert" parameterType="SysUser">
+        <selectKey keyProperty="userId" resultType="String" order="BEFORE">
+            select replace(uuid(),'-','') from dual
+        </selectKey>
+        insert into sys_user(
+        <if test="userId != null">user_id,</if>
+        <if test="userCode != null">user_code,</if>
+        <if test="userName != null">user_name,</if>
+        <if test="email != null">email,</if>
+        <if test="accountIsDisabled != null">account_is_disabled,</if>
+        <if test="phone != null">phone,</if>
+        <if test="sex != null">sex,</if>
+        <if test="birthday != null">birthday,</if>
+        <if test="jobNumber != null">job_number,</if>
+        <if test="cardNo != null">card_no,</if>
+        <if test="loginName != null">login_name,</if>
+        <if test="password != null">password,</if>
+        <if test="salt != null">salt,</if>
+        <if test="avatar != null">avatar,</if>
+        <if test="loginIp != null">login_ip,</if>
+        <if test="loginDate != null">login_date,</if>
+        <if test="remark != null">remark,</if>
+        <if test="areaStr != null">area_str,</if>
+        create_time
+        )values(
+        <if test="userId != null">#{userId},</if>
+        <if test="userCode != null">#{userCode},</if>
+        <if test="userName != null">#{userName},</if>
+        <if test="email != null">#{email},</if>
+        <if test="accountIsDisabled != null">#{accountIsDisabled},</if>
+        <if test="phone != null">#{phone},</if>
+        <if test="sex != null">#{sex},</if>
+        <if test="birthday != null">#{birthday},</if>
+        <if test="jobNumber != null">#{jobNumber},</if>
+        <if test="cardNo != null">#{cardNo},</if>
+        <if test="loginName != null">#{loginName},</if>
+        <if test="password != null">#{password},</if>
+        <if test="salt != null">#{salt},</if>
+        <if test="avatar != null">#{avatar},</if>
+        <if test="loginIp != null">#{loginIp},</if>
+        <if test="loginDate != null">#{loginDate},</if>
+        <if test="remark != null">#{remark},</if>
+        <if test="areaStr != null">#{areaStr},</if>
+        sysdate()
+        )
+    </insert>
+
+    <update id="update" parameterType="SysUser">
+        update sys_user
+        <set>
+            <if test="userCode != null">user_code=#{userCode},</if>
+            <if test="userName != null">user_name=#{userName},</if>
+            <if test="email != null">email=#{email},</if>
+            <if test="accountIsDisabled != null">account_is_disabled=#{accountIsDisabled},</if>
+            <if test="phone != null">phone=#{phone},</if>
+            <if test="sex != null">sex=#{sex},</if>
+            <if test="birthday != null">birthday=#{birthday},</if>
+            <if test="jobNumber != null">job_number=#{jobNumber},</if>
+            <if test="cardNo != null">card_no=#{cardNo},</if>
+            <if test="loginName != null">login_name=#{loginName},</if>
+            <if test="password != null">password=#{password},</if>
+            <if test="salt != null">salt=#{salt},</if>
+            <if test="avatar != null">avatar=#{avatar},</if>
+            <if test="loginIp != null">login_ip=#{loginIp},</if>
+            <if test="loginDate != null">login_date=#{loginDate},</if>
+            <if test="remark != null">remark=#{remark},</if>
+            <if test="areaStr != null">area_str=#{areaStr},</if>
+        </set>
+        where user_id = #{userId}
+    </update>
+
+    <resultMap type="SysUser" id="SysUserResult">
+        <id property="userId" column="user_id"/>
+        <result property="userCode" column="user_code"/>
+        <result property="userName" column="user_name"/>
+        <result property="email" column="email"/>
+        <result property="accountIsDisabled" column="account_is_disabled"/>
+        <result property="phone" column="phone"/>
+        <result property="sex" column="sex"/>
+        <result property="birthday" column="birthday"/>
+        <result property="jobNumber" column="job_number"/>
+        <result property="cardNo" column="card_no"/>
+        <result property="loginName" column="login_name"/>
+        <result property="password" column="password"/>
+        <result property="salt" column="salt"/>
+        <result property="avatar" column="avatar"/>
+        <result property="loginIp" column="login_ip"/>
+        <result property="loginDate" column="login_date"/>
+        <result property="createTime" column="create_time"/>
+        <result property="remark" column="remark"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="areaStr" column="area_str"/>
+        <collection property="sysOrgs" javaType="java.util.List" resultMap="sysOrgResult"/>
+    </resultMap>
+
+    <resultMap id="sysOrgResult" type="SysOrg">
+        <result property="orgId" column="org_id"/>
+        <result property="orgName" column="org_name"/>
+        <result property="orgIdPath" column="org_id_path"/>
+    </resultMap>
+
+    <sql id="where">
+        <if test="params.orgId!=null and params.orgId!=''">
+            RIGHT JOIN(
+            SELECT user_id FROM sys_org_user WHERE org_id IN(
+            SELECT org_id FROM sys_org WHERE FIND_IN_SET('${params.orgId}' ,REPLACE (org_id_path,'/',','))
+            ) GROUP BY user_id
+            )o ON t.user_id=o.user_id
+        </if>
+        <!-- 数据范围过滤 -->
+        <if test="params.dataScope!=null and params.dataScope!=''">
+            RIGHT JOIN(
+            select user_id from sys_org_user t where 1=1
+            ${params.dataScope}
+            )u on u.user_id=t.user_id
+        </if>
+        <where>
+            t.del_flag = '0'
+            <if test="userId != null and userId != ''">
+                AND t.user_id = #{userId}
+            </if>
+            <if test="userCode != null and userCode != ''">
+                AND t.user_code = #{userCode}
+            </if>
+            <if test="userName != null and userName != ''">
+                AND t.user_name =#{userName}
+            </if>
+            <if test="email != null and email != ''">
+                AND t.email= #{email}
+            </if>
+            <if test="accountIsDisabled != null and accountIsDisabled!=''">
+                AND t.account_is_disabled = #{accountIsDisabled}
+            </if>
+            <if test="phone != null and phone != ''">
+                AND t.phone = #{phone}
+            </if>
+            <if test="sex != null and sex != ''">
+                AND t.sex = #{sex}
+            </if>
+            <if test="birthday != null and birthday != ''">
+                AND t.birthday =#{birthday}
+            </if>
+            <if test="jobNumber != null and jobNumber != ''">
+                AND t.job_number =#{jobNumber}
+            </if>
+            <if test="cardNo != null and cardNo != ''">
+                AND t.card_no =#{cardNo}
+            </if>
+            <if test="loginName != null and loginName != ''">
+                AND t.login_name =#{loginName}
+            </if>
+            <if test="createTime != null and createTime != ''">
+                AND t.create_time =#{createTime}
+            </if>
+            <if test="searchValue!=null and searchValue!=''">
+                and (
+                t.user_code like concat('%',#{searchValue}, '%')
+                or t.user_name like concat('%',#{searchValue}, '%')
+                or t.email like concat('%',#{searchValue}, '%')
+                or t.phone like concat('%',#{searchValue}, '%')
+                or t.job_number like concat('%',#{searchValue}, '%')
+                or t.card_no like concat('%',#{searchValue}, '%')
+                or t.login_name like concat('%',#{searchValue}, '%')
+                )
+            </if>
+            <if test="params.notUserId!=null and params.notUserId!=''">
+                AND t.user_id !='${params.notUserId}'
+            </if>
+            <!--领导查看人数-->
+            <if test="params.leader!=null and params.leader=='1'.toString()">
+                and t.user_id IN(
+                    SELECT user_id FROM sys_org_user
+                    <where>
+                        <!--查看水厂人数-->
+                        <if test="params.waterWorksId!=null and params.waterWorksId!=''">
+                            and org_id='${params.waterWorksId}'
+                        </if>
+                        <!--查看公司水厂人数-->
+                        <if test="params.companyId!=null and params.companyId!=''">
+                            and org_id IN(
+                                SELECT t.org_id FROM sys_org t WHERE t.parent_id='${params.companyId}' or t.org_id='${params.companyId}'
+                            )
+                        </if>
+                        <!--查看区域公司水厂人数-->
+                        <if test="params.areaIds!=null and params.areaIds!=''">
+                            and org_id IN(
+                                SELECT org_id FROM sys_org WHERE  FIND_IN_SET(area_id,'${params.areaIds}')
+                            )
+                        </if>
+                    </where>
+                )
+            </if>
+        </where>
+        <if test="params.limit != null and params.limit !=''">
+            limit ${params.limit}
+        </if>
+    </sql>
+
+    <sql id="orderBy">
+        <choose>
+            <when test="sortName != null and sortName !=''">
+                order by ${sortName}
+                <if test="sortOrder!=null and sortOrder!=''">
+                    ${sortOrder}
+                </if>
+            </when>
+            <otherwise>
+                order by t.create_time desc
+            </otherwise>
+        </choose>
+    </sql>
+
+    <select id="getCount" parameterType="SysUser" resultType="int">
+        select COUNT(t.user_id) from sys_user t
+        <include refid="where"/>
+    </select>
+
+    <select id="getEntity" parameterType="SysUser" resultMap="SysUserResult">
+        select t.* from sys_user t
+        <include refid="where"/>
+        limit 1
+    </select>
+
+    <select id="findList" parameterType="SysUser" resultMap="SysUserResult">
+        select t.* from sys_user t
+        <include refid="where"/>
+        <include refid="orderBy"/>
+    </select>
+
+    <select id="findListByIds" parameterType="String" resultMap="SysUserResult">
+        <if test="userIds!=null">
+            select t.* from sys_user t where t.user_id in
+            <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+                #{userId}
+            </foreach>
+        </if>
+    </select>
+
+    <delete id="delete" parameterType="SysUser">
+        update sys_user t set t.del_flag='1'
+        <include refid="where"/>
+    </delete>
+
+    <delete id="deleteByIds" parameterType="String">
+        <if test="userIds!=null">
+            update sys_user t set t.del_flag='1' where t.user_id in
+            <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+                #{userId}
+            </foreach>
+        </if>
+    </delete>
+
+    <select id="getUserListByOrgId" parameterType="String" resultMap="SysUserResult">
+        SELECT u.* FROM sys_org_user t
+        right JOIN sys_user u ON u.user_id=t.user_id
+        <if test="orgId!=null and orgId!=''">
+            where t.org_id=#{orgId}
+        </if>
+    </select>
+
+    <select id="getUserListByRoleId" parameterType="String" resultMap="SysUserResult">
+        SELECT u.* FROM sys_user_role t
+        right JOIN sys_user u ON u.user_id=t.user_id
+        <if test="roleId!=null and roleId!=''">
+            where t.role_id=#{roleId}
+        </if>
+    </select>
+
+    <select id="getOrgUserList" resultMap="SysUserResult">
+		select u.user_id, u.user_code, u.user_name, ou.org_id, ou.org_name, ou.org_id_path
+		from sys_user u inner join (
+			select sou.user_id,sou.org_id,o.org_name,o.org_id_path from sys_org_user sou
+			left join sys_org o on sou.org_id = o.org_id where o.valid_status = '1' order by o.list_order asc
+			) ou on u.user_id = ou.user_id
+		where u.del_flag = '0' and u.account_is_disabled = '1'
+		order by u.job_number asc
+	</select>
+
+    <select id="findUserListByIds" parameterType="String" resultMap="SysUserResult">
+        <if test="userIds!=null">
+            select u.user_id, u.user_code, u.user_name from sys_user u
+            where u.del_flag = '0' and u.account_is_disabled = '1' and u.user_id in
+            <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+                #{userId}
+            </foreach>
+        </if>
+    </select>
+</mapper>

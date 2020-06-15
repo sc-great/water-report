@@ -1,0 +1,167 @@
+package com.boot.system.domain;
+
+import com.boot.common.core.domain.BaseEntity;
+
+/**
+ * 部门表 sys_dept
+ * 
+ * @author epl
+ */
+public class SysOrg extends BaseEntity
+{
+    private static final long serialVersionUID = 1L;
+
+    /** 部门ID */
+    private String orgId;
+
+    /**部门编号*/
+    private String orgCode;
+
+    /**部门名称*/
+    private String orgName;
+
+    /**父节点ID*/
+    private String parentId;
+
+    /**部门ID全路径*/
+    private String orgIdPath;
+
+    /**部门编码全路径*/
+    private String orgCodePath;
+
+    /**部门名称全路经*/
+    private String orgNamePath;
+
+    /**部门级别*/
+    private String level;
+
+    /**所属应用*/
+    private String appCode;
+
+    /**部门排序*/
+    private String listOrder;
+
+    /** 是否可用 */
+    private String validStatus;
+
+    /** 机构类型 */
+    private String orgType;
+
+    /** 工厂类型 */
+    private String factoryType;
+
+    /** 区域编号 */
+    private String areaId;
+
+    public String getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(String orgId) {
+        this.orgId = orgId;
+    }
+
+    public String getOrgCode() {
+        return orgCode;
+    }
+
+    public void setOrgCode(String orgCode) {
+        this.orgCode = orgCode;
+    }
+
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
+    }
+
+    public String getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
+    }
+
+    public String getOrgIdPath() {
+        return orgIdPath;
+    }
+
+    public void setOrgIdPath(String orgIdPath) {
+        this.orgIdPath = orgIdPath;
+    }
+
+    public String getOrgCodePath() {
+        return orgCodePath;
+    }
+
+    public void setOrgCodePath(String orgCodePath) {
+        this.orgCodePath = orgCodePath;
+    }
+
+    public String getOrgNamePath() {
+        return orgNamePath;
+    }
+
+    public void setOrgNamePath(String orgNamePath) {
+        this.orgNamePath = orgNamePath;
+    }
+
+    public String getLevel() {
+        return level;
+    }
+
+    public void setLevel(String level) {
+        this.level = level;
+    }
+
+    public String getAppCode() {
+        return appCode;
+    }
+
+    public void setAppCode(String appCode) {
+        this.appCode = appCode;
+    }
+
+    public String getListOrder() {
+        return listOrder;
+    }
+
+    public void setListOrder(String listOrder) {
+        this.listOrder = listOrder;
+    }
+
+    public String getValidStatus() {
+        return validStatus;
+    }
+
+    public void setValidStatus(String validStatus) {
+        this.validStatus = validStatus;
+    }
+
+    public String getAreaId() {
+        return areaId;
+    }
+
+    public void setAreaId(String areaId) {
+        this.areaId = areaId;
+    }
+
+    public String getFactoryType() {
+        return factoryType;
+    }
+
+    public void setFactoryType(String factoryType) {
+        this.factoryType = factoryType;
+    }
+
+    public String getOrgType() {
+        return orgType;
+    }
+
+    public void setOrgType(String orgType) {
+        this.orgType = orgType;
+    }
+}
