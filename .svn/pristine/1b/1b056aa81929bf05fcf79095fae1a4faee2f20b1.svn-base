@@ -1,0 +1,72 @@
+package com.boot.report.mapper;
+
+import com.boot.report.domain.BadWaterQualityInfo;
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Component;
+
+/**
+ * 水厂水质数据信息(污水处理厂/排水厂)Mapper接口
+ * 
+ * @author EPL
+ * @date 2020-03-24
+ */
+@Component
+@Mapper
+public interface BadWaterQualityInfoMapper {
+	/**
+	 * 新增水厂水质数据信息(污水处理厂/排水厂)
+	 *
+	 * @param badWaterQualityInfo 水厂水质数据信息(污水处理厂/排水厂)
+	 * @return 结果
+	 */
+	public int insert(BadWaterQualityInfo badWaterQualityInfo);
+
+	/**
+	 * 修改水厂水质数据信息(污水处理厂/排水厂)
+	 *
+	 * @param badWaterQualityInfo 水厂水质数据信息(污水处理厂/排水厂)
+	 * @return 结果
+	 */
+	public int update(BadWaterQualityInfo badWaterQualityInfo);
+
+	/**
+	 * 批量删除水厂水质数据信息(污水处理厂/排水厂)
+	 *
+	 * @param badWaterQualityInfo 删除条件
+	 * @return 结果
+	 */
+	public int delete(BadWaterQualityInfo badWaterQualityInfo);
+
+	/**
+	 * 获取水厂水质数据信息(污水处理厂/排水厂)数量
+	 *
+	 * @param badWaterQualityInfo 查询条件
+	 * @return 结果
+	 */
+	public int getCount(BadWaterQualityInfo badWaterQualityInfo);
+
+	/**
+	 * 获取水厂水质数据信息(污水处理厂/排水厂)对象
+	 * 
+	 * @param badWaterQualityInfo 查询条件
+	 * @return 水厂水质数据信息(污水处理厂/排水厂)
+	 */
+	public BadWaterQualityInfo getEntity(BadWaterQualityInfo badWaterQualityInfo);
+
+	/**
+	 * 查询水厂水质数据信息(污水处理厂/排水厂)列表
+	 * 
+	 * @param badWaterQualityInfo 查询条件
+	 * @return 水厂水质数据信息(污水处理厂/排水厂)集合
+	 */
+	public List<BadWaterQualityInfo> getList(BadWaterQualityInfo badWaterQualityInfo);
+
+	/**
+	 * 查询超标天数
+	 * @param badWaterQualityInfo
+	 * @return
+	 */
+	public int getOverNorm(BadWaterQualityInfo badWaterQualityInfo);
+}

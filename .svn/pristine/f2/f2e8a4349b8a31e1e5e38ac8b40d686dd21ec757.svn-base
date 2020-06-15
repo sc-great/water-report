@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="admin/include :: header('pdf阅读器')" />
+    <style>
+        body{
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        .iframe{
+            width:100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+<iframe class="iframe" frameborder="none" scrolling="no" border="0" th:src="${file.path}"></iframe>
+<th:block th:include="admin/include :: common" />
+</body>
+</html>

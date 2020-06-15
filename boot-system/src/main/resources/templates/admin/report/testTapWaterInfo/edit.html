@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+<th:block th:include="admin/include :: header('修改水厂水质数据信息（自来水厂/给水厂）')" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+	<form class="form-horizontal m" id="form-goodWaterHealthInfo-edit" th:object="${testTapWaterInfo}">
+		<input name="id" th:field="*{id}" type="hidden">
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left is-required">浊度（进水）：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="ntuIn" id="ntuIn" class="form-control" required th:value="${#numbers.formatDecimal(testTapWaterInfo.ntuIn,0,0)}" 
+							type="number" min="0" max="1000" maxLength="4" oninput="autoformart($(this))">
+					<span class="input-group-addon">NTU</span>
+				</div>
+			</div>
+			<label class="col-sm-2 control-label label-left">浊度 （出水）：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="ntuOut" class="form-control" th:value="${#numbers.formatDecimal(testTapWaterInfo.ntuOut,0,0)}"
+							type="number" min="0" max="1000" maxLength="4" oninput="autoformart($(this))">
+					<span class="input-group-addon">NTU</span>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">色度（进水）：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="colourIn" class="form-control" th:value="${#numbers.formatDecimal(testTapWaterInfo.colourIn,0,0)}"
+							type="number" min="0" max="1000" maxLength="4" oninput="autoformart($(this))">
+					<span class="input-group-addon">度</span>
+				</div>
+			</div>
+			<label class="col-sm-2 control-label label-left">色度（出水）：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="colourOut" class="form-control" th:value="${#numbers.formatDecimal(testTapWaterInfo.colourOut,0,0)}" 
+							type="number" min="0" max="1000" maxLength="4" oninput="autoformart($(this))">
+					<span class="input-group-addon">度</span>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">嗅和味（进水）：</label>
+			<div class="col-sm-4">
+				<input name="cwIn" class="form-control" maxlength="6" th:value="*{cwIn}">
+			</div>
+			<label class="col-sm-2 control-label label-left">嗅和味（出水）：</label>
+			<div class="col-sm-4">
+				<input name="cwOut" class="form-control" maxlength="6" th:value="*{cwOut}">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">肉眼可见物（进水）：</label>
+			<div class="col-sm-4">
+				<input name="eyeIn" class="form-control" maxlength="6" th:value="*{eyeIn}">
+			</div>
+			<label class="col-sm-2 control-label label-left">肉眼可见物（出水）：</label>
+			<div class="col-sm-4">
+				<input name="eyeOut" class="form-control" maxlength="6" th:value="*{eyeOut}">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">耗氧量（进水）：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="hyIn" class="form-control" th:value="${#numbers.formatDecimal(testTapWaterInfo.hyIn,0,0)}"
+							type="number" min="0" max="1000" maxLength="4" oninput="autoformart($(this))">
+					<span class="input-group-addon">mg/L</span>
+				</div>
+			</div>
+			<label class="col-sm-2 control-label label-left">耗氧量（出水）：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="hyOut" class="form-control" th:value="${#numbers.formatDecimal(testTapWaterInfo.hyOut,0,0)}"
+							type="number" min="0" max="1000" maxLength="4" oninput="autoformart($(this))">
+					<span class="input-group-addon">mg/L</span>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">氨氮（进水）：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="adanIn" class="form-control" th:value="${#numbers.formatDecimal(testTapWaterInfo.adanIn,0,0)}"
+							type="number" min="0" max="1000" maxLength="4" oninput="autoformart($(this))">
+					<span class="input-group-addon">mg/L</span>
+				</div>
+			</div>
+			<label class="col-sm-2 control-label label-left">二氧化氯（出水）：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="twoOut" class="form-control" th:value="${#numbers.formatDecimal(testTapWaterInfo.twoOut,0,0)}"
+							type="number" min="0" max="1000" maxLength="4" oninput="autoformart($(this))">
+					<span class="input-group-addon">mg/L</span>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">细菌总数（进水）：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="xjzsIn" class="form-control" th:value="${#numbers.formatDecimal(testTapWaterInfo.xjzsIn,0,0)}"
+							type="number" min="0" max="1000" maxLength="4" oninput="autoformart($(this))">
+					<span class="input-group-addon">CFU/ml</span>
+				</div>
+			</div>
+			<label class="col-sm-2 control-label label-left">细菌总数（出水）：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="xjzsOut" class="form-control" th:value="${#numbers.formatDecimal(testTapWaterInfo.xjzsOut,0,0)}"
+							type="number" min="0" max="1000" maxLength="4" oninput="autoformart($(this))">
+					<span class="input-group-addon">CFU/ml</span>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">总大肠菌群（进水）：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="zdjIn" class="form-control" th:value="${#numbers.formatDecimal(testTapWaterInfo.zdjIn,0,0)}"
+							type="number" min="0" max="1000" maxLength="4" oninput="autoformart($(this))">
+					<span class="input-group-addon">MPN/100ml</span>
+				</div>
+			</div>
+			<label class="col-sm-2 control-label label-left">总大肠菌群（出水）：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="zdjOut" class="form-control" th:value="${#numbers.formatDecimal(testTapWaterInfo.zdjOut,0,0)}"
+							type="number" min="0" max="1000" maxLength="4" oninput="autoformart($(this))">
+					<span class="input-group-addon">MPN/100ml</span>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">耐热大肠菌群（进水）：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="nrjIn" class="form-control" th:value="${#numbers.formatDecimal(testTapWaterInfo.nrjIn,0,0)}"
+							type="number" min="0" max="1000" maxLength="4" oninput="autoformart($(this))">
+					<span class="input-group-addon">MPN/100ml</span>
+				</div>
+			</div>
+			<label class="col-sm-2 control-label label-left">耐热大肠菌群（出水）：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="nrjOut" class="form-control" th:value="${#numbers.formatDecimal(testTapWaterInfo.nrjOut,0,0)}"
+							type="number" min="0" max="1000" maxLength="4" oninput="autoformart($(this))">
+					<span class="input-group-addon">MPN/100ml</span>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">温度（进水）：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="tempIn" class="form-control" th:value="${#numbers.formatDecimal(testTapWaterInfo.tempIn,0,0)}"
+							type="number" min="0" max="100" maxLength="3" oninput="autoformart($(this))">
+					<span class="input-group-addon">℃</span>
+				</div>
+			</div>
+			<label class="col-sm-2 control-label label-left">温度（出水）：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="tempOut" class="form-control" th:value="${#numbers.formatDecimal(testTapWaterInfo.tempOut,0,0)}"
+							type="number" min="0" max="100" maxLength="3" oninput="autoformart($(this))">
+					<span class="input-group-addon">℃</span>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: form" />
+<script th:inline="javascript">
+var prefix = ctx + "admin/report/testTapWaterInfo";
+
+$("#form-goodWaterHealthInfo-edit").validate({
+    focusCleanup: true
+});
+
+function submitHandler() {
+    if ($.validate.form()) {
+        $.operate.save(prefix + "/doEdit", $('#form-goodWaterHealthInfo-edit').serialize(),null,"put");
+    }
+}
+
+// input限制
+function autoformart(obj, isInt) {
+    var val = obj.val();
+    if (val == null || val == undefined || val == "") {
+        obj.val("");
+        return;
+    }
+    if (isInt && val.indexOf(".") != -1) { // 整数限制
+        val = val.slice(0, val.length - 2);
+    }
+    var maxLength = obj.attr("maxLength");
+    var max = obj.attr("max");
+    if (val.length > maxLength) {
+        obj.val(val.slice(0, maxLength)); // 限制长度
+        return;
+    }
+    if (parseFloat(val) > parseFloat(max)) {
+        obj.val(val.slice(0, val.length - 1)); // 限制大小
+        return;
+    }
+    obj.val(parseFloat(val));
+}
+</script>
+</body>
+</html>

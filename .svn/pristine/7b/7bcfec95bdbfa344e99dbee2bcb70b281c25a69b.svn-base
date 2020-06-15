@@ -1,0 +1,281 @@
+<!doctype html>
+<html class="no-js" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport"
+	content="width=ideal viewport, initial-scale=1 user-scalable=0" />
+<meta http-equiv="Cache-Control"
+	content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<title>工厂信息</title>
+<link rel="stylesheet"
+	th:href="${'/webapp/css/font-awesome.css?v='+@toolsUtils.version()}">
+<link rel="stylesheet"
+	th:href="${'/webapp/css/com.css?v='+@toolsUtils.version()}">
+<link rel="stylesheet"
+	th:href="${'/webapp/css/style.css?v='+@toolsUtils.version()}">
+    <script th:src="${'/webapp/js/jquery.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/jquery.cookie.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/common.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/plugin/layer_mobile/layer.js?v='+@toolsUtils.version()}"></script>
+    <!--json 序列化-->
+    <script th:src="${'/js/jquery.serializejson.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/ajax/libs/layui/layui.js?v='+@toolsUtils.version()}"></script>
+<style>
+.factoryInfo_header {
+    background: #ededed;
+    line-height: 6vh;
+}
+.factoryInfo_header .title {
+    padding-left: 8px;
+    color: #000;
+    font-weight: bold;
+    font-size: 1.6rem;
+}
+.factoryInfo_header .title i {
+    float: left;
+    line-height: 6vh;
+}
+.factoryInfo_header .title span {
+	display: flex;
+    justify-content: center;
+    font-weight: bold;
+}
+.factoryInfo_formBox {
+	font-size: 1.5rem;
+}
+.factoryInfo_formBox div {
+	line-height: 6vh;
+	margin-left: 3vh;
+}
+.factoryInfo_formBox div p {
+	display: inline-block;
+	border: 1px #dcdcdc solid;
+	background: #f9f9f9;
+	width: 65%;
+	line-height: 4vh;
+}
+.factoryInfo_formBox div span {
+	display: inline-block;
+	width: 26%;
+}
+input {
+	border: 0;
+	outline: none;
+	background-color: rgba(0, 0, 0, 0);
+}
+.factoryInfo_formBox form {
+	margin-top: 3vh;
+}
+.factoryInfo_formBox div p input {
+	width: 56%;
+	line-height: 4vh;
+	padding-left: 0.5vh;
+	width: 98%;
+}
+.factoryInfo_formBox .youDanWei p input {
+	width: 78%;
+}
+.factoryInfo_formBox div p i {
+	margin: 0 1vh;
+	font-style: normal;
+	float: right;
+}
+.factoryInfo_formBox .button_group {
+	width: 80%;
+	margin: 3vh auto;
+}
+.factoryInfo_formBox .button_group a {
+	display: inline-block;
+    width: 45%;
+    text-align: center;
+    line-height: 4ch;
+    font-size: 1.6rem;
+    margin-top: 2vh;
+}
+.factoryInfo_formBox .button_group .reset {
+	background: #f4f4f4;
+	float: left;
+}
+.factoryInfo_formBox .button_group .submit {
+	background: #1d7bb8;
+    color: #fff;
+    float: right;
+}
+
+.form-control, .single-line {
+    background: #FFFFFF none;
+    border: 1px solid #e5e6e7;
+    border-radius: 1px;
+    color: inherit;
+    display: block;
+    padding: 6px 12px;
+    -webkit-transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+    transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+    width: 100%;
+    font-size: 14px;
+}
+
+</style>
+</head>
+<body>
+	<div class="factoryInfo_header">
+		<div class="title" onclick="goBack();" >
+			<i class="fa fa-chevron-left"></i><span>水厂信息</span>
+		</div>
+	</div>
+	
+	<div class="factoryInfo_formBox">
+		<form  id="factory_form" class="form_main"  th:object="${sysFactoryInfo}">
+		<input name="factId" th:field="*{factId}" type="hidden">
+			<div><span>水厂名称</span><p><input  type="text" name="factName" id="factName" maxlength="20"  th:value="*{factName}"></p></div>
+			<div><span>竣工日期</span><p><input type="text" name="finiDate" id="finiDate" maxlength="10"   th:value="*{finiDate}"></p></div>
+			<div><span>开始运营日期</span><p><input type="text" name="startDate" id="startDate" maxlength="10" th:value="*{startDate}"></p></div>
+			<div ><span>设计处理能力</span><p><input type="text" name="ton" id="ton"  oninput = "value=value.replace(/[^\d]/g,'')"  maxlength="12" th:value="*{ton}"><i>吨/天</i></p></div>
+			<div ><span>人员配置</span><p><input type="text" name="personNum" id="personNum"  oninput = "value=value.replace(/[^\d]/g,'')"  maxlength="6" th:value="*{personNum}"><i>人</i></p></div>
+			<div><span>工艺</span><p><input type="text" name="technology" id="technology" maxlength="20" th:value="*{technology}"></p></div>
+			
+			<div class="youDanWei"><span>现执行单价</span><p><input  name="price" id="price"   type="number" min="0"  max="100" maxLength="5" oninput="autoformart($(this))"  th:value="*{price}"><i>元/吨</i></p></div>
+		
+		    <div class="button_group">
+           	<a class="reset" onclick="goBack_onload();" >返回</a>
+           	<a class="submit"  id="submit">提交</a>
+            </div>
+        </form>
+	</div>
+</body>
+<!-- scripts -->
+
+<script th:inline="javascript">
+
+//时间控件
+layui.use('laydate', function () {
+    var laydate = layui.laydate;
+    //执行一个laydate实例
+    laydate.render({
+        elem: '#finiDate', //指定元素
+        showBottom: false,
+        format: 'yyyy-MM-dd',
+        trigger: 'click'
+    });
+    laydate.render({
+        elem: '#startDate', //指定元素
+        showBottom: false,
+        format: 'yyyy-MM-dd',
+        trigger: 'click'
+    });
+});
+
+
+    $(function () {
+        $("#submit").click(function () {
+        
+            var field = $('#factory_form').serializeJSON();
+           
+            if (field["factName"] == "") {
+                layer.open({
+                    content: '请填写水厂名称！',
+                    btn: '知道了'
+                });
+                $("#factName").focus();
+                return false;
+            }
+            if (field["startDate"] == "") {
+                layer.open({
+                    content: '请填写开始运营日期！',
+                    btn: '知道了'
+                });
+                $("#startDate").focus();
+                return false;
+            }
+            if (field["ton"] == "") {
+                layer.open({
+                    content: '请填写设计处理能力！',
+                    btn: '知道了'
+                });
+                $("#ton").focus();
+                return false;
+            }
+              if (field["personNum"] == "") {
+                layer.open({
+                    content: '请填写人员配置！',
+                    btn: '知道了'
+                });
+                $("#personNum").focus();
+                return false;
+            }
+             
+          
+             if (field["price"] == "") {
+                layer.open({
+                    content: '请填写现执行单价！',
+                    btn: '知道了'
+                });
+                $("#price").focus();
+                return false;
+            }
+                 
+            
+            req("/app/doEdit",field, function (result) {
+          
+                if (result.code == 0) {
+                       layer.open({
+                          content: "修改成功!",
+                          btn: '知道了'
+                         });
+                         setTimeout( function(){
+                             window.top.location.href = "/app/homeAdmin";
+                         }, 3 * 300 )
+                } else {
+                    layer.open({
+                        content: result.msg,
+                        btn: '知道了'
+                    });
+                    
+                }
+               
+                
+            }, "post");
+        });
+    });
+</script>
+<script>
+	//获取节点
+    let inp = document.getElementById('price');
+    //给节点添加键盘抬起事件
+    inp.onkeyup = function restrictNumber() {
+        let inpu = document.getElementById('price');
+        inpu.value = inpu.value.replace(/[^\d.]/g, "");  
+        inpu.value = inpu.value.replace(/\.{2,}/g, "."); 
+        inpu.value = inpu.value.replace(".", "$#*").replace(/\./g,'').replace('$#*','.');
+        inpu.value = inpu.value.replace(/^(\d+)\.(\d\d).*$/, '$1.$2');
+        if (inpu.value.indexOf(".") < 0 && inpu.value != "") { 
+            inpu.value = parseFloat(inpu.value);
+        }
+    }
+    function goBack_onload(){
+      window.top.location.href = "/app/homeAdmin";
+    }
+  // input限制
+function autoformart(obj) {
+	var val = obj.val();
+	if (val == null || val == undefined || val == "") {
+		obj.val("");
+		return;
+	}
+	var maxLength = obj.attr("maxLength");
+	var max = obj.attr("max");
+	if (val.length > maxLength) {
+		obj.val(val.slice(0, maxLength)); // 限制长度
+		return;
+	}
+	if (parseFloat(val) > parseFloat(max)) {
+		obj.val(val.slice(0, val.length - 1)); // 限制大小
+		return;
+	}
+	obj.val(parseFloat(val));
+}
+</script>
+
+</html>

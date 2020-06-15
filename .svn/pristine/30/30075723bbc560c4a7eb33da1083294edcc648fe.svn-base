@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+<th:block th:include="admin/include :: header('修改水厂水量信息')" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-todayWaterYieldInfo-edit" th:object="${todayWaterYieldInfo}">
+        <input name="id" th:field="*{id}" type="hidden">
+        <div class="form-group">
+            <label class="col-sm-3 control-label label-left ">当日水量进水：</label>
+            <div class="col-sm-8">
+                <div class="input-group">
+                    <input name="todayIn" id="todayIn" class="form-control" placeholder="请输入当日水量进水" 
+                    		type="number" min="0" max="100000" maxLength="6" th:value="${#numbers.formatDecimal(todayWaterYieldInfo.todayIn,0,0)}" 
+                    		oninput="autoformart($(this));todayWaterYieldInfo_addIn()">
+                    <span class="input-group-addon">吨</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label label-left is-required">当日水量出水：</label>
+            <div class="col-sm-8">
+                <div class="input-group">
+                    <input name="todayOut" id="todayOut"  class="form-control" placeholder="请输入当日水量出水" required
+                    		type="number" min="0"  max="100000" maxLength="6" th:value="${#numbers.formatDecimal(todayWaterYieldInfo.todayOut,0,0)}" 
+                    		oninput="autoformart($(this));todayWaterYieldInfo_addOut()">
+                    <span class="input-group-addon">吨</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label label-left ">累计水量进水：</label>
+            <div class="col-sm-8">
+                <div class="input-group">
+                    <input name="totalIn" id="totalIn" class="form-control" placeholder="请输入累计水量进水" 
+                    		type="number" th:value="*{totalIn}" readonly>
+                    <span class="input-group-addon">万吨</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label label-left is-required">累计水量出水：</label>
+            <div class="col-sm-8">
+                <div class="input-group">
+                    <input name="totalOut" id="totalOut" class="form-control" placeholder="请输入累计水量出水" 
+                    		type="number" th:value="*{totalOut}" readonly>
+                    <span class="input-group-addon">万吨</span>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: form" />
+<script th:inline="javascript">
+var prefix = ctx + "admin/report/todayWaterYieldInfo";
+var totalIn = 0; // 原有当天日期以前的累计进水量
+var totalOut = 0; // 原有当天日期以前的累计出水量
+$.post(prefix + "/getSumInOut", function (data) {
+    totalIn = data.data.totalTodayIn;
+    totalOut = data.data.totalTodayOut;
+});
+
+function todayWaterYieldInfo_addIn() {
+    var a = document.getElementById("todayIn").value;
+    var c = Number(a) / 10000 + Number(totalIn);
+    document.getElementById("totalIn").value = c;
+}
+function todayWaterYieldInfo_addOut() {
+    var a = document.getElementById("todayOut").value;
+    var c = Number(a) / 10000 + Number(totalOut);
+    document.getElementById("totalOut").value = c;
+}
+
+$("#form-todayWaterYieldInfo-edit").validate({
+    focusCleanup: true
+});
+
+function submitHandler() {
+    if ($.validate.form()) {
+        $.operate.save(prefix + "/doEdit", $('#form-todayWaterYieldInfo-edit').serialize(), null, "put");
+    }
+}
+
+// input限制
+function autoformart(obj) {
+	var val = obj.val();
+	if (val == null || val == undefined || val == "") {
+		obj.val("");
+		return;
+	}
+	var maxLength = obj.attr("maxLength");
+	var max = obj.attr("max");
+	if (val.length > maxLength) {
+		obj.val(val.slice(0, maxLength)); // 限制长度
+		return;
+	}
+	if (parseFloat(val) > parseFloat(max)) {
+		obj.val(val.slice(0, val.length - 1)); // 限制大小
+		return;
+	}
+	obj.val(parseFloat(val));
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+package com.boot.report.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.boot.common.core.text.Convert;
+import com.boot.common.utils.DateUtils;
+import com.boot.report.domain.ReportDateInfo;
+import com.boot.report.domain.TodayMedicineInfo;
+import com.boot.report.mapper.ReportDateInfoMapper;
+import com.boot.report.mapper.TodayMedicineInfoMapper;
+import com.boot.report.service.ITodayMedicineInfoService;
+
+/**
+ * 水厂当日用药信息填报Service业务层处理
+ * 
+ * @author EPL
+ * @date 2020-03-24
+ */
+@Service
+public class TodayMedicineInfoServiceImpl implements ITodayMedicineInfoService {
+	@Autowired
+	private TodayMedicineInfoMapper todayMedicineInfoMapper;
+	@Autowired
+	private ReportDateInfoMapper reportDateInfoMapper;
+
+	/**
+	 * 新增水厂当日用药信息填报
+	 *
+	 * @param todayMedicineInfo 水厂当日用药信息填报
+	 * @return 结果
+	 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public int add(TodayMedicineInfo todayMedicineInfo) {
+		// 若是二次填报，则把第一次填报的信息改为不可用标识
+		String curDate = DateUtils.getDate();
+		
+		TodayMedicineInfo todayMedicineParam = new TodayMedicineInfo();
+		todayMedicineParam.setFactoryId(todayMedicineInfo.getFactoryId());
+		todayMedicineParam.setFillDate(curDate);
+		todayMedicineParam.setEffectIcon("1");
+		TodayMedicineInfo updateInfo = todayMedicineInfoMapper.getEntity(todayMedicineParam);
+		
+		if (updateInfo != null) {
+			updateInfo.setEffectIcon("2");
+			todayMedicineInfoMapper.update(updateInfo);
+		}
+		
+		// 添加新数据
+		int insertRow = todayMedicineInfoMapper.insert(todayMedicineInfo);
+		if (insertRow > 0) {
+			ReportDateInfo reportDateInfoParam = new ReportDateInfo();
+			reportDateInfoParam.setReportDate(curDate);
+			reportDateInfoParam.setFactoryId(todayMedicineInfo.getFactoryId());
+			int count = reportDateInfoMapper.getCount(reportDateInfoParam);
+			if (count == 0) {
+				reportDateInfoMapper.insert(reportDateInfoParam);
+			}
+		}
+		return insertRow;
+	}
+
+	/**
+	 * 修改水厂当日用药信息填报
+	 *
+	 * @param todayMedicineInfo 水厂当日用药信息填报
+	 * @return 结果
+	 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public int update(TodayMedicineInfo todayMedicineInfo) {
+		return todayMedicineInfoMapper.update(todayMedicineInfo);
+	}
+
+	/**
+	 * 删除水厂当日用药信息填报对象
+	 *
+	 * @param ids 需要删除的数据ID
+	 * @return 结果
+	 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public int deleteByIds(String ids) {
+		int result = 0;
+		if (!ids.isEmpty()) {
+			TodayMedicineInfo todayMedicineInfo = new TodayMedicineInfo();
+			todayMedicineInfo.getParams().put("ids", Convert.toStrArray(ids));
+			result = todayMedicineInfoMapper.delete(todayMedicineInfo);
+		}
+		return result;
+	}
+
+	/**
+	 * 查询水厂当日用药信息填报数量
+	 *
+	 * @param todayMedicineInfo 查询条件
+	 * @return 水厂当日用药信息填报数量
+	 */
+	@Override
+	public int getCount(TodayMedicineInfo todayMedicineInfo) {
+		return todayMedicineInfoMapper.getCount(todayMedicineInfo);
+	}
+
+	/**
+	 * 获取水厂当日用药信息填报实体对象
+	 * 
+	 * @param id 水厂当日用药信息填报ID
+	 * @return 水厂当日用药信息填报
+	 */
+	@Override
+	public TodayMedicineInfo getEntityById(String id) {
+		TodayMedicineInfo todayMedicineInfo = new TodayMedicineInfo();
+		todayMedicineInfo.setId(id);
+		return todayMedicineInfoMapper.getEntity(todayMedicineInfo);
+	}
+	@Override
+	public TodayMedicineInfo getEntity(TodayMedicineInfo todayMedicineInfo) {		
+		return todayMedicineInfoMapper.getEntity(todayMedicineInfo);
+	}
+
+	/**
+	 * 查询水厂当日用药信息填报列表
+	 * 
+	 * @param todayMedicineInfo 水厂当日用药信息填报
+	 * @return 水厂当日用药信息填报
+	 */
+	@Override
+	public List<TodayMedicineInfo> getList(TodayMedicineInfo todayMedicineInfo) {
+		return todayMedicineInfoMapper.getList(todayMedicineInfo);
+	}
+
+	@Override
+	public Map<String, Object> getSum(TodayMedicineInfo todayMedicineInfo) {
+		return todayMedicineInfoMapper.getSum(todayMedicineInfo);
+	}
+
+	/**
+	 * 手机端登录后的统计 :当日前累计的药量
+	 */
+	@Override
+	public Map<String, Object> getSumByApp(TodayMedicineInfo todayMedicineInfo) {
+		return todayMedicineInfoMapper.getSumByApp(todayMedicineInfo);
+	}
+
+	/**
+	 * 查最新数据
+	 * 
+	 * @param todayMedicineInfo
+	 * @return
+	 */
+	@Override
+	public TodayMedicineInfo getLatest(TodayMedicineInfo todayMedicineInfo) {
+		return todayMedicineInfoMapper.getLatest(todayMedicineInfo);
+	}
+
+	@Override
+	public Map<String, Object> getSumByAppBefore(TodayMedicineInfo todayMedicineInfo) {
+		return todayMedicineInfoMapper.getSumByAppBefore(todayMedicineInfo);
+	}
+
+	@Override
+	public Map<String, Object> getSumForChart(TodayMedicineInfo todayMedicineInfo) {
+		return todayMedicineInfoMapper.getSumForChart(todayMedicineInfo);
+	}
+
+	@Override
+	public Map<String, Object> getTodayForChart(TodayMedicineInfo todayMedicineInfo) {
+		return todayMedicineInfoMapper.getTodayForChart(todayMedicineInfo);
+	}
+}

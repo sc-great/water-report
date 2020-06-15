@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="admin/include :: header('查看用户消息')" />
+    <style type="text/css">
+        .link{
+            cursor: pointer;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-sysMsg-edit" th:object="${sysMsg}">
+            <div class="form-group">    
+                <label class="col-sm-2 control-label">消息标题：</label>
+                <div class="col-sm-10">
+                    <p class="form-control-static" th:text="*{msgTitle}"></p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">消息类型：</label>
+                <div class="col-sm-10" th:with="msgType=*{msgType}">
+                    <input type="hidden" id="msgType" th:value="*{msgType}">
+                    <p class="form-control-static" th:text="${@dict.getLabel('msg_type',msgType)}"></a>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">消息内容：</label>
+                <div class="col-sm-10" th:switch="*{msgType}">
+                    <p th:case="30" class="form-control-static" th:text="*{msgContent}" style="min-height: 200px;"></a>
+                    <p th:case="40" class="form-control-static" th:text="*{msgContent}" style="min-height: 200px;"></a>
+                    <p th:case="50" class="form-control-static" th:text="*{msgContent}" style="min-height: 200px;"></a>
+                    <p th:case="60" class="form-control-static" th:text="*{msgContent}" style="min-height: 200px;"></a>
+                    <p th:case="*" title="点击去完成任务" th:attr="data-params=*{msgParams}" class="form-control-static link" id="go_task" th:text="*{msgContent}" style="min-height: 200px;"></a>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">发送人：</label>
+                <div class="col-sm-10">
+                    <p class="form-control-static" th:text="*{createBy}"></p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">发送时间：</label>
+                <div class="col-sm-10">
+                    <p class="form-control-static" th:text="*{createTime}"></p>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-2 control-label">最近阅读：</label>
+                <div class="col-sm-10">
+                    <p class="form-control-static" th:text="*{readTime}"></p>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="admin/include :: common" />
+    <script th:inline="javascript">
+        $(function(){
+           $("#go_task").click(function () {
+               var msgType=$("#msgType").val();
+               var paramStr=$(this).data("params");
+               if(paramStr!=undefined && paramStr!=""){
+                   var params=eval(paramStr);
+                   var runFlowId=params.runFlowId;
+                   parent.goAudit(runFlowId,msgType);
+               }
+           });
+        });
+    </script>
+</body>
+</html>

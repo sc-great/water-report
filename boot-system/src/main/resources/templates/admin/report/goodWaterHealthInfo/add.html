@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+<th:block th:include="admin/include :: header('新增水厂水质数据信息（自来水厂/给水厂）')" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-goodWaterHealthInfo-add">
+        <input id="goodWaterHealthInfo_params" name="params[icon]" th:value="${icon}" type="hidden">
+        <div class="form-group">
+            <label class="col-sm-2 control-label label-left">PH值进水：</label>
+            <div class="col-sm-4">
+                <input name="phIn" id="phIn" class="form-control" placeholder="请输入PH值进水" 
+                		type="number" min="0" max="14" maxLength="5" oninput="autoformart($(this))">
+            </div>
+            <label class="col-sm-2 control-label label-left is-required ">PH值出水：</label>
+            <div class="col-sm-4">
+                <input name="phOut" class="form-control" placeholder="请输入PH值出水" required
+                		type="number" min="0" max="14" maxLength="5" oninput="autoformart($(this))">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label label-left">浊度进水：</label>
+            <div class="col-sm-4">
+                <div class="input-group">
+                    <input name="ntuIn" class="form-control" placeholder="请输入浊度进水" 
+                    		type="number" min="0" max="10000" maxLength="5" oninput="autoformart($(this))">
+                    <span class="input-group-addon">NTU</span>
+                </div>
+            </div>
+            <label class="col-sm-2 control-label label-left">浊度出水：</label>
+            <div class="col-sm-4">
+                <div class="input-group">
+                    <input name="ntuOut" class="form-control" placeholder="请输入浊度出水" 
+                    		type="number" min="0" max="10000" maxLength="5" oninput="autoformart($(this))"> 
+                    <span class="input-group-addon">NTU</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label label-left is-required">COL2出水：</label>
+            <div class="col-sm-4">
+                <div class="input-group">
+                    <input name="col2Out" class="form-control" placeholder="请输入COL2出水" required
+                    		type="number" min="0" max="10000" maxLength="5" oninput="autoformart($(this))">
+                    <span class="input-group-addon">Mg/L</span>
+                </div>
+            </div>
+            <label class="col-sm-2 control-label label-left is-required">出水细菌总数：</label>
+            <div class="col-sm-4">
+                <div class="input-group">
+                    <input name="germOut" class="form-control" placeholder="请输入出水细菌总数" required
+                    		type="number" min="0" max="10000" maxLength="5" oninput="autoformart($(this))">
+                    <span class="input-group-addon">CFU/mL</span>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: form" />
+</body>
+<script th:inline="javascript">
+var form_goodWaterHealthInfo_add_prefix = ctx + "admin/report/goodWaterHealthInfo";
+
+$("#form-goodWaterHealthInfo-add").validate({
+    focusCleanup: true
+});
+
+function submitHandler() {
+    if ($.validate.form()) {
+        $.operate.save(form_goodWaterHealthInfo_add_prefix + "/doAdd", $('#form-goodWaterHealthInfo-add').serialize());
+    }
+}
+
+function isEmpty() {
+    var obj = document.getElementById("phIn").value;
+
+    if (obj != null || obj != "") {
+
+        return false;
+    }
+}
+
+function index_goodWaterHealthInfo_submitHandler() {
+    if ($.validate.formRequired("form-goodWaterHealthInfo-add")) {
+        $.operate.saveModal(form_goodWaterHealthInfo_add_prefix + "/doAdd", $('#form-goodWaterHealthInfo-add').serialize());
+    }
+}
+
+$.post(form_goodWaterHealthInfo_add_prefix + "/checkIsOver?operateIcon=add", function (data) {
+    if (data.code == web_status.SUCCESS) {
+        $("#goodWaterHealthInfo_params").val("1");
+    } else if (data.code == web_status.FAIL) {
+        $("#goodWaterHealthInfo_params").val("2");
+
+        $("#form-goodWaterHealthInfo-add .form-group input[name=\"phIn\"]").val(data.data.phIn);
+        $("#form-goodWaterHealthInfo-add .form-group input[name=\"phOut\"]").val(data.data.phOut);
+        $("#form-goodWaterHealthInfo-add .form-group input[name=\"ntuIn\"]").val(data.data.ntuIn);
+        $("#form-goodWaterHealthInfo-add .form-group input[name=\"ntuOut\"]").val(data.data.ntuOut);
+        $("#form-goodWaterHealthInfo-add .form-group input[name=\"col2Out\"]").val(data.data.col2Out);
+        $("#form-goodWaterHealthInfo-add .form-group input[name=\"germOut\"]").val(data.data.germOut);
+    }
+});
+
+// input限制
+function autoformart(obj) {
+	var val = obj.val();
+	if (val == null || val == undefined || val == "") {
+		obj.val("");
+		return;
+	}
+	var maxLength = obj.attr("maxLength");
+	var max = obj.attr("max");
+	if (val.length > maxLength) {
+		obj.val(val.slice(0, maxLength)); // 限制长度
+		return;
+	}
+	if (parseFloat(val) > parseFloat(max)) {
+		obj.val(val.slice(0, val.length - 1)); // 限制大小
+		return;
+	}
+	obj.val(parseFloat(val));
+}
+</script>
+</html>

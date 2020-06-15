@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+<th:block th:include="admin/include :: header('查看详情')"/>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+            	<input id="consumableId" name="id" hidden="hidden" th:value="${id}"/>
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            <p>填报日期：</p>
+                            <input type="text" class="time-input" name="fillDate" data-type="date" data-format="yyyy-MM-dd"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="admin/include :: common"/>
+<th:block th:include="admin/include :: table"/>
+<script th:inline="javascript">
+var prefix = ctx + "admin/materialControl/consumable";
+$(function () {
+    var options = {
+        url: prefix + "/doListInfo",
+        modalName: "水厂耗材管理",
+        rememberSelected: true,
+        uniqueId: "id",
+        columns: [
+        	{
+                field: "",
+                title: '序号',
+                align: 'center',
+                formatter: function (value, row, index) {
+                	return index + 1;
+                }
+            },
+            {
+                field: "name",
+                title: "名称",
+                align: "center",
+                formatter: function (value, row, index) {
+                	if (row.model == null || row.model == undefined || row.model == "")
+                		return row.name;
+                	var model = $.trim(row.model);
+                	if (model == "")
+                		return row.name;
+                    return row.name + "（" + model + "）";
+                }
+            },
+            {
+                field: "total",
+                title: "总量（PCS）",
+                align: "center"
+            },
+            {
+                field: "",
+                title: "操作",
+                align: "center",
+                formatter: function (value, row, index) {
+                	var lastSetTime = new Date(row.lastSetTime).getTime();
+                	var lastGetTime = new Date(row.lastGetTime).getTime();
+                	if (lastSetTime > lastGetTime)
+                		return "<font color='green'>添加</font>";
+                	else
+                		return "<font color='blue'>领用</font>";
+                }
+            },
+            {
+                field: "",
+                title: "操作数量（PCS）",
+                align: "center",
+                formatter: function (value, row, index) {
+                	var lastSetTime = new Date(row.lastSetTime).getTime();
+                	var lastGetTime = new Date(row.lastGetTime).getTime();
+                	if (lastSetTime > lastGetTime)
+                		return row.lastSetNum;
+                	else
+                		return row.lastGetNum;
+                }
+            },
+            {
+                field: "",
+                title: "操作时间",
+                align: "center",
+                formatter: function (value, row, index) {
+                	var lastSetTime = new Date(row.lastSetTime).getTime();
+                	var lastGetTime = new Date(row.lastGetTime).getTime();
+                	if (lastSetTime > lastGetTime)
+                		return row.lastSetTime;
+                	else
+                		return row.lastGetTime;
+                }
+            },
+            {
+                field: "",
+                title: "操作人员",
+                align: "center",
+                formatter: function (value, row, index) {
+                	var lastSetTime = new Date(row.lastSetTime).getTime();
+                	var lastGetTime = new Date(row.lastGetTime).getTime();
+                	if (lastSetTime > lastGetTime)
+                		return row.lastSetUserName;
+                	else
+                		return row.lastGetUserName;
+                }
+            },
+            {
+                field: "fillDate",
+                title: "填报日期",
+                align: "center"
+            }]
+    };
+    $.table.init(options);
+    
+    var doc = window.top == window.parent ? window.document : window.parent.document;
+    $(".layui-layer-btn", doc).hide();
+    $("#layui-layer-iframe1", doc).css("height", "458px");
+    $(".table-striped").css("min-height", "80%");
+    $(".table-striped").css("margin-bottom", "2%");
+});
+</script>
+</body>
+</html>

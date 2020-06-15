@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.materialControl.mapper.CostInfoMapper">
+	<resultMap type="CostInfo" id="resultMapping">
+		<result property="id" 			column="id" />
+		<result property="fillDate" 	column="fill_date" />
+		<result property="fillTime" 	column="fill_time" />
+		<result property="fillUserId" 	column="fill_user_id" />
+		<result property="fillUserName" column="fill_user_name" />
+		<result property="thisYear" 	column="this_year" />
+		<result property="lastYear" 	column="last_year" />
+		<result property="currentEnter" column="current_enter" />
+		<result property="currentTotal" column="current_total" />
+		<result property="factoryId" 	column="factory_id" />
+		<result property="areaId" 		column="area_id" />
+		<result property="effectIcon" 	column="effect_icon" />
+	</resultMap>
+
+	<sql id="select">
+		SELECT
+			t.*,
+			( SELECT a.area_name FROM r_area a WHERE a.area_id = t.area_id ) AS areaName 
+		FROM
+			m_cost_info t
+	</sql>
+
+	<sql id="where">
+		<where>
+			<if test="id != null and id != ''">
+				and t.id = #{id}
+			</if>
+			<if test="fillDate != null and fillDate != ''">
+				and t.fill_date = #{fillDate}
+			</if>
+			<if test="factoryId != null and factoryId != ''">
+				and t.factory_id = #{factoryId}
+			</if>
+			<if test="fillUserId != null and fillUserId != ''">
+				and t.fill_user_id = #{fillUserId}
+			</if>
+			<if test="effectIcon != null and effectIcon != ''">
+				and t.effect_icon = #{effectIcon}
+			</if>
+			<if test="areaId != null and areaId != ''">
+				and t.area_id = #{areaId}
+			</if>
+			<if test="params.ids != null">
+				and t.id in
+				<foreach collection="params.ids" item="id" open="("
+					separator="," close=")">
+					#{id}
+				</foreach>
+			</if>
+			<if test="params.factoryIds != null and params.factoryIds != ''">
+				and FIND_IN_SET(t.factory_id,'${params.factoryIds}')
+			</if>
+			<if test="params.companyId != null and params.companyId != ''">
+				and t.factory_id IN(
+					SELECT org_id FROM sys_org WHERE parent_id='${params.companyId}' AND org_type='3'
+				)
+			</if>
+			<if test="params.areaIds != null and params.areaIds != ''">
+				and FIND_IN_SET(t.area_id, '${params.areaIds}')
+			</if>
+			<!-- 数据范围过滤 -->
+			${params.dataScope}
+		</where>
+	</sql>
+
+	<select id="getList" parameterType="CostInfo" resultMap="resultMapping">
+		<include refid="select" />
+		<include refid="where" />
+		order by t.fill_time desc
+	</select>
+
+	<insert id="insert" parameterType="CostInfo">
+		<selectKey keyProperty="id" resultType="String" order="BEFORE">
+			select replace(uuid(),'-','') from dual
+		</selectKey>
+		insert into m_cost_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null ">id,</if>
+			<if test="fillDate != null ">fill_date,</if>
+			fill_time,
+			<if test="thisYear != null ">this_year,</if>
+			<if test="lastYear != null ">last_year,</if>
+			<if test="currentEnter != null ">current_enter,</if>
+			<if test="currentTotal != null ">current_total,</if>
+			<if test="factoryId != null ">factory_id,</if>
+			<if test="areaId != null ">area_id,</if>
+			<if test="fillUserId != null ">fill_user_id,</if>
+			<if test="fillUserName != null ">fill_user_name,</if>
+			effect_icon
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null ">#{id},</if>
+			<if test="fillDate != null ">#{fillDate},</if>
+			NOW(),
+			<if test="thisYear != null ">#{thisYear},</if>
+			<if test="lastYear != null ">#{lastYear},</if>
+			<if test="currentEnter != null ">#{currentEnter},</if>
+			<if test="currentTotal != null ">#{currentTotal},</if>
+			<if test="factoryId != null ">#{factoryId},</if>
+			<if test="areaId != null ">#{areaId},</if>
+			<if test="fillUserId != null ">#{fillUserId},</if>
+			<if test="fillUserName != null ">#{fillUserName},</if>
+			'1'
+		</trim>
+	</insert>
+
+	<update id="update" parameterType="CostInfo">
+		update m_cost_info
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="thisYear != null ">this_year = #{thisYear},</if>
+			<if test="lastYear != null ">last_year = #{lastYear},</if>
+			<if test="currentEnter != null ">current_enter = #{currentEnter},</if>
+			<if test="currentTotal != null ">current_total = #{currentTotal},</if>
+			<if test="effectIcon != null ">effect_icon = #{effectIcon},</if>
+		</trim>
+		where id = #{id}
+	</update>
+
+	<select id="getEntity" parameterType="CostInfo" resultMap="resultMapping">
+		<include refid="select" />
+		<include refid="where" />
+		order by t.fill_time desc LIMIT 1
+	</select>
+
+	<select id="getLast" parameterType="CostInfo" resultMap="resultMapping">
+		<include refid="select" />
+		<include refid="where" />
+		order by t.fill_time desc LIMIT 1
+	</select>
+
+	<delete id="delete" parameterType="CostInfo">
+		delete t from m_cost_info t
+		<include refid="where" />
+	</delete>
+
+	<select id="getSum" parameterType="CostInfo" resultType="map">
+		SELECT
+			IFNULL( SUM( t.this_year ), 0 ) AS thisYear,
+			IFNULL( SUM( t.last_year ), 0 ) AS lastYear,
+			IFNULL( SUM( t.current_enter ), 0 ) AS currentEnter,
+			IFNULL( SUM( t.current_total ), 0 ) AS currentTotal,
+			( SELECT area_name FROM r_area a WHERE a.area_id = #{areaId} ) AS areaName 
+		FROM
+			m_cost_info t
+		<where>
+			<if test="fillDate != null and fillDate != ''">
+				and t.fill_date = #{fillDate}
+			</if>
+			<if test="effectIcon != null and effectIcon != ''">
+				and t.effect_icon = #{effectIcon}
+			</if>
+			<if test="areaId != null and areaId != ''">
+				and t.area_id = #{areaId}
+			</if>
+			<if test="params.dateSta != null and params.dateSta != ''">
+				and t.fill_date &gt;= #{params.dateSta}
+			</if>
+			<if test="params.dateEnd != null and params.dateEnd != ''">
+				and t.fill_date &lt;= #{params.dateEnd}
+			</if>
+			<if test="params.areaIds != null and params.areaIds != ''">
+				and FIND_IN_SET(t.area_id, '${params.areaIds}')
+			</if>
+		</where>
+	</select>
+	<!--- 集团、区域、厂区领导登录手机端：收费情况模块列表查询 当年实际收费款: 
+			a1, 当年目标款：a2 ,当年收费进展率： a3 特别注意：在收费情况表中存在一年中有多条"当年目标"款，只要最新填入的那个当年目标 -->
+	<select id="getSumBySubjectCost" parameterType="CostInfo" resultType="map">
+		SELECT
+			m.a1, m.a2, ROUND( a1 / a2, 2 ) * 100 AS a3, m.areaName 
+		FROM
+			(
+			SELECT
+				SUM( t.current_total ) AS a1,
+				( SELECT t.this_year FROM m_cost_info t WHERE t.effect_icon = '1' AND t.area_id = #{areaId}
+						AND LEFT ( t.fill_date, 4 ) = LEFT ( NOW( ), 4 ) ORDER BY fill_time DESC LIMIT 1 ) AS a2,
+				( SELECT area_name FROM r_area a WHERE a.area_id = #{areaId} ) AS areaName
+			FROM
+				m_cost_info t 
+			WHERE
+				t.effect_icon = '1' 
+				AND t.area_id = #{areaId}
+				AND LEFT ( t.fill_date, 4 ) = LEFT ( NOW( ), 4 ) 
+			) m
+	</select>
+
+	<!-- 手机端登录后首页栏： 收费进展=当年实际 到帐/ -->
+	<select id="getSumByApp" parameterType="CostInfo" resultType="Double">
+		SELECT IFNULL( SUM(t.current_total), 0 ) AS speed FROM m_cost_info t
+		<where>
+			<if test="effectIcon != null and effectIcon != ''">
+				and t.effect_icon = #{effectIcon}
+			</if>
+			<if test="fillDate != null and fillDate != ''">
+				and LEFT (t.fill_date,4)=LEFT (NOW(),4)
+			</if>
+			<if test="params.areaIds != null and params.areaIds != ''">
+				and FIND_IN_SET(t.area_id, '${params.areaIds}')
+			</if>
+		</where>
+	</select>
+	
+	<!-- 手机端登录后首页栏： 当年应收目标 :因为表中每月记录都有当年目标，只取最新填的那条记录中的当年目标 -->
+	<select id="getSumByAppYear" parameterType="CostInfo" resultType="map">
+		SELECT IFNULL( t.this_year, 0 ) AS speed FROM m_cost_info t
+		<where>
+			<if test="effectIcon != null and effectIcon != ''">
+				and t.effect_icon = #{effectIcon}
+			</if>
+			<if test="fillDate != null and fillDate != ''">
+				and LEFT (t.fill_date,4)=LEFT (NOW(),4)
+			</if>
+			<if test="areaId != null and areaId != ''">
+				and t.area_id = #{areaId}
+			</if>
+		</where>
+		order by t.fill_time desc limit 1
+	</select>
+</mapper>

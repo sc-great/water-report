@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.report.mapper.UserHealthInfoMapper">
+    <resultMap type="UserHealthInfo" id="resultMapping">
+        <result property="id"           column="id"/>
+        <result property="userName"     column="user_name"/>
+        <result property="mobile"       column="mobile"/>
+        <result property="workType"     column="work_type"/>
+        <result property="temp"         column="temp"/>
+        <result property="healthStatus" column="health_status"/>
+        <result property="factoryId"    column="factory_id"/>
+        <result property="areaId"       column="area_id"/>
+        <result property="fillDate"     column="fill_date"/>
+        <result property="fillTime"     column="fill_time"/>
+        <result property="isInFactory"  column="is_in_factory"/>
+        <result property="effectIcon"   column="effect_icon"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="UserHealthInfo">
+        <selectKey keyProperty="id" resultType="String" order="BEFORE">
+            select replace(uuid(),'-','') from dual
+        </selectKey>
+        insert into r_user_health_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null ">id,</if>
+            <if test="userName != null ">user_name,</if>
+            <if test="mobile != null ">mobile,</if>
+            <if test="workType != null ">work_type,</if>
+            <if test="temp != null ">temp,</if>
+            <if test="healthStatus != null ">health_status,</if>
+            <if test="factoryId != null ">factory_id,</if>
+            <if test="areaId != null ">area_id,</if>
+            <if test="fillDate != null ">fill_date,</if>
+            <if test="fillTime != null ">fill_time,</if>
+            <if test="isInFactory != null ">is_in_factory,</if>
+            <if test="effectIcon != null ">effect_icon,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null ">#{id},</if>
+            <if test="userName != null ">#{userName},</if>
+            <if test="mobile != null ">#{mobile},</if>
+            <if test="workType != null ">#{workType},</if>
+            <if test="temp != null ">#{temp},</if>
+            <if test="healthStatus != null ">#{healthStatus},</if>
+            <if test="factoryId != null ">#{factoryId},</if>
+            <if test="areaId != null ">#{areaId},</if>
+            <if test="fillDate != null ">#{fillDate},</if>
+            <if test="fillTime != null ">#{fillTime},</if>
+            <if test="isInFactory != null ">#{isInFactory},</if>
+            <if test="effectIcon != null ">#{effectIcon},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="UserHealthInfo">
+        update r_user_health_info
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userName != null ">user_name = #{userName},</if>
+            <if test="mobile != null ">mobile = #{mobile},</if>
+            <if test="workType != null ">work_type = #{workType},</if>
+            <if test="temp != null ">temp = #{temp},</if>
+            <if test="healthStatus != null ">health_status = #{healthStatus},</if>
+            <if test="factoryId != null ">factory_id = #{factoryId},</if>
+            <if test="areaId != null ">area_id = #{areaId},</if>
+            <if test="fillDate != null ">fill_date = #{fillDate},</if>
+            <if test="fillTime != null ">fill_time = #{fillTime},</if>
+            <if test="isInFactory != null ">is_in_factory = #{isInFactory},</if>
+            <if test="effectIcon != null ">effect_icon = #{effectIcon},</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <update id="updateByWhere" parameterType="UserHealthInfo">
+        update r_user_health_info t
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="params.userName != null ">user_name = '${params.userName}',</if>
+            <if test="params.mobile != null ">mobile = '${params.mobile}',</if>
+            <if test="params.workType != null ">work_type = '${params.workType}',</if>
+            <if test="params.temp != null ">temp = '${params.temp}',</if>
+            <if test="params.healthStatus != null ">health_status = '${params.healthStatus}',</if>
+            <if test="params.factoryId != null ">factory_id = '${params.factoryId}',</if>
+            <if test="params.areaId != null ">area_id = '${params.areaId}',</if>
+            <if test="params.fillDate != null ">fill_date = '${params.fillDate}',</if>
+            <if test="params.fillTime != null ">fill_time = '${params.fillTime}',</if>
+            <if test="params.isInFactory != null ">is_in_factory = '${params.isInFactory}',</if>
+            <if test="params.effectIcon != null ">effect_icon = '${params.effectIcon}',</if>
+        </trim>
+        <include refid="where"/>
+    </update>
+    <sql id="where">
+        <where>
+            <if test="id!=null  and id != ''">
+                and t.id=#{id}
+            </if>
+            <if test="userName != null  and userName != ''">
+                and t.user_name like concat('%', #{userName}, '%')
+            </if>
+            <if test="mobile != null  and mobile != ''">
+                and t.mobile = #{mobile}
+            </if>
+            <if test="workType != null  and workType != ''">
+                and t.work_type = #{workType}
+            </if>
+            <if test="healthStatus != null  and healthStatus != ''">
+                and t.health_status = #{healthStatus}
+            </if>
+            <if test="factoryId != null  and factoryId != ''">
+                and t.factory_id = #{factoryId}
+            </if>
+            <if test="areaId != null  and areaId != ''">
+                and t.area_id = #{areaId}
+            </if>
+            <if test="fillDate != null  and fillDate != ''">
+                and t.fill_date = #{fillDate}
+            </if>
+            <if test="isInFactory != null  and isInFactory != ''">
+                and t.is_in_factory = #{isInFactory}
+            </if>
+            <if test="effectIcon != null  and effectIcon != ''">
+                and t.effect_icon = #{effectIcon}
+            </if>
+            <if test="params.ids!=null">
+                and t.id in
+                <foreach collection="params.ids" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="params.areaIds != null and params.areaIds != ''">
+                and FIND_IN_SET(t.area_id,'${params.areaIds}')
+            </if>
+            <if test="params.companyId != null  and params.companyId != ''">
+                and t.factory_id in(
+                  SELECT t.org_id FROM sys_org t WHERE t.parent_id='${params.companyId}' or t.org_id='${params.companyId}'
+                )
+            </if>
+            <if test="params.healthStatuses!=null">
+                and find_in_set(t.health_status,#{params.healthStatuses})
+            </if>
+            <!-- 数据范围过滤 -->
+            ${params.dataScope}
+        </where>
+    </sql>
+
+    <delete id="delete" parameterType="UserHealthInfo">
+        delete t from r_user_health_info t
+        <include refid="where"/>
+    </delete>
+
+    <select id="getCount" parameterType="UserHealthInfo" resultType="int">
+        select count(*) from r_user_health_info t
+        <include refid="where"/>
+    </select>
+
+    <sql id="select">
+        select t.* from r_user_health_info t
+    </sql>
+
+    <select id="getEntity" parameterType="UserHealthInfo" resultMap="resultMapping">
+        <include refid="select"/>
+        <include refid="where"/>
+        LIMIT 1
+    </select>
+
+    <select id="getList" parameterType="UserHealthInfo" resultMap="resultMapping">
+        <include refid="select"/>
+        <include refid="where"/>
+        order by t.fill_date desc
+    </select>
+</mapper>

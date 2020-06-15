@@ -1,0 +1,67 @@
+package ${packageName}.service;
+
+import ${packageName}.domain.${ClassName};
+import java.util.List;
+import java.util.Map;
+#if($table.tree)
+import com.boot.common.core.domain.Ztree;
+#end
+
+/**
+ * ${functionName}Service接口
+ * 
+ * @author ${author}
+ * @date ${datetime}
+ */
+public interface I${ClassName}Service {
+    /**
+     * 新增${functionName}
+     *
+     * @param ${className} ${functionName}
+     * @return 结果
+     */
+    public int add(${ClassName} ${className});
+    /**
+     * 修改${functionName}
+     *
+     * @param ${className} ${functionName}
+     * @return 结果
+     */
+    public int update(${ClassName} ${className});
+    /**
+     * 批量删除${functionName}
+     *
+     * @param ids 需要删除的数据ID
+     * @return 结果
+     */
+    public int deleteByIds(String ids);
+    /**
+     * 查询${functionName}数量
+     *
+     * @param ${className} 查询条件
+     * @return ${functionName}数量
+     */
+    public int getCount(${ClassName} ${className});
+    /**
+     * 获取${functionName}实体对象
+     * 
+     * @param ${pkColumn.javaField} ${functionName}ID
+     * @return ${functionName}
+     */
+    public ${ClassName} getEntityById(${pkColumn.javaType} ${pkColumn.javaField});
+    /**
+     * 查询${functionName}列表
+     * 
+     * @param ${className} ${functionName}
+     * @return ${functionName}集合
+     */
+    public List<${ClassName}> getList(${ClassName} ${className});
+#if($table.tree)
+    /**
+     * 查询${functionName}树列表
+     * 
+     * @return 所有${functionName}信息
+     */
+    public List<Ztree> getTree(${ClassName} ${className});
+#end
+}

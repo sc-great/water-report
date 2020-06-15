@@ -1,0 +1,431 @@
+<!doctype html>
+<html class="no-js" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport"
+	content="width=ideal viewport, initial-scale=1 user-scalable=0" />
+<meta http-equiv="Cache-Control"
+	content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<title>强制检测</title>
+<link rel="stylesheet"
+	th:href="${'/webapp/css/font-awesome.css?v='+@toolsUtils.version()}">
+<link rel="stylesheet"
+	th:href="${'/webapp/css/com.css?v='+@toolsUtils.version()}">
+<link rel="stylesheet"
+	th:href="${'/webapp/css/style.css?v='+@toolsUtils.version()}">
+<script th:src="${'/webapp/js/jquery.min.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/webapp/js/pace.min.js?v='+@toolsUtils.version()}"></script>
+<script
+	th:src="${'/webapp/js/plugin/layer_mobile/layer.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/webapp/js/common.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/webapp/js/jdate.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/webapp/js/dateUtil.js?v='+@toolsUtils.version()}"></script>
+    <!--json 序列化-->
+    <script th:src="${'/js/jquery.serializejson.js?v='+@toolsUtils.version()}"></script>
+     <script th:src="${'/ajax/libs/layui/layui.js?v='+@toolsUtils.version()}"></script>
+     
+	<style>
+.factoryInfo_formBox div p {
+	position: relative;
+}
+label.error {
+	position: absolute;
+	right: 15vw;
+	color: #ef392b;
+	font-size: 12px;
+	top: 0.5vw;
+}
+input.error {
+	background-color: #fbe2e2;
+    border-color: #c66161;
+    color: #c00;
+}
+
+.factoryInfo_header {
+    background: #ededed;
+    line-height: 6vh;
+}
+.factoryInfo_header .title {
+    padding-left: 8px;
+    color: #000;
+    font-weight: bold;
+    font-size: 1.6rem;
+}
+.factoryInfo_header .title i {
+    float: left;
+    line-height: 6vh;
+}
+.factoryInfo_header .title span {
+	display: flex;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.factoryInfo_formBox {
+	font-size: 1.5rem;
+}
+.factoryInfo_formBox div {
+	line-height: 6vh;
+	margin-left: 3vh;
+}
+.factoryInfo_formBox div p {
+	display: inline-block;
+	border: 1px #dcdcdc solid;
+	background: #f9f9f9;
+	width: 65%;
+	line-height: 4vh;
+}
+.factoryInfo_formBox div span {
+	display: inline-block;
+	width: 26%;
+}
+input, select {
+	border: 0;
+	outline: none;
+	background-color: rgba(0, 0, 0, 0);
+}
+.factoryInfo_formBox form {
+	margin-top: 3vh;
+}
+.factoryInfo_formBox div p input, .factoryInfo_formBox div p select {
+	width: 56%;
+	line-height: 4vh;
+	padding-left: 0.5vh;
+	width: 98%;
+}
+.factoryInfo_formBox .youDanWei p input {
+	width: 78%;
+}
+.factoryInfo_formBox div p b {
+	margin: 0 1vh;
+	font-style: normal;
+	float: right;
+	font-weight: normal;
+	position: absolute;
+    top: 0;
+    right: 0;
+}
+.factoryInfo_formBox .button_group {
+	width: 80%;
+	margin: 3vh auto;
+	height: 10vh;
+}
+.factoryInfo_formBox .button_group a {
+	display: inline-block;
+    width: 45%;
+    text-align: center;
+    line-height: 4ch;
+    font-size: 1.6rem;
+    margin-top: 2vh;
+}
+.factoryInfo_formBox .button_group .reset {
+	background: #f4f4f4;
+	float: left;
+}
+.factoryInfo_formBox .button_group .submit {
+	background: #1d7bb8;
+    color: #fff;
+    float: right;
+}
+
+.factoryInfo_buttonBox {
+	line-height: 6vh;
+	height: 6vh;
+}
+.factoryInfo_buttonBox div {
+	float: right;
+	width: 24%;
+	text-align: right;
+	height: 6vh;
+}
+.factoryInfo_buttonBox div img {
+	margin: 1.4vh 0 0 1vh;
+	float: left;
+}
+.factoryInfo_buttonBox div span {
+	float: right;
+	padding-right: 3vw;
+}
+
+  input {
+			border: 0;
+			outline: none;
+			background-color: rgba(0, 0, 0, 0);
+		}
+		input {
+			border: 1px #dcdcdc solid;
+			background: #f9f9f9;
+		}
+	    .home_main_form {
+	    	width: 96%;
+	    	margin: 2vh auto;
+	    }
+	    .home_main_form .from_box {
+	    	width: 100%;
+	    	border: 1px #1590ee solid;
+	    	font-size: 1.5rem;
+	    	background: #fff;
+	    	margin: 1vh 0;
+	    }
+	    .home_main_form .other {
+	    	border-color: #ff7e00;
+	    }
+	    .home_main_form .from_box .ibox-title {
+		    width: 100%;
+		    height: 5vh;
+		    display: table;
+		    text-decoration: none;
+		    margin: 1.5vh 0;
+	    }
+	    .home_main_form .from_box .ibox-title .icon,.home_main_form .from_box .ibox-title .icon_w {
+		    height: 100%;
+		    width: 10vw;
+		    display: table-cell;
+		    text-align: center;
+		    vertical-align: middle;
+	    }
+	    .home_main_form .from_box .ibox-title .icon img {
+	    	height: auto;
+	    	width: 5vw;
+	    }
+	    .home_main_form .from_box .ibox-title .icon_w img {
+	    	height: auto;
+	    	width: 3.5vw;
+	    }
+	    .home_main_form .from_box .ibox-title .text {
+		    display: table-cell;
+		    vertical-align: middle;
+		    font-size: 1.4rem;
+		    font-weight: bold;
+		}
+		.from_box p {
+			line-height: 5vh;
+			margin-left: 3vh;
+		}
+		.from_box p span {
+			display: inline-block;
+    		width: 26%;
+		}
+		.from_box p input {
+			width: 50%;
+			line-height: 3.5vh;
+			padding-left: 0.5vh;
+		}
+		.from_box p b {
+			font-weight: normal;
+    		margin-left: 1vh;
+		}
+		.from_box .button_group {
+			width: 80%;
+	   		margin: 3vh auto;
+		}
+		.from_box .button_group a {
+			display: inline-block;
+		    width: 45%;
+		    text-align: center;
+		    line-height: 4.5ch;
+		}
+		.from_box .button_group .reset {
+			background: #f4f4f4;
+		}
+		.from_box .button_group .submit {
+			background: #1d7bb8;
+		    color: #fff;
+		    float: right;
+		}
+		 .textarea-inherit {
+        width: 88%;
+        overflow: auto;
+        word-break: break-all; 
+    }
+</style>
+</head>
+<body>
+	<div class="factoryInfo_header">
+		<div class="title" onclick="goBack();">
+			<i class="fa fa-chevron-left"></i><span id="consumableTitle">强制检测</span>
+		</div>
+	</div>
+    <div class="from_box">
+        <form   id="mandatory_check_form">    		       
+	        	<p><span>检测日期</span><input  type="text" name="checkDate" id="checkDate"  style="width: 60%"><b></b></p>
+		        <p><span>检测周期</span><input  type="text"  name="checkCycle" id="checkCycle"  maxlength="5" style="width: 60%"
+		         onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')};mandatoryCheckInfo_autoCalculate()" ><b>天</b></p>
+		        <p><span>下次日期</span><input  type="text"  name="nextCheckDate" id="nextCheckDate"  readOnly style="width: 60%"><b></b></p>
+		        <p><span>检测项目</span><input  type="text" name="checkProject" maxlength="80" style="width: 60%"><b></b></p>
+		        <p><span>检测内容</span><textarea  name="checkInfo" maxlength="500"   rows="3"   class="textarea-inherit"></textarea><b></b></p>
+		        <p><span>检测结果</span><textarea name="checkResult" maxlength="500"  rows="3"   class="textarea-inherit"></textarea><b></b></p>
+		        <p><span>备注</span><textarea name="note" maxlength="500"  rows="3"   class="textarea-inherit"></textarea><b></b></p>		        
+	       
+			  <div class="button_group">
+            	<a class="reset"  id="reset" >重置</a>
+            	<a class="submit" id="submit_mandatory_check">提交</a>
+             </div>
+           </form>
+     </div>
+	
+	<div class="factoryInfo_formBox" id="factoryInfo_formBox_set" hidden="hidden"></div>
+	<div class="factoryInfo_formBox" id="factoryInfo_formBox_get" hidden="hidden"></div>
+	<div class="content center font-size-14">
+        <table class="cross-color">
+            <thead class="bg-color1 color-3">
+	            <tr class="font-size-12">
+					<th style="width:26%">填报日期</th>
+	                <th style="width:20%">检测日期</th>
+	                <th style="width:60%">检测项目</th>
+	            </tr>
+            </thead>
+            <tbody id="consumable_list" class="cross-color"></tbody>
+        </table>
+    </div>
+</body>
+
+<script>
+
+
+$(function() {
+	$("#consumable_list").html("");
+	$.post("/app/mandatoryCheckAreaFactoryData", function(data) {
+		if (data.code != 0)
+			return;
+		var manCheckList = data.data;
+		if (manCheckList == null || manCheckList == undefined || manCheckList.length <= 0)
+			return;
+		var html="";
+		for (var i = 0; i < manCheckList.length; i ++) {
+		    var tempText=manCheckList[i].checkProject;
+		    
+			html += '<tr>\n'+
+			'           <td>' + manCheckList[i].fillDate + '</td>\n' +
+            '        	<td>' + manCheckList[i].checkDate + '</td>\n' +
+            '           <td style="word-break:break-all">' + tempText + '</td>\n' +
+            '        </tr>\n';
+            if(i==7){
+              break;
+            }
+		}
+		$("#consumable_list").append(html);
+	})
+})
+
+	//时间控件
+	layui.use('laydate', function () {
+		    var laydate = layui.laydate;
+		    //执行一个laydate实例
+		    laydate.render({
+		        elem: '#checkDate', //指定元素
+		        showBottom: false,
+		        format: 'yyyy-MM-dd',
+		        trigger: 'click',
+		        done: function(value, date) {
+		        	mandatoryCheckInfo_autoCalculate();
+		        }
+		    });
+		   
+		});
+
+		// 自动计算
+		function mandatoryCheckInfo_autoCalculate() {
+		    var cdate = $("#checkDate").val();
+		    if (cdate == null || cdate == undefined || cdate == "")
+		    	return;
+		    var n = $("#checkCycle").val();
+		    if (n == null || n == undefined || n == "")
+		    	return;
+		
+		    $("#nextCheckDate").val(dateAddDays(cdate, n));
+		}
+		/**
+		指定日期增加天数
+		 */
+		function dateAddDays(dateStr, dayCount) {
+		    var tempDate = new Date(dateStr.replace(/-/g, "/")); // 把日期字符串转换成日期格式
+		    var resultDate = new Date((tempDate / 1000 + (86400 * dayCount)) * 1000); // 增加n天后的日期
+		    
+		    var y = resultDate.getFullYear();
+		    var m = resultDate.getMonth() + 1;
+		    var d = resultDate.getDate();
+		    var mm = m < 10 ? ("0" + m) : m;
+		    var dd = d < 10 ? ("0" + d) : d;
+		    
+		    return y + "-" + mm + "-" + dd;
+		}
+
+
+    $(function () {
+        $("#submit_mandatory_check").click(function () {
+        
+            var field = $('#mandatory_check_form').serializeJSON();
+           
+            if (field["checkDate"] == "") {
+                layer.open({
+                    content: '请填写检测日期！',
+                    btn: '知道了'
+                });
+                $("#checkDate").focus();
+                return false;
+            }
+            if (field["checkCycle"] == "") {
+                layer.open({
+                    content: '请填写检测周期！',
+                    btn: '知道了'
+                });
+                $("#checkCycle").focus();
+                return false;
+            }
+            if (field["checkProject"] == "") {
+                layer.open({
+                    content: '请填写检测项目！',
+                    btn: '知道了'
+                });
+                $("#checkProject").focus();
+                return false;
+            }
+                             
+            req("/app/doAddMandatoryCheck",field, function (result) {
+          
+                if (result.code == 0) {
+                     if(result.data.flag=="0"){                     
+                        layer.open({
+                          content: result.data.mess,
+                          btn: '知道了'
+                         });
+                        window.top.location.href = "/app/mandatoryCheckAreaFactory";
+                     }else if (result.data.flag=="1"){
+                         layer.open({
+                          content: result.data.mess,
+                          btn: '知道了'
+                         });
+                         setTimeout( function(){
+                             window.top.location.href = "/app/login";
+                         }, 5 * 600 )
+                                                                     
+                     }else{
+                        layer.open({
+                         content: "异常错误，请与 系统管理员联系！",
+                         btn: '知道了'
+                         });
+                     
+                     }
+
+                } else {
+                    layer.open({
+                        content: result.msg,
+                        btn: '知道了'
+                    });
+                    
+                }
+               
+                
+            }, "post");
+        });
+        
+          $("#reset").click(function () {
+               $('#mandatory_check_form')[0].reset() 
+               
+          });
+    });
+</script>
+</html>

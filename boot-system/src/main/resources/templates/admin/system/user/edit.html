@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+<th:block th:include="admin/include :: header('修改用户')" />
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <form id="form-user-edit" class="form-horizontal" th:object="${user}">
+        <input type="hidden" id="userId" name="userId" th:field="*{userId}">
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>基本信息</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">用户名称：</label>
+                            <div class="col-sm-10">
+                                <input type="text" maxlength="100" id="userName" name="userName" th:field="*{userName}" placeholder="请输入用户名称" class="form-control" required>
+                                <i class="required-icon">*</i>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label ">组织机构：</label>
+                            <div class="col-sm-10">
+                                <div id="orgs_div" class="tree-select">
+                                    <div style="line-height: 34px;"><i class="fa fa-spinner fa-spin"></i>正在初始化</div>
+                                </div>
+                                <i class="required-icon">*</i>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label ">岗位角色：</label>
+                            <div class="col-sm-10">
+                                <select name="params[roleIds]" class="form-control" required id="role_select">
+                                    <option value="">--请选择角色岗位--</option>
+                                    <option th:each="role : ${roleList}" th:value="${role.roleId}" th:text="${role.roleName}" th:selected="${role.roleId == roleId}"></option>
+                                </select>
+                                <i class="required-icon">*</i>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">登录账号：</label>
+                            <div class="col-sm-10">
+                                <input type="text" maxlength="30" id="loginName" name="loginName" th:field="*{loginName}" placeholder="请输入登录账号" class="form-control" required>
+                                <i class="required-icon">*</i>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">登录密码：</label>
+                            <div class="col-sm-10">
+                                <input type="password" id="password" name="password" placeholder="请输入登录密码" class="form-control">
+                                <i class="required-icon">*</i>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">状态：</label>
+                            <div class="col-sm-10">
+                                <label class="toggle-switch switch-solid">
+                                    <input type="checkbox" id="accountIsDisabled"  th:checked="${user.accountIsDisabled == '1' ? true : false}">
+                                    <span></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>用户信息</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="form-group">
+                            <div id="avatar_upload" style="text-align: center;"></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">手机号码：</label>
+                            <div class="col-sm-10">
+                                <input type="text" maxlength="11" id="phone" name="phone" th:field="*{phone}" placeholder="请输入手机号码" class="form-control" required>
+                                <i class="required-icon">*</i>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">出生日期：</label>
+                            <div class="col-sm-4">
+                                <input type="text"  id="birthday" name="birthday" th:field="*{birthday}" placeholder="请输入出生日期" readonly class="form-control">
+                            </div>
+                            <label class="col-sm-2 control-label">性别：</label>
+                            <div class="col-sm-4">
+                                <select id="sex" name="sex" class="form-control" th:with="type=${@dict.getType('sex')}">
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:selected="${dict.dictValue==user.sex}?true:false"></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>其他信息</h5>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="form-group">
+                            <label class="col-xs-1 control-label">备注：</label>
+                            <div class="col-xs-11">
+                                <textarea name="remark" maxlength="500" th:text="*{remark}" class="form-control" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="row">
+        <div class="col-sm-offset-5 col-sm-5">
+            <button type="button" class="btn btn-sm btn-primary" onclick="submitHandler()"><i class="fa fa-check"></i>保 存</button>&nbsp;
+            <button type="button" class="btn btn-sm btn-danger" onclick="closeItem()"><i class="fa fa-reply-all"></i>关 闭 </button>
+        </div>
+    </div>
+</div>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: form" />
+<th:block th:include="admin/include :: custom-plugins" />
+<th:block th:include="admin/include :: jasny-bootstrap" />
+<script th:inline="javascript">
+var prefix = ctx + "admin/system/user";
+$(function () {
+    var orgIds = [[${orgIds}]] == null ? "" : [[${orgIds}]];
+    var orgNames = [[${orgNames}]] == null ? "" : [[${orgNames}]];
+    loadOrgTree(orgIds, orgNames);
+
+    if ([[${orgType}]] == '3') {
+        $("#role_select option").each(function (index, item) {
+            if ($(item).val() == '' || $(item).val() == '3' || $(item).val() == '4' || $(item).val() == '5' || $(item).val() == '7') {
+                $(item).show();
+            } else {
+                $(item).hide();
+            }
+        });
+    } else {
+        $("#role_select option").each(function (index, item) {
+            if ($(item).val() == '' || $(item).val() == '1' || $(item).val() == '2' || $(item).val() == '6') {
+                $(item).show();
+            } else {
+                $(item).hide();
+            }
+        });
+    }
+    // var roleIds=[[${roleIds}]]==null?"":[[${roleIds}]];
+    // var roleNames=[[${roleNames}]]==null?"":[[${roleNames}]];
+    // loadRoleTree(orgIds,roleIds,roleNames);
+    // 头像控件
+    var avatar = [[${avatar}]];
+    if (avatar == null) {
+        avatar = {
+            id: "",
+            name: "",
+            path: "../../../../img/header.png"
+        };
+    }
+    var params = {
+        container: "#avatar_upload",
+        type: "preview",
+        file_name: "avatar",
+        accept: ".jpg,.jpeg,.gif,.png",
+        width: 126,
+        height: 126,
+        value: avatar
+    };
+    $.file.initUpload(params);
+
+    $("#cardNo").on("input propertychange", function () {
+        var info = getCardNoInfo($(this).val());
+        if (info != undefined) {
+            var birth = info.birth;
+            var sex = info.sex;
+            $("#sex").find("option[value='" + sex + "']").prop("selected", true);
+            $("#birthday").val(birth);
+        }
+    });
+});
+// 时间控件
+layui.use('laydate', function () {
+    var laydate = layui.laydate;
+    // 执行一个laydate实例
+    laydate.render({
+        elem: '#birthday', // 指定元素
+        showBottom: false,
+        format: 'yyyy-MM-dd',
+        trigger: 'click'
+    });
+});
+function loadOrgTree(checkIds, checkTexts) {
+    var params = {
+        url: ctx + "admin/system/org/treeListArea",
+        data: {
+            parentId: 0,
+            validStatus: 1
+        },
+        objId: 'orgs_div',
+        checkBox: false,
+        lastNodeShowCheckBox: true,
+        openLevel: 1,
+        valueId: 'orgIds',
+        textId: 'orgNames',
+        value_filed: 'orgId',
+        text_filed: 'orgName',
+        placeholder: '请选择所属机构',
+        required: 'required',
+        defaultValue: checkIds,
+        defaultText: checkTexts,
+        callback: function (values) {
+            if ($.common.isNotEmpty(values)) {
+                $.ajax({
+                    type: "get",
+                    url: ctx + "admin/system/org/get/" + values,
+                    dataType: 'json',
+                    data: {},
+                    success: function (r) {
+                        if (r.code == 0) {
+                            $("#role_select option[value='']").prop("selected", true);
+                            var selOrg = r.data;
+                            
+                         	// 初始化select——————————————————————解决IE11 select下的option隐藏问题
+                            toggleOptionInit($("#role_select"), true);
+                            
+                         	// 若机构类型是‘水厂（3）’则加载水厂角色，反之加载领导角色
+                            if (selOrg.orgType == '3') {
+                                $("#role_select option").each(function (index, item) {
+                                    if ($(item).val() == '' || $(item).val() == '3' || $(item).val() == '4' || $(item).val() == '5' || $(item).val() == '7') {
+                                        // $(item).show();
+                                        toggleOption($(item), "show"); // ——————————————————————解决IE11 select下的option隐藏问题
+                                    } else {
+                                        // $(item).hide();
+                                    	toggleOption($(item), ""); // ——————————————————————解决IE11 select下的option隐藏问题
+                                    }
+                                });
+                            } else if (selOrg.orgType == '2.5') { // 组织机构是区域，只有财务角色
+                                $("#role_select option").each(function (index, item) {
+                                    if ($(item).val() == '' || $(item).val() == '8') {
+                                        // $(item).show();
+                                    	toggleOption($(item), "show");
+                                    } else {
+                                        // $(item).hide();
+                                    	toggleOption($(item), "");
+                                    }
+                                });
+                            } else if (selOrg.orgType == '2') { // 11个公司
+                                $("#role_select option").each(function (index, item) {
+                                    if ($(item).val() == '' || $(item).val() == '6') {
+                                        // $(item).show();
+                                    	toggleOption($(item), "show");
+                                    } else {
+                                        // $(item).hide();
+                                    	toggleOption($(item), "");
+                                    }
+                                });
+                            } else { // 集团
+                            	$("#role_select option").each(function (index, item) {
+                                    if ($(item).val() == '' || $(item).val() == '1') {
+                                        // $(item).show();
+                                    	toggleOption($(item), "show");
+                                    } else {
+                                        // $(item).hide();
+                                    	toggleOption($(item), "");
+                                    }
+                                });
+                            }
+                        } else {
+                            $.modal.msgWarning(r.msg);
+                        }
+                    }
+                });
+            }
+        }
+    };
+    selectTree(params);
+}
+// 加载岗位角色树
+function loadRoleTree(orgIds, checkIds, checkTexts) {
+    // 岗位角色
+    var html = '<input type="text" name="roleNames" id="roleNames" value="' + (checkTexts != undefined ? checkTexts : "") + '" class="form-control" required placeholder="请先选择岗位角色" autocomplete="off" readonly="readonly" onclick="toggleTree(\'roles_div\');">\n' +
+        '		<span class="input-icon fa fa-caret-down"></span>\n' +
+        '		<input name="roleIds" id="roleIds" type="hidden" value="' + (checkIds != undefined ? checkIds : "") + '">\n' +
+        '		<div class="tree" style="position: absolute;border-top: none;max-height: 300px;display:none;">\n' +
+        '			<div class="node">\n' +
+        '				<div class="node-text">\n' +
+        '					<label>请先选择组织机构</label>\n' +
+        '				</div>\n' +
+        '			</div>\n' +
+        '		</div>';
+    var objHTML = $(html);
+    objHTML.find(".node-text").click(function () {
+        $("#roleIds").val("");
+        $("#roleNames").val("");
+        $(this).closest(".tree").slideUp();
+    });
+    $("#roles_div").html(objHTML);
+    if (orgIds != undefined) {
+        loadRoleOrg(orgIds, checkIds);
+    }
+}
+// 加载角色机构
+function loadRoleOrg(orgIds, checkIds) {
+    $("#roles_div .tree .node:gt(1)").remove();
+    if (orgIds != "") {
+        $.ajax({
+            url: ctx + "admin/system/role/getRoleTreeDataByOrgIds",
+            type: 'get',
+            data: {
+                orgIds: orgIds
+            },
+            success: function (result) {
+                if (result.code == 0) {
+                    var data = result.data;
+                    loadTree($("#roles_div .tree"), data, checkIds);
+                }
+            }
+        });
+    }
+}
+function loadTree(obj, data, checkIds) {
+    var html = treeHtml(data, checkIds);
+    var objHTML = $(html);
+    objHTML.find(".node-text").click(function () {
+        if ($(this).find(".node-icon").hasClass("fa-caret-right")) {
+            $(this).find(".node-icon").addClass("fa-caret-down").removeClass("fa-caret-right");
+            $(this).closest(".node").children(".node").slideDown("slow");
+        } else {
+            $(this).closest(".node").find(".node-icon").addClass("fa-caret-right").removeClass("fa-caret-down");
+            $(this).closest(".node").find(".node").slideUp("slow");
+        }
+    });
+    objHTML.find("input[type='checkbox']").bind("change", function () {
+        var values = "",
+        texts = "";
+        objHTML.closest(".tree").find("input[type='checkbox']:checked").each(function (index, item) {
+            var value = $(item).val();
+            var text = $(item).data("text");
+            if (values == "") {
+                values = value;
+            } else {
+                values += "," + value;
+            }
+            if (texts == "") {
+                texts = text;
+            } else {
+                texts += "," + text;
+            }
+        });
+        var valueObj = objHTML.closest(".tree-select").children("input[type='hidden']");
+        var textObj = objHTML.closest(".tree-select").children("input[type='text']");
+        valueObj.val(values);
+        textObj.val(texts);
+    });
+    obj.append(objHTML);
+}
+function treeHtml(data, checkIds) {
+    var html = "";
+    $.each(data, function (index, item) {
+        var childCount = item.childCount;
+        var value = item.id;
+        var text = item.name;
+        html += '<div class="node">\n' +
+        '			<div class="node-text">\n' + (childCount > 0 ? '<span class="node-icon fa fa-caret-down"></span>' : '') +
+        '			<label data-value="' + value + '" data-text="' + text + '">';
+        if (childCount == 0) {
+            var checked = checkIds == undefined ? false : (checkIds.indexOf(value) != -1 ? true : false);
+            html += '<input type="checkbox" value="' + value + '" data-text="' + text + '" ' + (checked ? 'checked="checked"' : '') + '>';
+        }
+        html += text + '</label>\n' +
+        '</div>\n';
+        if (childCount > 0) {
+            var children = item.children;
+            html += treeHtml(children, checkIds);
+        }
+        html += '</div>\n';
+    });
+    return html;
+}
+$("#form-user-edit").validate({
+    onkeyup: false,
+    rules: {
+        loginName: {
+            minlength: 2,
+            maxlength: 20,
+            remote: {
+                url: ctx + "admin/system/user/count",
+                type: "get",
+                dataType: "json",
+                data: {
+                    'params[notUserId]': function () {
+                        return $.common.trim($("#userId").val());
+                    },
+                    loginName: function () {
+                        return $.common.trim($("#loginName").val());
+                    }
+                },
+                dataFilter: function (data, type) {
+                    var json = eval("(" + data + ")");
+                    var code = json.code == 0 ? 1 : 0;
+                    return $.validate.unique(code);
+                }
+            }
+        },
+        password: {
+            minlength: 5,
+            maxlength: 20
+        },
+        phone: {
+            isPhone: true,
+            remote: {
+                url: ctx + "admin/system/user/count",
+                type: "get",
+                dataType: "json",
+                data: {
+                    'params[notUserId]': function () {
+                        return $.common.trim($("#userId").val());
+                    },
+                    phone: function () {
+                        return $.common.trim($("#phone").val());
+                    }
+                },
+                dataFilter: function (data, type) {
+                    var json = eval("(" + data + ")");
+                    var code = json.code == 0 ? 1 : 0;
+                    return $.validate.unique(code);
+                }
+            }
+        },
+        cardNo: {
+            maxlength: 18,
+            remote: {
+                url: ctx + "admin/system/user/count",
+                type: "get",
+                dataType: "json",
+                data: {
+                    'params[notUserId]': function () {
+                        return $.common.trim($("#userId").val());
+                    },
+                    cardNo: function () {
+                        return $.common.trim($("#cardNo").val());
+                    }
+                },
+                dataFilter: function (data, type) {
+                    var json = eval("(" + data + ")");
+                    var code = json.code == 0 ? 1 : 0;
+                    return $.validate.unique(code);
+                }
+            }
+        },
+        email: {
+            email: true
+        }
+    },
+    messages: {
+        // userCode:{
+        //     remote: "用户编号已经存在"
+        // },
+        // jobNumber:{
+        //     remote: "用户工号已经存在"
+        // },
+        loginName: {
+            remote: "登录账号已经存在"
+        },
+        phone: {
+            remote: "手机号码已经存在"
+        },
+        // dingUserId:{
+        //     remote: "钉钉ID已经存在"
+        // },
+        cardNo: {
+            remote: "身份证号已经存在"
+        }
+    },
+    focusCleanup: true
+});
+
+function submitHandler() {
+    if ($.validate.form()) {
+        var filed = $("#form-user-edit").serializeJSON();
+        filed["accountIsDisabled"] = $("#accountIsDisabled").is(':checked') ? 1 : 0;
+        filed["params[orgIds]"] = $("#orgIds").val();
+        filed["params[roleIds]"] = $("#roleIds").val();
+        $.operate.saveTab(prefix + "/doEdit", filed);
+    }
+}
+</script>
+<script type="text/javascript">
+// ——————————————————————解决IE11 select下的option隐藏问题——————————————————————
+
+// 初始化select
+function toggleOptionInit(obj, firstException) {
+//    var firstException = arguments[1] ? arguments[1] : true;
+
+    obj.find('option').each(function () {
+        if (!$(this).parent().is('span')) {
+            $(this).wrap("<span style='display:none'></span>");
+        }
+    });
+
+    if (firstException) {
+        if (obj.find('option').eq(0).parent().is('span')) {
+            obj.find('option').eq(0).unwrap();
+        }
+    }
+}
+// 隐藏显示option
+function toggleOption(obj, type) {
+    if (type == 'show') {
+        obj.each(function () {
+            if ($(this).parent().is('span')) {
+                $(this).unwrap();
+            }
+        });
+    } else {
+        obj.each(function () {
+            if (!$(this).parent().is('span')) {
+                $(this).wrap("<span style='display:none'></span>");
+            }
+        });
+    }
+}
+</script>
+</body>
+</html>

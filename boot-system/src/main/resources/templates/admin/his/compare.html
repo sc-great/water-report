@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+<th:block th:include="admin/include :: header('水厂历史数据统计')"/>
+</head>
+<style>
+#orgs_div .tree .node .node-text label {
+    width: 85%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#orgNames {
+	width: 250px;
+}
+
+.noSelect {
+	-webkit-user-select:none;
+	-moz-user-select:none;
+	-ms-user-select:none;
+	user-select:none;
+}
+.select-list li p {
+	margin-right: 0;
+}
+#formId {
+	width: 100%;
+    height: auto;
+}
+ul, li {
+	list-style: none;
+}
+.choosePanel ul li {
+	float: left;
+    border: #999 1px solid;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+.choosePanel ul li p {
+	margin: 0;
+	padding: 0;
+	line-height: 25px;
+	margin: 0 5px;
+}
+.choosePanel ul li p span {
+    display: inline-block;
+    width: 20px;
+    text-align: center;
+    line-height: 20px;
+    margin-left: 5px;
+    cursor: pointer;
+}
+.choosePanel ul li p span:hover {
+    background: #999;
+    color: #fff;
+}
+.clear {
+	clear: both;
+}
+.error {
+	background-color: #fbe2e2!important;
+   	border-color: #c66161!important;
+    color: #c00!important;
+}
+.btn-export {
+	background-color: #337ab7;
+    border-color: #337ab7;
+}
+.btn-export:hover {
+	background-color: #3c8cd0;
+    border-color: #3c8cd0;
+}
+
+.clearfix:after {
+	content: ".";
+	display: block;
+	height: 0;
+	visibility: hidden;
+	clear: both;
+}
+.clearfix {
+	zoom:1;
+}    
+</style>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row noSelect">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul class="clearfix">
+                        <li>
+                            <p>开始：</p>
+                            <input type="text" id="dateSta" data-type="date" data-format="yyyy-MM-dd" onFocus="removeError($(this))"/>
+                        </li>
+                        <li>
+                        	<p>结束：</p>
+                            <input type="text" id="dateEnd" data-type="date" data-format="yyyy-MM-dd" onFocus="removeError($(this))"/>
+                        </li>
+                        <li>
+                           	<p>组织机构：</p>
+                           	<input id="orgType" hidden="hidden"/>
+                           	<input id="orgId" hidden="hidden"/>
+                            <div class="col-sm-10" style="width:auto;">
+                            	<div id="orgs_div" class="tree-select">
+                            		<div style="line-height: 34px;"><i class="fa fa-spinner fa-spin"></i>正在初始化</div>
+                            	</div>
+                            </div>
+                        </li>
+                        <li>
+                           	<p>查询项目：</p>
+                            <div class="col-sm-10" style="width:auto;">
+                            	<div id="obj_div" class="tree-select">
+                            		<div style="line-height: 34px;"><i class="fa fa-spinner fa-spin"></i>正在初始化</div>
+                            	</div>
+                            </div>
+                        </li>
+                        <li>
+                        	<a class="btn btn-primary btn-rounded btn-sm" onclick="compare()">
+                            	<i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="resetForm()">
+                            	<i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            <a class="btn btn-warning btn-export btn-rounded btn-sm" onclick="exportData()" 
+									shiro:hasPermission="report:his:export">
+								<i class="fa fa-download"></i>&nbsp;导出
+							</a>
+                        </li>
+                        <li class="clear"></li>
+                    </ul>
+                </div>
+            </form>
+            <div class="choosePanel">
+            	<div>
+            		<p>组织机构：</p>
+            		<ul class="clear" id="orgChoosePanel"></ul>
+            	</div>
+            	<div>
+            		<p>查询项目：</p>
+            		<ul class="clear" id="objChoosePanel"></ul>
+            	</div>
+            </div>
+        </div>
+        <div class="col-sm-12 select-table table-striped table-bordered table-groupheader" id="table-box">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="admin/include :: common"/>
+<th:block th:include="admin/include :: table"/>
+<th:block th:include="admin/include :: custom-plugins" />
+<script type="text/javascript">
+// 得到当前时间
+var dateNow = getCurDate("yyyy-MM-dd");
+// laydate 时间控件绑定
+layui.use("laydate", function () {
+    var laydate = layui.laydate;
+    var startDate = laydate.render({
+            elem: "#dateSta",
+            max: $("#dateEnd").val(),
+            theme: "molv",
+            trigger: "click",
+            done: function (value, date) {
+                // 结束时间大于开始时间
+                if (value !== "") {
+                    endDate.config.min.year = date.year;
+                    endDate.config.min.month = date.month - 1;
+                    endDate.config.min.date = date.date;
+                } else {
+                    endDate.config.min.year = "";
+                    endDate.config.min.month = "";
+                    endDate.config.min.date = "";
+                }
+            }
+        });
+    var endDate = laydate.render({
+            elem: "#dateEnd",
+            min: $("#dateSta").val(),
+            max: dateNow,
+            theme: "molv",
+            trigger: "click",
+            done: function (value, date) {
+                // 开始时间小于结束时间
+                if (value !== "") {
+                    startDate.config.max.year = date.year;
+                    startDate.config.max.month = date.month - 1;
+                    startDate.config.max.date = date.date;
+                } else {
+                    startDate.config.max.year = "";
+                    startDate.config.max.month = "";
+                    startDate.config.max.date = "";
+                }
+            }
+        });
+});
+</script>
+<script th:inline="javascript">
+$(function () {
+	var orgId = [[${orgId}]];
+	if (orgId == "1") {
+		loadOrgTree(0);
+	} else {
+		loadOrgTree("MARK" + orgId);
+	}
+	// 加载查询项目
+	loadObjecTree();
+});
+
+// 用于标记所选择组织机构的类型
+var orgType = "";
+var orgIds = "";
+
+function loadOrgTree(pId) {
+    var params = {
+        url: ctx + "admin/system/org/treeListArea",
+        data: {
+            parentId: pId,
+            validStatus: 1
+        },
+        objId: 'orgs_div',
+        openLevel: 1,
+        valueId: 'orgIds',
+        textId: 'orgNames',
+        value_filed: 'orgId',
+        text_filed: 'orgName',
+        placeholder: '请选择所属机构',
+        required: 'required',
+        checkBox: false,
+        isShow: true,
+        callback: function (values) {
+            if ($.common.isNotEmpty(values)) {
+            	$.ajax({
+                    type: "get",
+                    url: ctx + "admin/system/org/get/" + values,
+                    dataType: 'json',
+                    data: {},
+                    success: function (r) {
+                        if (r.code == 0) {
+                            var org = r.data;
+                            //if (org.orgId == "1")
+                            //	return;
+                            
+                            if (orgType != "" && orgType != org.orgType) {
+                            	$("#orgNames").addClass("error");
+                            	$.modal.msgWarning("对不起，请选择相同等级机构进行比较！");
+                            	return;
+                            }
+                            if (orgIds.indexOf(org.orgId) >= 0)
+                            	return;
+	                        orgIds += org.orgId + ",";
+                            orgType = org.orgType;
+                            var li = '<li id="orgChooseLi_' + org.orgId + '"><p>' + org.orgName + '<span onClick="removeLi(\'' + org.orgId + '\')">×</span></p></li>';
+                       		$("#orgChoosePanel").append(li);
+                        } else {
+                            $.modal.msgWarning(r.msg);
+                        }
+                    }
+                });
+            }
+        }
+    };
+    selectTree(params);
+}
+</script>
+<script th:inline="javascript">
+function removeError(obj) {
+	obj.removeClass("error");
+}
+$("#orgs_div").click(function() {
+	$("#orgNames").removeClass("error");
+})
+function exportData() {
+	var dateSta = $("#dateSta").val();
+	var dateEnd = $("#dateEnd").val();
+	
+	if (dateSta == null || dateSta == undefined || dateSta == "") {
+		$("#dateSta").addClass("error");
+		$.modal.alertWarning("请选择开始时间！");
+		return;
+	}
+	
+	if (dateEnd == null || dateEnd == undefined || dateEnd == "") {
+		$("#dateEnd").addClass("error");
+		$.modal.alertWarning("请选择结束时间！");
+		return;
+	}
+
+	if (orgIds == "") {
+		$("#orgNames").addClass("error");
+		$.modal.alertWarning("请选择组织结构！");
+		return;
+	}
+	
+	if (objIds == "") {
+		$("#objNames").addClass("error");
+		$.modal.alertWarning("请选择查询项目！");
+		return;
+	}
+	
+	$.modal.loading("正在导出数据，请稍后...");
+    $.post("/admin/his/exportCompare", {
+    	"dateSta": dateSta,
+    	"dateEnd": dateEnd,
+    	"orgType": orgType,
+    	"orgIds": orgIds,
+    	"objIds": objIds
+    }, function (result) {
+        if (result.code == web_status.SUCCESS) {
+            window.location.href = ctx + "common/download?fileName=" + encodeURI(result.msg) + "&delete=" + true;
+        } else if (result.code == web_status.WARNING) {
+            $.modal.alertWarning(result.msg);
+        } else {
+            $.modal.alertError(result.msg);
+        }
+        $.modal.closeLoading();
+    });
+}
+// 移除li
+function removeLi(orgId) {
+	orgIds = orgIds.replace(orgId + ",", "");
+	$("#orgChooseLi_" + orgId).remove();
+	if (orgIds == "")
+		orgType = "";
+}
+</script>
+<script type="text/javascript">
+// 加载查询项目
+function loadObjecTree() {
+    $.post("loadObjecTree", function (data) {
+        $("#obj_div").html("");
+        var html = '<input type="text" name="objNames" id="objNames" class="form-control"' +
+            '				required="" placeholder="请选择查询项目" autocomplete="off"' +
+            '				readonly="readonly" onclick="toggleObjTree(\'obj_div\');" value="" onFocus="removeError($(this))">' +
+            '		<span class="input-icon fa fa-caret-up"></span>' +
+            '		<div class="tree" style="position:absolute;border-top:none;max-height:300px;display:none;">';
+        for (var m = 0; m < data.length; m++) {
+            html += '<div class="node" id="node_' + data[m].id + '">' +
+            '		 	<div class="node-text">' +
+            '				<span class="node-icon fa fa-caret-right" id="icon_' + data[m].id + '" onClick="toggle(\'' + data[m].id + '\')"></span>' +
+            '				<input id="checkbox_' + data[m].id + '" type="checkbox" value="' + data[m].id + '" onChange="getCheckbox(\'' + data[m].id + '\')">' +
+            '				<label for="checkbox_' + data[m].id + '">' + data[m].name + '</label>' +
+            '			</div>';
+            for (var n = 0; n < data[m].obj.length; n++) {
+                html += '<div class="node" id="node_' + data[m].obj[n].id + '" style="display:none;" onClick="backForPanel(\'' + data[m].obj[n].id + '\', \'' + data[m].obj[n].name + '\')">' +
+                '			<div class="node-text">' +
+                '				<input class="checkbox_' + data[m].id + '" value="' + data[m].obj[n].id + '" name="' + data[m].obj[n].name + '" id="checkbox_' + data[m].obj[n].id + '" type="checkbox">' +
+                '				<label for="checkbox_' + data[m].obj[n].id + '">' + data[m].obj[n].name + '</label>' +
+                '			</div>' +
+                '		</div>';
+            }
+            html += '</div>';
+        }
+        html += '</div>';
+        $("#obj_div").append(html);
+    })
+}
+var objIds = "";
+function backForPanel(id, name) {
+	if (objIds.indexOf(id) >= 0) {
+		if (!$("#checkbox_" + id).prop("checked"))
+			objRemoveLi(id);
+		return;
+	}
+	objIds += id + ",";
+	var li = '<li id="objChooseLi_' + id + '"><p>' + name + '<span onClick="objRemoveLi(\'' + id + '\')">×</span></p></li>';
+	$("#objChoosePanel").append(li);
+}
+// 移除li
+function objRemoveLi(id) {
+	objIds = objIds.replace(id + ",", "");
+	$("#objChooseLi_" + id).remove();
+}
+function getCheckbox(objId) {
+	if ($("#checkbox_" + objId).prop("checked"))
+		$(".checkbox_" + objId).prop("checked", true);
+	else
+		$(".checkbox_" + objId).prop("checked", false);
+	
+	var son = $(".checkbox_" + objId);
+	for (var i = 0; i < son.length; i ++) {
+		var value = son[i].value;
+		if ($("#checkbox_" + objId).prop("checked")) {
+			backForPanel(value, son[i].name);
+		} else {
+			objRemoveLi(value);
+		}
+	}
+}
+function toggle(objId) {
+	$("#node_" + objId + " .node").slideToggle();
+	if ($("#icon_" + objId).hasClass("fa-caret-down")) {
+		$("#icon_" + objId).addClass("fa-caret-right").removeClass("fa-caret-down");
+		return;
+	}
+	if ($("#icon_" + objId).hasClass("fa-caret-right")) {
+		$("#icon_" + objId).addClass("fa-caret-down").removeClass("fa-caret-right");
+		return;
+	}
+}
+// 显示树形下拉控件
+function toggleObjTree(objId) {
+    if ($("#" + objId).children(".input-icon").hasClass("fa-caret-up")) {
+        $("#" + objId).children(".input-icon").addClass("fa-caret-down").removeClass("fa-caret-up");
+    } else {
+        $("#" + objId).children(".input-icon").addClass("fa-caret-up").removeClass("fa-caret-down");
+    }
+    $("#" + objId).children(".tree").slideToggle();
+}
+// 隐藏项目选择下拉框
+$("body").bind("click", function (e) {
+	if ($(e.target).closest("#obj_div").length == 0 && !$("#obj_div .tree").is(':hidden')) {
+		toggleObjTree("obj_div");
+	}
+});
+// 重置
+function resetForm() {
+	$.form.reset();
+	orgType = "";
+	orgIds = "";
+	objIds = "";
+	$("#orgChoosePanel").html("");
+	$("#objChoosePanel").html("");
+}
+</script>
+<script type="text/javascript">
+// 查询功能--------------------------------------------------------------------------------------------------------------
+function compare() {
+	var dateSta = $("#dateSta").val();
+	var dateEnd = $("#dateEnd").val();
+	
+	if (dateSta == null || dateSta == undefined || dateSta == "") {
+		$("#dateSta").addClass("error");
+		$.modal.alertWarning("请选择开始时间！");
+		return;
+	}
+	
+	if (dateEnd == null || dateEnd == undefined || dateEnd == "") {
+		$("#dateEnd").addClass("error");
+		$.modal.alertWarning("请选择结束时间！");
+		return;
+	}
+
+	if (orgIds == "") {
+		$("#orgNames").addClass("error");
+		$.modal.alertWarning("请选择组织结构！");
+		return;
+	}
+	
+	if (objIds == "") {
+		$("#objNames").addClass("error");
+		$.modal.alertWarning("请选择查询项目！");
+		return;
+	}
+	
+	$.modal.loading("正在查询数据，请稍后...");
+	
+	$("#table-box").html('<table id="bootstrap-table" data-mobile-responsive="true"></table>');
+	
+	var objId_arr = objIds.split(",");
+	var data_two = [];
+	
+	var arr02 = 0, arr03 = 0, arr04 = 0, arr05 = 0, arr06 = 0;
+	for (var i = 0; i < objId_arr.length; i ++) {
+		switch (objId_arr[i]) {
+			case "0201":
+				data_two.push({
+			        field: 'totalOut',
+			        title: '累计处理量（万吨）',
+			        align: 'center'
+			    });
+				arr02 ++;
+				break;
+			case "0202":
+				data_two.push({
+			        field: 'ton',
+			        title: '设计处理能力（万吨/日）',
+			        align: 'center'
+			    });
+				arr02 ++;
+				break;
+			case "0203":
+				data_two.push({
+			        field: 'loadRate',
+			        title: '负荷率（%）',
+			        align: 'center'
+			    });
+				arr02 ++;
+				break;
+			case "0204":
+				data_two.push({
+			        field: 'avgCapacity',
+			        title: '平均处理能力（万吨/日）',
+			        align: 'center'
+			    });
+				arr02 ++;
+				break;
+				
+			case "0301":
+				data_two.push({
+			        field: 'should',
+			        title: '累计应收水费（万元）',
+			        align: 'center'
+			    });
+				arr03 ++;
+				break;
+			case "0302":
+				data_two.push({
+			        field: 'reality',
+			        title: '累计实收取水费（万元）',
+			        align: 'center'
+			    });
+				arr03 ++;
+				break;
+			case "0303":
+				data_two.push({
+			        field: 'backRate',
+			        title: '回款率（%）',
+			        align: 'center'
+			    });
+				arr03 ++;
+				break;
+				
+			case "0401":
+				data_two.push({
+			        field: 'totalElec',
+			        title: '累计总电量（度）',
+			        align: 'center'
+			    });
+				arr04 ++;
+				break;
+			case "0402":
+				data_two.push({
+			        field: 'tonElec',
+			        title: '吨水电耗（度/吨）',
+			        align: 'center'
+			    });
+				arr04 ++;
+				break;
+			case "0403":
+				data_two.push({
+			        field: 'avgTonElec',
+			        title: '平均吨水电耗（度/吨）',
+			        align: 'center'
+			    });
+				arr04 ++;
+				break;
+				
+			case "0501":
+				data_two.push({
+			        field: 'totalMud',
+			        title: '累计产泥量（吨）',
+			        align: 'center'
+			    });
+				arr05 ++;
+				break;
+			case "0502":
+				data_two.push({
+			        field: 'totalDryMud',
+			        title: '累计绝干泥总量（吨）',
+			        align: 'center'
+			    });
+				arr05 ++;
+			case "0503":
+				data_two.push({
+			        field: 'avgTotalDryMud',
+			        title: '万吨水绝干污泥量（吨/万吨）',
+			        align: 'center'
+			    });
+				arr05 ++;
+				break;
+				
+			case "0601":
+				data_two.push({
+			        field: 'totalPAMYang',
+			        title: 'PAM（阳）累计（KG）',
+			        align: 'center'
+			    });
+				arr06 ++;
+				break;
+			case "0602":
+				data_two.push({
+			        field: 'tonPAMYang',
+			        title: 'PAM（阳）单耗（KG/吨）',
+			        align: 'center'
+			    });
+				arr06 ++;
+				break;
+			case "0603":
+				data_two.push({
+			        field: 'totalPAMYin',
+			        title: 'PAM（阴）累计（KG）',
+			        align: 'center'
+			    });
+				arr06 ++;
+				break;
+			case "0604":
+				data_two.push({
+			        field: 'tonPAMYin',
+			        title: 'PAM（阴）单耗（KG/吨）',
+			        align: 'center'
+			    });
+				arr06 ++;
+				break;
+			case "0605":
+				data_two.push({
+			        field: 'totalPAC',
+			        title: 'PAC累计（KG）',
+			        align: 'center'
+			    });
+				arr06 ++;
+				break;
+			case "0606":
+				data_two.push({
+			        field: 'tonPAC',
+			        title: 'PAC单耗（KG/吨）',
+			        align: 'center'
+			    });
+				arr06 ++;
+				break;
+			case "0607":
+				data_two.push({
+			        field: 'totalLime',
+			        title: '石灰累计（KG）',
+			        align: 'center'
+			    });
+				arr06 ++;
+				break;
+			case "0608":
+				data_two.push({
+			        field: 'tonLime',
+			        title: '石灰单耗（KG/吨）',
+			        align: 'center'
+			    });
+				arr06 ++;
+				break;
+			case "0609":
+				data_two.push({
+			        field: 'totalPhosphorus',
+			        title: '复核除磷剂累计（KG）',
+			        align: 'center'
+			    });
+				arr06 ++;
+				break;
+			case "0610":
+				data_two.push({
+			        field: 'tonPhosphorus',
+			        title: '复核除磷剂单耗（KG/吨）',
+			        align: 'center'
+			    });
+				arr06 ++;
+				break;
+			case "0611":
+				data_two.push({
+			        field: 'totalHCL',
+			        title: '盐酸累计（KG）',
+			        align: 'center'
+			    });
+				arr06 ++;
+				break;
+			case "0612":
+				data_two.push({
+			        field: 'tonHCL',
+			        title: '盐酸单耗（KG/吨）',
+			        align: 'center'
+			    });
+				arr06 ++;
+				break;
+			case "0613":
+				data_two.push({
+			        field: 'totalSC',
+			        title: '氯酸钠累计（KG）',
+			        align: 'center'
+			    });
+				arr06 ++;
+				break;
+			case "0614":
+				data_two.push({
+			        field: 'tonSC',
+			        title: '氯酸钠单耗（KG/吨）',
+			        align: 'center'
+			    });
+				arr06 ++;
+				break;
+			case "0615":
+				data_two.push({
+			        field: 'totalNaCLO',
+			        title: '次氯酸钠累计（KG）',
+			        align: 'center'
+			    });
+				arr06 ++;
+				break;
+			case "0616":
+				data_two.push({
+			        field: 'tonNaCLO',
+			        title: '次氯酸钠单耗（KG/吨）',
+			        align: 'center'
+			    });
+				arr06 ++;
+				break;
+			case "0617":
+				data_two.push({
+			        field: 'totalGlucose',
+			        title: '葡萄糖累计（KG）',
+			        align: 'center'
+			    });
+				arr06 ++;
+				break;
+			case "0618":
+				data_two.push({
+			        field: 'tonGlucose',
+			        title: '葡萄糖单耗（KG/吨）',
+			        align: 'center'
+			    });
+				arr06 ++;
+				break;
+			case "0619":
+				data_two.push({
+			        field: 'totalSA',
+			        title: '乙酸钠累计（KG）',
+			        align: 'center'
+			    });
+				arr06 ++;
+				break;
+			case "0620":
+				data_two.push({
+			        field: 'tonSA',
+			        title: '乙酸钠单耗（KG/吨）',
+			        align: 'center'
+			    });
+				arr06 ++;
+				break;
+			case "0621":
+				data_two.push({
+			        field: 'composite',
+			        title: '综合药耗（KG/吨）',
+			        align: 'center'
+			    });
+				arr06 ++;
+				break;
+				
+			default:
+				break;
+		}
+	}
+	var data_one = [{
+        field: '',
+        title: '序号',
+        align: 'center',
+        valign: 'middle',
+        rowspan: 2,
+        formatter: function (value, row, index) {
+            return index + 1;
+        }
+    }, {
+        field: 'orgName',
+        title: '区域/项目公司名称',
+        align: 'center',
+        valign: 'middle',
+        rowspan: 2
+    }];
+
+	if (arr02 > 0) {
+		data_one.push({
+	        field: '',
+	        title: '污水处理量',
+	        align: 'center',
+	        colspan: arr02
+	    });
+	}
+	if (arr03 > 0) {
+		data_one.push({
+	        field: '',
+	        title: '收费情况',
+	        align: 'center',
+	        colspan: arr03
+	    });
+	}
+	if (arr04 > 0) {
+		data_one.push({
+	        field: '',
+	        title: '用电量',
+	        align: 'center',
+	        colspan: arr04
+	    });
+	}
+	if (arr05 > 0) {
+		data_one.push({
+	        field: '',
+	        title: '产泥量',
+	        align: 'center',
+	        colspan: arr05
+	    });
+	}
+	if (arr06 > 0) {
+		data_one.push({
+	        field: '',
+	        title: '水处理药剂',
+	        align: 'center',
+	        colspan: arr06
+	    });
+	}
+	
+	var data = [data_one, data_two];
+    var options = {
+        url: "/admin/his/searchCompare",
+        modalName: "对比",
+        rememberSelected: true,
+        uniqueId: "id",
+        pagination: false, // 不分页
+        queryParams: {
+        	dateSta: $("#dateSta").val() != undefined ? $("#dateSta").val() : "",
+        	dateEnd: $("#dateEnd").val() != undefined ? $("#dateEnd").val() : "",
+        	orgType: orgType,
+        	orgIds: orgIds,
+        	objIds: objIds
+        },
+        columns: data
+    };
+    $.table.init(options);
+    $.modal.closeLoading();
+}
+</script>
+</body>
+</html>

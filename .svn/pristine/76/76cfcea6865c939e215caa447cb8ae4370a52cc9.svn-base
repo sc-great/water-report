@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+<th:block th:include="admin/include :: header('新增水厂当日用药信息填报')" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+	<form class="form-horizontal m" id="form-TodayMedicineInfo-add">
+		<input id="todayMedicineInfo_params" name="params[icon]" th:value="${icon}" type="hidden">
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">当日PAC：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="todayPac" class="form-control" placeholder="请输入当日PAC"
+							type="number" min="0" max="100000" maxLength="6" oninput="autoformart($(this));todayMedicineInfo_totalPac_fn()">
+					<span class="input-group-addon">KG</span>
+				</div>
+			</div>
+			<label class="col-sm-2 control-label label-left">累计PAC：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="totalPac" class="form-control" placeholder="请输入累计PAC"
+							type="number" readonly="readonly">
+					<span class="input-group-addon">KG</span>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">当日PAM阴离子：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="todayPamYin" class="form-control" placeholder="请输入当日PAM阴离子" 
+							type="number" min="0" max="100000" maxLength="6" oninput="autoformart($(this));todayMedicineInfo_totalPamYin_fn()">
+					<span class="input-group-addon">KG</span>
+				</div>
+			</div>
+			<label class="col-sm-2 control-label label-left">累计PAM阴离子：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="totalPamYin" class="form-control" placeholder="请输入累计PAM阴离子" 
+							type="number" readonly="readonly">
+					<span class="input-group-addon">KG</span>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">当日PAM阳离子：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="todayPamYang" class="form-control" placeholder="请输入当日PAM阳离子" 
+							type="number" min="0" max="100000" maxLength="6" oninput="autoformart($(this));todayMedicineInfo_totalPamYang_fn()">
+					<span class="input-group-addon">KG</span>
+				</div>
+			</div>
+			<label class="col-sm-2 control-label label-left">累计PAM阳离子：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="totalPamYang" class="form-control" placeholder="请输入累计PAM阳离子" 
+							type="number" readonly="readonly">
+					<span class="input-group-addon">KG</span>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">当日石灰：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="todayLime" class="form-control" placeholder="请输入当日石灰"
+							type="number" min="0" max="100000" maxLength="6" oninput="autoformart($(this));todayMedicineInfo_totalLime_fn()">
+					<span class="input-group-addon">KG</span>
+				</div>
+			</div>
+			<label class="col-sm-2 control-label label-left">累计石灰：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="totalLime" class="form-control" placeholder="请输入累计石灰"
+							type="number" readonly="readonly">
+					<span class="input-group-addon">KG</span>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">当日复核除磷剂：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="todayPhosphorus" class="form-control" placeholder="请输入当日复核除磷剂" 
+							type="number" min="0" max="100000" maxLength="6" oninput="autoformart($(this));todayMedicineInfo_totalPhosphorus_fn()">
+					<span class="input-group-addon">KG</span>
+				</div>
+			</div>
+			<label class="col-sm-2 control-label label-left">累计复核除磷剂：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="totalPhosphorus" class="form-control"
+						placeholder="请输入累计复核除磷剂" type="number" readonly="readonly">
+					<span class="input-group-addon">KG</span>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">当日氯化氢：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="todayHCL" class="form-control" placeholder="请输入当日氯化氢"
+							type="number" min="0" max="100000" maxLength="6" oninput="autoformart($(this));todayMedicineInfo_totalHCL_fn()">
+					<span class="input-group-addon">KG</span>
+				</div>
+			</div>
+			<label class="col-sm-2 control-label label-left">累计氯化氢：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="totalHCL" class="form-control" placeholder="请输入累计氯化氢"
+							type="number" readonly="readonly">
+					<span class="input-group-addon">KG</span>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">当日氯酸钠：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="todaySc" class="form-control" placeholder="请输入当日氯酸钠"
+							type="number" min="0" max="100000" maxLength="6" oninput="autoformart($(this));todayMedicineInfo_totalSc_fn()">
+					<span class="input-group-addon">KG</span>
+				</div>
+			</div>
+			<label class="col-sm-2 control-label label-left">累计氯酸钠：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="totalSc" class="form-control" placeholder="请输入累计氯酸钠"
+							type="number" readonly="readonly">
+					<span class="input-group-addon">KG</span>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">当日NaCLO：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="todayNaclo" class="form-control" placeholder="请输入当日NaCLO" 
+							type="number" min="0" max="100000" maxLength="6" oninput="autoformart($(this));todayMedicineInfo_totalNaclo_fn()">
+					<span class="input-group-addon">KG</span>
+				</div>
+			</div>
+			<label class="col-sm-2 control-label label-left">累计NaCLO：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="totalNaclo" class="form-control" placeholder="请输入累计NaCLO" 
+							type="number" readonly="readonly">
+					<span class="input-group-addon">KG</span>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">当日葡萄糖：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="todayGlucose" class="form-control" placeholder="请输入当日葡萄糖" 
+							type="number" min="0" max="100000" maxLength="6" oninput="autoformart($(this));todayMedicineInfo_totalGlucose_fn()">
+					<span class="input-group-addon">KG</span>
+				</div>
+			</div>
+			<label class="col-sm-2 control-label label-left">累计葡萄糖：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="totalGlucose" class="form-control" placeholder="请输入累计葡萄糖" 
+							type="number" readonly="readonly">
+					<span class="input-group-addon">KG</span>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">当日乙酸钠：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="todaySa" class="form-control" placeholder="请输入当日乙酸钠"
+							type="number" min="0" max="100000" maxLength="6" oninput="autoformart($(this));todayMedicineInfo_totalSa_fn()">
+					<span class="input-group-addon">KG</span>
+				</div>
+			</div>
+			<label class="col-sm-2 control-label label-left">累计乙酸钠：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="totalSa" class="form-control" placeholder="请输入累计乙酸钠"
+							type="number" readonly="readonly">
+					<span class="input-group-addon">KG</span>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: form" />
+</body>
+<script th:inline="javascript">
+var form_TodayMedicineInfo_add_prefix = ctx + "admin/report/TodayMedicineInfo";
+
+$("#form-TodayMedicineInfo-add").validate({
+    focusCleanup: true
+});
+
+function submitHandler() {
+    if ($.validate.form()) {
+        $.operate.save(form_TodayMedicineInfo_add_prefix + "/doAdd", $('#form-TodayMedicineInfo-add').serialize());
+    }
+}
+
+function index_todayMedicineInfo_submitHandler() {
+	if ($.validate.formRequired("form-TodayMedicineInfo-add")) {
+        $.operate.saveModal(form_TodayMedicineInfo_add_prefix + "/doAdd", $('#form-TodayMedicineInfo-add').serialize());
+    }
+}
+
+var todayMedicineInfo_totalPac = 0;
+var todayMedicineInfo_totalPamYin = 0;
+var todayMedicineInfo_totalPamYang = 0;
+var todayMedicineInfo_totalLime = 0;
+var todayMedicineInfo_totalPhosphorus = 0;
+var todayMedicineInfo_totalHCL = 0;
+var todayMedicineInfo_totalSc = 0;
+var todayMedicineInfo_totalNaclo = 0;
+var todayMedicineInfo_totalGlucose = 0;
+var todayMedicineInfo_totalSa = 0;
+
+$.post(form_TodayMedicineInfo_add_prefix + "/getLatest", function (data) {
+    if (data.data != null && data.data != undefined) {
+        if (data.data.totalPac != null && data.data.totalPac != undefined)
+            todayMedicineInfo_totalPac = data.data.totalPac;
+        if (data.data.totalPamYin != null && data.data.totalPamYin != undefined)
+            todayMedicineInfo_totalPamYin = data.data.totalPamYin;
+        if (data.data.totalPamYang != null && data.data.totalPamYang != undefined)
+            todayMedicineInfo_totalPamYang = data.data.totalPamYang;
+        if (data.data.totalLime != null && data.data.totalLime != undefined)
+            todayMedicineInfo_totalLime = data.data.totalLime;
+        if (data.data.totalPhosphorus != null && data.data.totalPhosphorus != undefined)
+            todayMedicineInfo_totalPhosphorus = data.data.totalPhosphorus;
+        if (data.data.totalHCL != null && data.data.totalHCL != undefined)
+            todayMedicineInfo_totalHCL = data.data.totalHCL;
+        if (data.data.totalSc != null && data.data.totalSc != undefined)
+            todayMedicineInfo_totalSc = data.data.totalSc;
+        if (data.data.totalNaclo != null && data.data.totalNaclo != undefined)
+            todayMedicineInfo_totalNaclo = data.data.totalNaclo;
+        if (data.data.totalGlucose != null && data.data.totalGlucose != undefined)
+            todayMedicineInfo_totalGlucose = data.data.totalGlucose;
+        if (data.data.totalSa != null && data.data.totalSa != undefined)
+            todayMedicineInfo_totalSa = data.data.totalSa;
+    }
+    $("#form-TodayMedicineInfo-add .input-group input[name=\"totalPac\"]").val(todayMedicineInfo_totalPac);
+    $("#form-TodayMedicineInfo-add .input-group input[name=\"totalPamYin\"]").val(todayMedicineInfo_totalPamYin);
+    $("#form-TodayMedicineInfo-add .input-group input[name=\"totalPamYang\"]").val(todayMedicineInfo_totalPamYang);
+    $("#form-TodayMedicineInfo-add .input-group input[name=\"totalLime\"]").val(todayMedicineInfo_totalLime);
+    $("#form-TodayMedicineInfo-add .input-group input[name=\"totalPhosphorus\"]").val(todayMedicineInfo_totalPhosphorus);
+    $("#form-TodayMedicineInfo-add .input-group input[name=\"totalHCL\"]").val(todayMedicineInfo_totalHCL);
+    $("#form-TodayMedicineInfo-add .input-group input[name=\"totalSc\"]").val(todayMedicineInfo_totalSc);
+    $("#form-TodayMedicineInfo-add .input-group input[name=\"totalNaclo\"]").val(todayMedicineInfo_totalNaclo);
+    $("#form-TodayMedicineInfo-add .input-group input[name=\"totalGlucose\"]").val(todayMedicineInfo_totalGlucose);
+    $("#form-TodayMedicineInfo-add .input-group input[name=\"totalSa\"]").val(todayMedicineInfo_totalSa);
+});
+function todayMedicineInfo_totalPac_fn() {
+    var todayPac_obj = $("#form-TodayMedicineInfo-add .input-group input[name=\"todayPac\"]")
+        var totalPac_obj = $("#form-TodayMedicineInfo-add .input-group input[name=\"totalPac\"]");
+    var todayPac = parseFloat(todayPac_obj.val());
+    totalPac_obj.val((todayPac + todayMedicineInfo_totalPac).toFixed(2));
+}
+function todayMedicineInfo_totalPamYin_fn() {
+    var todayPamYin_obj = $("#form-TodayMedicineInfo-add .input-group input[name=\"todayPamYin\"]");
+    var totalPamYin_obj = $("#form-TodayMedicineInfo-add .input-group input[name=\"totalPamYin\"]");
+    var todayPamYin = parseFloat(todayPamYin_obj.val());
+    totalPamYin_obj.val((todayPamYin + todayMedicineInfo_totalPamYin).toFixed(2));
+}
+function todayMedicineInfo_totalPamYang_fn() {
+    var todayPamYang_obj = $("#form-TodayMedicineInfo-add .input-group input[name=\"todayPamYang\"]");
+    var totalPamYang_obj = $("#form-TodayMedicineInfo-add .input-group input[name=\"totalPamYang\"]");
+    var todayPamYang = parseFloat(todayPamYang_obj.val());
+    totalPamYang_obj.val((todayPamYang + todayMedicineInfo_totalPamYang).toFixed(2));
+}
+function todayMedicineInfo_totalLime_fn() {
+    var todayLime_obj = $("#form-TodayMedicineInfo-add .input-group input[name=\"todayLime\"]");
+    var totalLime_obj = $("#form-TodayMedicineInfo-add .input-group input[name=\"totalLime\"]");
+    var todayLime = parseFloat(todayLime_obj.val());
+    totalLime_obj.val((todayLime + todayMedicineInfo_totalLime).toFixed(2));
+}
+function todayMedicineInfo_totalPhosphorus_fn() {
+    var todayPhosphorus_obj = $("#form-TodayMedicineInfo-add .input-group input[name=\"todayPhosphorus\"]");
+    var totalPhosphorus_obj = $("#form-TodayMedicineInfo-add .input-group input[name=\"totalPhosphorus\"]");
+    var todayPhosphorus = parseFloat(todayPhosphorus_obj.val());
+    totalPhosphorus_obj.val((todayPhosphorus + todayMedicineInfo_totalPhosphorus).toFixed(2));
+}
+function todayMedicineInfo_totalHCL_fn() {
+    var todayHCL_obj = $("#form-TodayMedicineInfo-add .input-group input[name=\"todayHCL\"]");
+    var totalHCL_obj = $("#form-TodayMedicineInfo-add .input-group input[name=\"totalHCL\"]");
+    var todayHCL = parseFloat(todayHCL_obj.val());
+    totalHCL_obj.val((todayHCL + todayMedicineInfo_totalHCL).toFixed(2));
+}
+function todayMedicineInfo_totalSc_fn() {
+    var todaySc_obj = $("#form-TodayMedicineInfo-add .input-group input[name=\"todaySc\"]");
+    var totalSc_obj = $("#form-TodayMedicineInfo-add .input-group input[name=\"totalSc\"]");
+    var todaySc = parseFloat(todaySc_obj.val());
+    totalSc_obj.val((todaySc + todayMedicineInfo_totalSc).toFixed(2));
+}
+function todayMedicineInfo_totalNaclo_fn() {
+    var todayNaclo_obj = $("#form-TodayMedicineInfo-add .input-group input[name=\"todayNaclo\"]");
+    var totalNaclo_obj = $("#form-TodayMedicineInfo-add .input-group input[name=\"totalNaclo\"]");
+    var todayNaclo = parseFloat(todayNaclo_obj.val());
+    totalNaclo_obj.val((todayNaclo + todayMedicineInfo_totalNaclo).toFixed(2));
+}
+function todayMedicineInfo_totalGlucose_fn() {
+    var todayGlucose_obj = $("#form-TodayMedicineInfo-add .input-group input[name=\"todayGlucose\"]");
+    var totalGlucose_obj = $("#form-TodayMedicineInfo-add .input-group input[name=\"totalGlucose\"]");
+    var todayGlucose = parseFloat(todayGlucose_obj.val());
+    totalGlucose_obj.val((todayGlucose + todayMedicineInfo_totalGlucose).toFixed(2));
+}
+function todayMedicineInfo_totalSa_fn() {
+    var todaySa_obj = $("#form-TodayMedicineInfo-add .input-group input[name=\"todaySa\"]");
+    var totalSa_obj = $("#form-TodayMedicineInfo-add .input-group input[name=\"totalSa\"]");
+    var todaySa = parseFloat(todaySa_obj.val());
+    totalSa_obj.val((todaySa + todayMedicineInfo_totalSa).toFixed(2));
+}
+
+$.post(form_TodayMedicineInfo_add_prefix + "/checkIsOver?operateIcon=add", function (data) {
+    if (data.code == web_status.SUCCESS) {
+        $("#todayMedicineInfo_params").val("1");
+    } else if (data.code == web_status.FAIL) {
+        $("#todayMedicineInfo_params").val("2");
+        
+        $("#form-TodayMedicineInfo-add .input-group input[name=\"todayPac\"]").val(data.data.todayPac);
+        $("#form-TodayMedicineInfo-add .input-group input[name=\"todayPamYin\"]").val(data.data.todayPamYin);
+        $("#form-TodayMedicineInfo-add .input-group input[name=\"todayPamYang\"]").val(data.data.todayPamYang);
+        $("#form-TodayMedicineInfo-add .input-group input[name=\"todayLime\"]").val(data.data.todayLime);
+        $("#form-TodayMedicineInfo-add .input-group input[name=\"todayPhosphorus\"]").val(data.data.todayPhosphorus);
+        $("#form-TodayMedicineInfo-add .input-group input[name=\"todayHCL\"]").val(data.data.todayHCL);
+        $("#form-TodayMedicineInfo-add .input-group input[name=\"todaySc\"]").val(data.data.todaySc);
+        $("#form-TodayMedicineInfo-add .input-group input[name=\"todayNaclo\"]").val(data.data.todayNaclo);
+        $("#form-TodayMedicineInfo-add .input-group input[name=\"todayGlucose\"]").val(data.data.todayGlucose);
+        $("#form-TodayMedicineInfo-add .input-group input[name=\"todaySa\"]").val(data.data.todaySa);
+        
+        $("#form-TodayMedicineInfo-add .input-group input[name=\"totalPac\"]").val(data.data.totalPac);
+        $("#form-TodayMedicineInfo-add .input-group input[name=\"totalPamYin\"]").val(data.data.totalPamYin);
+        $("#form-TodayMedicineInfo-add .input-group input[name=\"totalPamYang\"]").val(data.data.totalPamYang);
+        $("#form-TodayMedicineInfo-add .input-group input[name=\"totalLime\"]").val(data.data.totalLime);
+        $("#form-TodayMedicineInfo-add .input-group input[name=\"totalPhosphorus\"]").val(data.data.totalPhosphorus);
+        $("#form-TodayMedicineInfo-add .input-group input[name=\"totalHCL\"]").val(data.data.totalHCL);
+        $("#form-TodayMedicineInfo-add .input-group input[name=\"totalSc\"]").val(data.data.totalSc);
+        $("#form-TodayMedicineInfo-add .input-group input[name=\"totalNaclo\"]").val(data.data.totalNaclo);
+        $("#form-TodayMedicineInfo-add .input-group input[name=\"totalGlucose\"]").val(data.data.totalGlucose);
+        $("#form-TodayMedicineInfo-add .input-group input[name=\"totalSa\"]").val(data.data.totalSa);
+    }
+});
+
+// input限制
+function autoformart(obj) {
+	var val = obj.val();
+	if (val == null || val == undefined || val == "") {
+		obj.val("");
+		return;
+	}
+	var maxLength = obj.attr("maxLength");
+	var max = obj.attr("max");
+	if (val.length > maxLength) {
+		obj.val(val.slice(0, maxLength)); // 限制长度
+		return;
+	}
+	if (parseFloat(val) > parseFloat(max)) {
+		obj.val(val.slice(0, val.length - 1)); // 限制大小
+		return;
+	}
+	obj.val(parseFloat(val));
+}
+</script>
+</html>

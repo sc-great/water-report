@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+<th:block th:include="admin/include :: header('备品备件')"/>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            <p>模糊查询：</p>
+                            <input type="text" name="param">
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="addTypeUrl()" shiro:hasPermission="materialControl:consumable:type">
+                <i class="fa fa-plus"></i> 添加
+            </a>
+            <a class="btn btn-danger multiple disabled" onclick="deleteAllTypeUrl()" shiro:hasPermission="materialControl:consumable:type">
+                <i class="fa fa-remove"></i> 删除
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="admin/include :: common"/>
+<th:block th:include="admin/include :: table"/>
+<script th:inline="javascript">
+var prefix = ctx + "admin/materialControl/consumable";
+var typeFlag = [[${@permission.hasPermi("materialControl:consumable:type")}]];
+
+$(function () {
+    var options = {
+        url: prefix + "/doListType",
+        modalName: "物品管理",
+        rememberSelected: true,
+        uniqueId: "id",
+        columns: [
+            {
+                field: "state",
+                checkbox: true
+            },
+            {
+                field: "name",
+                title: "名称",
+                align: "center"
+            },
+            {
+                field: "model",
+                title: "型号",
+                align: "center"
+            },
+            {
+                field: "unit",
+                title: "单位",
+                align: "center"
+            },
+            {
+                field: "info",
+                title: "信息",
+                align: "center"
+            },
+            {
+                field: "note",
+                title: "备注",
+                align: "center"
+            },
+            {
+                field: "createTime",
+                title: "添加时间",
+                align: "center"
+            },
+            {
+                field: "updateTime",
+                title: "修改时间",
+                align: "center"
+            },
+            {
+                title: "操作",
+                align: "center",
+                formatter: function (value, row, index) {
+                    var actions = [];
+                    actions.push("<a class='btn btn-success btn-xs " + typeFlag + "' href='javascript:void(0)' onclick=\"editTypeUrl('" + row.id + "')\"><i class='fa fa-edit'></i>编辑</a>");
+                    actions.push("<a class='btn btn-danger btn-xs " + typeFlag + "' href='javascript:void(0)' onclick=\"deleteTypeUrl('" + row.id + "')\"><i class='fa fa-remove'></i>删除</a>");
+                    return actions.join("");
+                }
+            }]
+    };
+    $.table.init(options);
+});
+
+// 添加备品备件信息
+function addTypeUrl() {
+	$.modal.closeLoading();
+	$.modal.enable();
+	$.modal.open("添加类型", prefix + "/typeAdd", "500", "380");
+}
+
+// 编辑备品备件信息
+function editTypeUrl(id) {
+	$.modal.open("编辑物品信息", prefix + "/editType/" + id, "500", "380");
+}
+
+// 删除单条备品备件信息
+function deleteTypeUrl(id) {
+	$.modal.confirm("确定删除该条备数据吗？", function () {
+        var data = {
+            "ids": id
+        };
+        $.operate.submit(prefix + "/doTypeDelete", "post", "json", data);
+    });
+}
+
+// 删除选中的备品备件信息
+function deleteAllTypeUrl() {
+	var rows = $.table.selectColumns("id");
+    if (rows.length == 0) {
+        $.modal.alertWarning("请至少选择一条记录");
+        return;
+    }
+    $.modal.confirm("确认要删除选中的" + rows.length + "条数据吗?", function () {
+        var url = prefix + "/doTypeDelete";
+        var data = {
+            "ids": rows.join()
+        };
+        $.operate.submit(url, "post", "json", data);
+    });
+}
+</script>
+</body>
+</html>

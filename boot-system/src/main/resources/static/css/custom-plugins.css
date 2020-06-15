@@ -1,0 +1,587 @@
+/**自定义插件样式*/
+/*tree样式*/
+.tree-select {
+    position: relative;
+    width: 100%;
+}
+.tree-select .input-icon {
+    position: absolute;
+    right: 10px;
+    top: calc(50% - 6px);
+    z-index: 9;
+}
+.tree-static{
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    overflow: auto;
+    z-index: 9;
+}
+.tree-static .tree{
+    margin-top: 10px;
+    height: calc(100% - 10px);
+}
+.tree-static .tree:before,.tree-static .tree:after{
+    position: absolute;
+    content: '';
+    border-top: 10px transparent dashed;
+    border-left: 10px transparent dashed;
+    border-right: 10px transparent dashed;
+    border-bottom: 10px #fff solid;
+    top:-10px;
+    left: 10px;
+}
+.tree-static .tree:before{
+    border-bottom: 10px #e2e2e2 solid;
+}
+.tree-static .tree:after{
+    top: -9px; /*覆盖并错开1px*/
+    border-bottom: 10px #fff solid;
+}
+
+.tree-static .tree.right:before,.tree-static .tree.right:after{
+    right: 10px;
+    left: 270px;
+}
+
+.tree-static .tree.none:before,.tree-static .tree.none:after{
+    top: 270px;
+    left: -20px;
+    border-top: none;
+    border-right: none;
+    border-bottom: none;
+    border-left: none;
+}
+
+.input-clear {
+    position: absolute;
+    right: 24px;
+    top: 8px;
+    color: #c00f13;
+    cursor: pointer;
+    font-size: 16px;
+    z-index: 9;
+    display: none;
+}
+
+.tree {
+    width: 100%;
+    background-color: #fff;
+    border: 1px solid #e2e2e2;
+    box-sizing: border-box;
+    z-index: 999999;
+    overflow: auto;
+    top: 34px;
+}
+
+.tree .node {
+    margin-left: 24px;
+    position: relative;
+}
+.tree .node:before {
+    content: '';
+    position: absolute;
+    left: -18px;
+    height: 100%;
+    border-left: 1px solid #ccc;
+    top: 2px;
+}
+.tree .node:last-child:before {
+    height: 0;
+}
+.tree > .node {
+    margin-left: 8px;
+}
+.tree .node .node-childs:after {
+    content: '';
+    position: absolute;
+    left: 6px;
+    height: 100%;
+    border-left: 1px solid #ccc;
+    top: 21px;
+}
+
+.tree .node:last-child .node-childs:after{
+    height: 15px
+}
+
+.tree .node .node-text {
+    line-height: 34px;
+    height: 34px;
+    cursor: pointer;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap
+}
+
+.tree .node .node-text input {
+    width: 16px;
+    height: 16px;
+    vertical-align: sub;
+    margin: 0 4px 0 0;
+    padding: 0;
+}
+
+.tree .node .node-text .node-icon {
+    font-size: 22px;
+    vertical-align: top;
+    width: 14px;
+    height: 34px;
+    line-height: 34px;
+    text-align: right;
+    position: relative;
+    z-index: 9;
+}
+
+.tree .node .node-text label {
+    font-weight: normal;
+    margin: 0;
+    padding: 0;
+    background-color: #fff;
+    position: relative;
+    z-index: 9;
+    cursor: pointer;
+}
+.tree .node .node-text label.checked{
+    background-color: #ef72b6;
+    color: #fff;
+    padding: 0 8px 0 9px;
+}
+
+
+.tree .node .node-text:before {
+    content: '';
+    position: absolute;
+    left: -18px;
+    width: 24px;
+    height: 27px;
+    border-left: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    top: -11px;
+}
+
+/*.tree > .node > .node-text:before {
+    height: 0;
+    width: 0;
+}*/
+/*tree样式*/
+
+
+/*tab选项卡、步骤样式*/
+.tab{
+    width:100%;
+    height: 100%;
+}
+.tab .tab-title{
+    position: relative;
+    white-space: nowrap;
+    width:100%;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-bottom: 1px solid #ddd;
+    box-sizing: content-box;
+    float:left;
+    height: 34px;
+}
+.tab .tab-title li{
+    display: inline-block;
+    position: relative;
+    vertical-align: middle;
+    height: 34px;
+    line-height: 34px;
+    font-size: 14px;
+    padding: 0 12px 0 12px;
+    text-align: center;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+    border-right: none;
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+    background-color: #efefef;
+    float:left;
+}
+.tab .tab-title li:last-child{
+    border-right: 1px solid #ddd;
+}
+.step .tab-title{
+    float: none;
+}
+.step .tab-title li {
+    background: #50abe4;
+    color: #fff;
+    border:none;
+    border-radius: 0;
+    float: none;
+}
+.step .tab-title li:first-child {
+    margin-left: 0;
+}
+.step .tab-title li:first-child:before {
+    display: none;
+}
+.step .tab-title li{
+    border: none;
+}
+.step .tab-title li:last-child:after {
+    display: none;
+}
+.step .tab-title li:after {
+    content: '';
+    display: block;
+    border-top: 17px solid transparent;
+    border-bottom: 17px solid transparent;
+    border-left: 17px solid #50abe4;
+    position: absolute;
+    right: -17px;
+    top: 0px;
+    z-index: 10;
+}
+.step .tab-title li:before {
+    content: '';
+    display: block;
+    border-top: 17px solid transparent;
+    border-bottom: 17px solid transparent;
+    border-left: 17px solid #fff;
+    position: absolute;
+    left: 0px;
+    top: 0;
+}
+.tab .tab-title .active {
+    background: #fff;
+}
+.step .tab-title .active {
+    background: #ef72b6;
+}
+.step .tab-title .active:after {
+    border-left: 17px solid #ef72b6;
+    left: unset;
+    width: unset;
+    height: unset;
+    border-right-style: none;
+}
+.tab .tab-content {
+    width:100%;
+    height: calc(100% - 35px);
+    overflow: hidden;
+    position: relative;
+    border:1px solid #ddd;
+    border-top:none;
+    box-sizing: border-box;
+}
+.tab .tab-content .tab-item{
+    width:100%;
+    position: absolute;
+    top:0;
+    left:0;
+    z-index: 9999;
+    background-color: #fff;
+    height: 100%;
+    overflow: auto;
+}
+.tab .tab-content .tab-item.active {
+    z-index: 99999;
+}
+.form-page {
+    height: 100%;
+    position: relative;
+}
+.tab-content .form-input {
+    height: calc(100% - 70px);
+    overflow: auto;
+    background-color: #fff;
+    margin-top: 10px;
+}
+.tab-content .form-input .form-group {
+    margin-right: 0;
+    margin-left: 0;
+}
+.tab-content .footer-option {
+    margin-left: 0;
+    margin-right: 0;
+    border-top: 1px solid #e2e2e2;
+    box-sizing: border-box;
+    text-align: right;
+    padding-top: 7px;
+    margin-top: 10px;
+}
+.step-block .tab-content .tab-item{
+    display: none;
+    position:relative;
+}
+.step-block .tab-content .tab-item.active{
+    display: block;
+}
+.step-block .tab-content .footer-option{
+    height: 50px;
+}
+/*tab选项卡、步骤样式*/
+
+
+/*左右结构样式*/
+.left-to-right{
+    width:100%;
+    height: 100%;
+    float:left;
+}
+.left-to-right .left,.left-to-right .right{
+    border:1px solid #eee;
+    box-sizing: border-box;
+    height: 100%;
+    overflow: auto;
+    float: left;
+}
+.left-to-right .left{
+    width:42%;
+}
+.left-to-right .left .table-row:hover{
+    background-color:#ef72b6;
+    color:#fff;
+}
+.left-to-right .right{
+    width:43%;
+}
+.left-to-right .right .sorttable-main{
+    display: none;
+}
+.left-to-right .right .active{
+    display: block;
+}
+
+.left-to-right .left .tree-veiw{
+    width:100%;
+    height: 100%;
+    overflow: auto;
+    margin: 0;
+}
+.left-to-right .left .tree-veiw dt,.left-to-right .left .tree-veiw dd,.left-to-right .left .tree-veiw dl{
+    width:100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    margin: 0;
+}
+.left-to-right .left .tree-veiw dt.item:hover,.left-to-right .left .tree-veiw dd:hover{
+    background-color: #50abe4;
+    color:#fff;
+}
+.left-to-right .left .tree-veiw dt.nochecked{
+    cursor:not-allowed;
+}
+.left-to-right .left .tree-veiw .nochecked .child{
+    font-size: 18px;
+    font-weight: bold;
+    margin-right: 4px;
+    vertical-align: middle;
+    display: inline;
+}
+.left-to-right .left .tree-veiw dt.checked,.left-to-right .left .tree-veiw dd.checked{
+    background-color: #50abe4;
+    color:#fff;
+}
+.left-to-right .left .tree-veiw dt{
+    background-color: #e2e2e2;
+    height: 36px;
+    line-height: 36px;
+    text-indent: 10px;
+}
+.left-to-right .left .tree-veiw dd{
+    height: 32px;
+    line-height: 32px;
+    text-indent: 40px;
+}
+.left-to-right .to{
+    width:15%;
+    text-align: center;
+    height: 100%;
+    float: left;
+    position: relative;
+}
+.left-to-right .to .arrow-right{
+    display: inline-block;
+    height: 32px;
+    line-height: 32px;
+    text-align: center;
+    width:calc(100% - 20px);
+    position: absolute;
+    top:calc((100% - 32px)/2);
+    left: 0;
+    background-color: #50abe4;
+    color: #fff;
+    cursor: pointer;
+    text-indent: 16px
+}
+.left-to-right .to .arrow-right:before{
+    content: '';
+    display: block;
+    border-top: 16px solid transparent;
+    border-bottom: 16px solid transparent;
+    border-left: 16px solid #fff;
+    position: absolute;
+    left: 0px;
+    top: 0;
+}
+.left-to-right .to .arrow-right:after{
+    content: '';
+    display: block;
+    border-top: 32px solid transparent;
+    border-bottom: 32px solid transparent;
+    border-left: 20px solid #50abe4;
+    position: absolute;
+    right: -20px;
+    top: -16px;
+    z-index: 10;
+}
+/*左右结构样式*/
+
+/*table列表样式*/
+.table-list{
+    border: 1px solid #e2e2e2;
+    box-sizing: border-box;
+    width:100%;
+    height: 100%;
+    display: table;
+    margin-bottom: 0;
+}
+.table-list .table-header{
+    display: table-row;
+    background-color:#f2f2f2;
+}
+.table-list .row,.table-list .table-rows{
+    display: table-row;
+}
+.table-list .table-header .cel,.table-list .row .cel{
+    display: table-cell;
+    min-height: 40px;
+    text-align: center;
+    border:1px solid #e6e6e6;
+    box-sizing: border-box;
+    border-left:none;
+    border-top:none;
+    vertical-align: middle;
+    padding: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.table-list .table-body{
+    height: 100%;
+    overflow: auto;
+}
+.table-list .table-body::-webkit-scrollbar {
+    display: none;
+}
+.table-list .row .cel.week{
+    background-color: #f5f2aa;
+}
+.table-list .row .cel:last-child{
+    border-right: none;
+}
+.table-list .row:last-child .cel{
+    border-bottom: none;
+}
+
+.table-row{
+    width:100%;
+    float:left;
+    height: 40px;
+    line-height: 40px;
+    cursor: pointer;
+    position: relative;
+}
+.table-row .del{
+    color: #fff;
+    font-size: 18px;
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    cursor: pointer;
+    border: none;
+    display: none;
+    background-color: #ff0101;
+    height: 40px;
+    width: 40px;
+    line-height: 40px;
+}
+.table-row:hover .del{
+    display:block;
+}
+.table-row.checked{
+    background-color: #50abe4;
+    color:#fff;
+}
+.table-row > div{
+    float:left;
+    text-align: center;
+    border:1px solid #e2e2e2;
+    border-left:none;
+    border-top:none;
+    box-sizing: border-box;
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap;
+    position: relative;
+}
+.table-row > div:last-child{
+    border-right: none;
+}
+.table-row > div .del-row{
+    font-size: 22px;
+    font-weight: 900;
+    color: #d40505;
+    position: absolute;
+    right: 0px;
+    top: 4px;
+    display: none;
+    cursor: pointer;
+}
+.table-row:hover > div .del-row{
+    display: block;
+    transform: scale(1.1);
+}
+.table-row > div .checkbox{
+    padding-top: 0;
+    display: contents;
+}
+.table-row .table-cel1{
+    width:10%;
+}
+.table-row .table-cel1-5{
+    width:15%;
+}
+.table-row .table-cel2{
+    width:20%;
+}
+.table-row .table-cel3{
+    width:30%;
+}
+.table-row .table-cel4{
+    width:40%;
+}
+.table-row .table-cel5{
+    width:50%;
+}
+.table-row .table-cel6{
+    width:60%;
+}
+.table-row .table-cel7{
+    width:70%;
+}
+.table-row .table-cel8{
+    width:80%;
+}
+.table-row .table-cel9{
+    width:90%;
+}
+.table-row .table-cel10{
+    width:100%;
+}
+.table-row .checkbox label{
+    margin: 0;
+}
+/*table列表样式*/
+
+
+

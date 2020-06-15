@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+<th:block th:include="admin/include :: header('查看详情')"/>
+</head>
+<style>
+.table-striped {
+    min-height: 95% !important;
+}
+</style>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="admin/include :: common"/>
+<th:block th:include="admin/include :: table"/>
+<script th:inline="javascript">
+var prefix = ctx + "admin/materialControl/costInfo";
+$(function () {
+    var options = {
+        url: prefix + "/doListInfo?id=" + [[${id}]],
+        modalName: "收费情况",
+        rememberSelected: true,
+        uniqueId: "id",
+        columns: [
+            {
+                field: "",
+                title: '序号',
+                align: 'center',
+                formatter: function (value, row, index) {
+                	return index + 1;
+                }
+            },
+            {
+                field: 'fillDate',
+                title: '日期',
+                align: 'center'
+            },
+            {
+                field: 'thisYear',
+                title: '当年目标（万元）',
+                align: 'center'
+            },
+            {
+                field: 'lastYear',
+                title: '去年目标（万元）',
+                align: 'center'
+            },
+            {
+                field: 'currentEnter',
+                title: '本月到账（万元）',
+                align: 'center'
+            },
+            {
+                field: 'currentTotal',
+                title: '本月累计（万元）',
+                align: 'center'
+            },
+            {
+                field: 'fillUserName',
+                title: '填报人',
+                align: 'center'
+            },
+            {
+                field: 'fillTime',
+                title: '填报时间',
+                align: 'center'
+            }
+        ]
+    };
+    $.table.init(options);
+    
+    var doc = window.top == window.parent ? window.document : window.parent.document;
+    $(".layui-layer-btn", doc).hide();
+    $("#layui-layer-iframe1", doc).css("height", "458px");
+    $(".table-striped").css("min-height", "80%");
+    $(".table-striped").css("margin-bottom", "2%");
+});
+</script>
+</body>
+</html>

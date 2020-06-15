@@ -1,0 +1,164 @@
+<!-- 通用CSS -->
+<head th:fragment=header(title) xmlns:th="http://www.w3.org/1999/xhtml">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="keywords" content="">
+	<meta name="description" content="">
+	<title th:text="${title}"></title>
+	<link rel="shortcut icon" href="/favicon.ico">
+	<link th:href="${'/css/bootstrap.min.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+	<link th:href="${'/css/font-awesome.min.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+	<link th:href="${'/css/animate.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+	<link th:href="${'/css/style.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+	<link th:href="${'/boot/css/admin.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+</head>
+<!-- 通用JS -->
+<div th:fragment="common" xmlns:th="http://www.w3.org/1999/xhtml">
+	<script th:src="${'/js/jquery.min.js?v='+@toolsUtils.version()}"></script>
+	<script th:src="${'/js/bootstrap.min.js?v='+@toolsUtils.version()}"></script>
+	<script th:src="${'/ajax/libs/blockUI/jquery.blockUI.js?v='+@toolsUtils.version()}"></script>
+	<script th:src="${'/ajax/libs/iCheck/icheck.min.js?v='+@toolsUtils.version()}"></script>
+	<script th:src="${'/ajax/libs/layer/layer.min.js?v='+@toolsUtils.version()}"></script>
+	<script th:src="${'/ajax/libs/layui/layui.js?v='+@toolsUtils.version()}"></script>
+	<script th:src="${'/js/dateUtil.js?v='+@toolsUtils.version()}"></script>
+	<script th:src="${'/js/accounting.js?v='+@toolsUtils.version()}"></script>
+	<script th:src="${'/boot/js/common.js?v='+@toolsUtils.version()}"></script>
+	<script th:src="${'/boot/js/admin.js?v='+@toolsUtils.version()}"></script>
+	<script th:inline="javascript"> var ctx = [[@{/}]]; </script>
+</div>
+<!-- 列表js -->
+<div th:fragment="table" xmlns:th="http://www.w3.org/1999/xhtml">
+	<!-- bootstrap-table 表格插件 -->
+	<link th:href="${'/ajax/libs/bootstrap-table/bootstrap-table.min.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+	<script th:src="${'/ajax/libs/bootstrap-table/bootstrap-table.min.js?v='+@toolsUtils.version()}"></script>
+	<script th:src="${'/ajax/libs/bootstrap-table/locale/bootstrap-table-zh-CN.min.js?v='+@toolsUtils.version()}"></script>
+	<script th:src="${'/ajax/libs/bootstrap-table/extensions/mobile/bootstrap-table-mobile.js?v='+@toolsUtils.version()}"></script>
+	<script th:src="${'/ajax/libs/bootstrap-table/extensions/toolbar/bootstrap-table-toolbar.min.js?v='+@toolsUtils.version()}"></script>
+	<script th:src="${'/ajax/libs/bootstrap-table/extensions/columns/bootstrap-table-fixed-columns.js?v='+@toolsUtils.version()}"></script>
+	<!-- jquery-validate 表单树插件 -->
+	<script th:src="${'/ajax/libs/bootstrap-treetable/bootstrap-treetable.js?v='+@toolsUtils.version()}"></script>
+	<!-- jquery-export 表格导出插件 -->
+	<script th:src="${'/ajax/libs/bootstrap-table/extensions/export/bootstrap-table-export.js?v='+@toolsUtils.version()}"></script>
+	<script th:src="${'/ajax/libs/bootstrap-table/extensions/export/tableExport.js?v='+@toolsUtils.version()}"></script>
+</div>
+<!-- 表单js -->
+<div th:fragment="form" xmlns:th="http://www.w3.org/1999/xhtml">
+	<!-- jquery-validate 表单验证插件 -->
+	<script th:src="${'/ajax/libs/validate/jquery.validate.min.js?v='+@toolsUtils.version()}"></script>
+	<script th:src="${'/ajax/libs/validate/messages_zh.min.js?v='+@toolsUtils.version()}"></script>
+	<script th:src="${'/ajax/libs/validate/jquery.validate.extend.js?v='+@toolsUtils.version()}"></script>
+	<!--json 序列化-->
+	<script th:src="${'/js/jquery.serializejson.js?v='+@toolsUtils.version()}"></script>
+</div>
+<!-- fileinput文件上传插件 -->
+<div th:fragment="fileinput" xmlns:th="http://www.w3.org/1999/xhtml">
+	<link th:href="${'/ajax/libs/bootstrap-fileinput/fileinput.min.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+	<script th:src="${'/ajax/libs/bootstrap-fileinput/sortable.min.js?v='+@toolsUtils.version()}"></script>
+	<script th:src="${'/ajax/libs/bootstrap-fileinput/purify.min.js?v='+@toolsUtils.version()}"></script>
+	<script th:src="${'/ajax/libs/bootstrap-fileinput/fileinput.js?v='+@toolsUtils.version()}"></script>
+	<script th:src="${'/ajax/libs/bootstrap-fileinput/piexif.js?v='+@toolsUtils.version()}"></script>
+	<script th:src="${'/ajax/libs/bootstrap-fileinput/locales/zh.js?v='+@toolsUtils.version()}"></script>
+</div>
+<!-- 上传jasny功能扩展插件 -->
+<div th:fragment="jasny-bootstrap" xmlns:th="http://www.w3.org/1999/xhtml">
+	<link th:href="${'/ajax/libs/jasny/jasny-bootstrap.min.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+	<script th:src="${'/ajax/libs/jasny/jasny-bootstrap.js?v='+@toolsUtils.version()}"></script>
+</div>
+
+<!-- ztree树插件 -->
+<div th:fragment="ztree" xmlns:th="http://www.w3.org/1999/xhtml">
+	<link th:href="${'/ajax/libs/jquery-ztree/3.5/css/metro/zTreeStyle.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+    <script th:src="${'/ajax/libs/jquery-ztree/3.5/js/jquery.ztree.all-3.5.js?v='+@toolsUtils.version()}"></script>
+</div>
+
+<!-- select2下拉框插件 -->
+<div th:fragment="select2" xmlns:th="http://www.w3.org/1999/xhtml">
+    <link th:href="${'/ajax/libs/select2/select2.min.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+    <link th:href="${'/ajax/libs/select2/select2-bootstrap.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+	<script th:src="${'/ajax/libs/select2/select2.min.js?v='+@toolsUtils.version()}"></script>
+</div>
+
+<!-- bootstrap-select下拉框插件 -->
+<div th:fragment="bootstrap-select" xmlns:th="http://www.w3.org/1999/xhtml">
+	<link th:href="${'/ajax/libs/bootstrap-select/bootstrap-select.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+    <script th:src="${'/ajax/libs/bootstrap-select/bootstrap-select.js?v='+@toolsUtils.version()}"></script>
+</div>
+
+<!-- ui布局插件 -->
+<div th:fragment="layout-latest" xmlns:th="http://www.w3.org/1999/xhtml">
+	<link th:href="${'/ajax/libs/jquery-layout/jquery.layout-latest.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+    <script th:src="${'/ajax/libs/jquery-layout/jquery.layout-latest.js?v='+@toolsUtils.version()}"></script>
+</div>
+
+<!-- summernote富文本编辑器插件 -->
+<div th:fragment="summernote" xmlns:th="http://www.w3.org/1999/xhtml">
+	<link th:href="${'/ajax/libs/summernote/summernote.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+	<link th:href="${'/ajax/libs/summernote/summernote-bs3.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+    <script th:src="${'/ajax/libs/summernote/summernote.min.js?v='+@toolsUtils.version()}"></script>
+	<script th:src="${'/ajax/libs/summernote/summernote-zh-CN.js?v='+@toolsUtils.version()}"></script>
+</div>
+
+<!-- cropbox图像裁剪插件 -->
+<div th:fragment="cropbox" xmlns:th="http://www.w3.org/1999/xhtml">
+	<link th:href="${'/ajax/libs/cropbox/cropbox.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+    <script th:src="${'/ajax/libs/cropbox/cropbox.js?v='+@toolsUtils.version()}"></script>
+</div>
+
+<!-- duallistbox双列表框插件 -->
+<div th:fragment="bootstrap-duallistbox" xmlns:th="http://www.w3.org/1999/xhtml">
+	<link th:href="${'/ajax/libs/duallistbox/bootstrap-duallistbox.min.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+    <script th:src="${'/ajax/libs/duallistbox/bootstrap-duallistbox.min.js?v='+@toolsUtils.version()}"></script>
+</div>
+
+<!-- suggest搜索自动补全 -->
+<div th:fragment="bootstrap-suggest" xmlns:th="http://www.w3.org/1999/xhtml">
+    <script th:src="${'/ajax/libs/suggest/bootstrap-suggest.min.js?v='+@toolsUtils.version()}"></script>
+</div>
+
+<!-- typeahead搜索自动补全 -->
+<div th:fragment="bootstrap-typeahead" xmlns:th="http://www.w3.org/1999/xhtml">
+    <script th:src="${'/ajax/libs/typeahead/bootstrap3-typeahead.min.js?v='+@toolsUtils.version()}"></script>
+</div>
+
+<!-- jsonview格式化和语法高亮JSON格式数据查看插件 -->
+<div th:fragment="jsonview" xmlns:th="http://www.w3.org/1999/xhtml">
+	<link th:href="${'/ajax/libs/jsonview/jquery.jsonview.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+    <script th:src="${'/ajax/libs/jsonview/jquery.jsonview.js?v='+@toolsUtils.version()}"></script>
+</div>
+
+<!-- jquery.steps表单向导插件 -->
+<div th:fragment="jquery-steps" xmlns:th="http://www.w3.org/1999/xhtml">
+	<link th:href="${'/ajax/libs/staps/jquery.steps.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+    <script th:src="${'/ajax/libs/staps/jquery.steps.min.js?v='+@toolsUtils.version()}"></script>
+</div>
+
+<!-- 包含树形的jquery.steps表单向导插件 -->
+<div th:fragment="jquery-steps-tree" xmlns:th="http://www.w3.org/1999/xhtml">
+	<link th:href="${'/boot/css/jquery-steps-tree.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+</div>
+
+<!-- ECharts百度统计图表插件 -->
+<div th:fragment="echarts" xmlns:th="http://www.w3.org/1999/xhtml">
+    <script th:src="${'/ajax/libs/report/echarts/echarts-all.js?v='+@toolsUtils.version()}"></script>
+</div>
+
+<!-- peity图表组合插件 -->
+<div th:fragment="peity" xmlns:th="http://www.w3.org/1999/xhtml">
+    <script th:src="${'/ajax/libs/report/peity/jquery.peity.min.js?v='+@toolsUtils.version()}"></script>
+</div>
+
+<!-- sparkline线状图插件 -->
+<div th:fragment="sparkline" xmlns:th="http://www.w3.org/1999/xhtml">
+    <script th:src="${'/ajax/libs/report/sparkline/jquery.sparkline.min.js?v='+@toolsUtils.version()}"></script>
+</div>
+
+<!-- 表格拖拽插件 -->
+<div th:fragment="bootstrap-table-reorder" xmlns:th="http://www.w3.org/1999/xhtml">
+	<script th:src="${'/ajax/libs/bootstrap-table/extensions/reorder/bootstrap-table-reorder.js?v='+@toolsUtils.version()}"></script>
+	<script th:src="${'/ajax/libs/bootstrap-table/extensions/reorder/jquery.tablednd.js?v='+@toolsUtils.version()}"></script>
+</div>
+<!--自定义插件-->
+<div th:fragment="custom-plugins" xmlns:th="http://www.w3.org/1999/xhtml">
+	<script th:src="${'/js/custom-plugins.js?v='+@toolsUtils.version()}"></script>
+	<link th:href="${'/css/custom-plugins.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+</div>

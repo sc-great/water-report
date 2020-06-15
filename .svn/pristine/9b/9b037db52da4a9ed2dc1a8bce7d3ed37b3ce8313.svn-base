@@ -1,0 +1,8 @@
+eclipse.preferences.version=1
+encoding//src/main/java=UTF-8
+encoding//src/main/resources=UTF-8
+encoding//src/main/resources/templates/admin/report/TodayMedicineInfo/add.html=UTF-8
+encoding//src/main/resources/templates/admin/report/TodayMedicineInfo/edit.html=UTF-8
+encoding//src/main/resources/templates/admin/report/TodayMedicineInfo/list.html=UTF-8
+encoding//src/main/resources/templates/admin/report/userHealthInfo/add.html=UTF-8
+encoding/<project>=UTF-8

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+<th:block th:include="admin/include :: header('处理数据信息')" />
+</head>
+<style>
+.form-group .date_div {
+	float: left;
+	width: 33%;
+}
+.form-group label {
+	width: auto;
+}
+.form-group .date_div .col-sm-9 {
+	width: 60%;
+}
+.form-group .right {
+	float: right;
+}
+.form-group .right .col-sm-9 {
+	width: 54%;
+}
+.form-group .col-xs-11 {
+	width: 86.8%!important;
+}
+textarea {
+	resize: none;
+}
+</style>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+	<form class="form-horizontal m" id="form-mandatoryCheckInfo-dispose" th:object="${mandatoryCheckInfo}">
+		<input name="id" th:field="*{id}" type="hidden">
+		<div class="form-group">
+			<div class="date_div">
+				<label class="col-sm-2 control-label label-left label-checkDate is-required">检测日期：</label>
+				<div class="col-sm-9">
+					<div class="input-group">
+						<input name="checkDate" id="checkDate" th:value="*{checkDate}" required readonly class="form-control" />
+					</div>
+				</div>
+			</div>
+			<div class="date_div">
+				<label class="col-sm-2 control-label label-left is-required">检测周期：</label>
+				<div class="col-sm-9">
+					<div class="input-group">
+						<input name="checkCycle" id="checkCycle" class="form-control" th:value="*{checkCycle}" required
+								type="number" min="0" max="365" maxLength="3"
+								oninput="autoformart($(this), true);mandatoryCheckInfo_autoCalculate()" />
+						<span class="input-group-addon">天</span>
+					</div>
+				</div>
+			</div>
+			<div class="date_div right">
+				<label class="col-sm-2 control-label label-left">下次检测日期：</label>
+				<div class="col-sm-9">
+					<div class="input-group">
+						<input name="nextCheckDate" id="nextCheckDate" class="form-control" readonly />
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left is-required">检测项目：</label>
+			<div class="col-xs-11">
+				<input name="checkProject" maxlength="80" class="form-control" th:value="*{checkProject}" required />
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left is-required">检测内容：</label>
+			<div class="col-xs-11">
+				<textarea name="checkInfo" maxlength="500" class="form-control" th:text="*{checkInfo}" rows="3" required></textarea>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left is-required">检测结果：</label>
+			<div class="col-xs-11">
+				<textarea name="checkResult" maxlength="500" class="form-control" rows="3" required></textarea>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left label-note">备&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;注：</label>
+			<div class="col-xs-11">
+				<textarea name="note" maxlength="500" class="form-control" th:value="*{note}" rows="3"></textarea>
+			</div>
+		</div>
+	</form>
+</div>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: form" />
+</body>
+<script th:inline="javascript">
+var prefix = ctx + "admin/materialControl/mandatoryCheckInfo";
+
+$("#form-mandatoryCheckInfo-dispose").validate({
+    focusCleanup: true
+});
+
+$(function () {
+	$(".label-note").width($(".label-checkDate").width());
+	
+	mandatoryCheckInfo_autoCalculate();
+})
+
+function submitHandler() {
+    if ($.validate.form()) {
+        $.operate.save(prefix + "/doDispose", $('#form-mandatoryCheckInfo-dispose').serialize(), null, "put");
+    }
+}
+
+// 自动计算
+function mandatoryCheckInfo_autoCalculate() {
+	var cdate = $("#checkDate").val();
+    if (cdate == null || cdate == undefined || cdate == "")
+    	return;
+    var n = $("#checkCycle").val();
+    if (n == null || n == undefined || n == "")
+    	return;
+
+    $("#nextCheckDate").val(dateAddDays(cdate, n));
+}
+/**
+指定日期增加天数
+ */
+function dateAddDays(dateStr, dayCount) {
+	var tempDate = new Date(dateStr.replace(/-/g, "/")); // 把日期字符串转换成日期格式
+    var resultDate = new Date((tempDate / 1000 + (86400 * dayCount)) * 1000); // 增加n天后的日期
+    
+    var y = resultDate.getFullYear();
+    var m = resultDate.getMonth() + 1;
+    var d = resultDate.getDate();
+    var mm = m < 10 ? ("0" + m) : m;
+    var dd = d < 10 ? ("0" + d) : d;
+    
+    return y + "-" + mm + "-" + dd;
+}
+
+// input限制
+function autoformart(obj, isInt) {
+    var val = obj.val();
+    if (val == null || val == undefined || val == "") {
+        obj.val("");
+        return;
+    }
+    if (isInt && val.indexOf(".") != -1) { // 整数限制
+    	val = val.slice(0, val.length - 2);
+    }
+    var maxLength = obj.attr("maxLength");
+    var max = obj.attr("max");
+    if (val.length > maxLength) {
+        obj.val(val.slice(0, maxLength)); // 限制长度
+        return;
+    }
+    if (parseFloat(val) > parseFloat(max)) {
+        obj.val(val.slice(0, val.length - 1)); // 限制大小
+        return;
+    }
+    obj.val(parseFloat(val));
+}
+</script>
+</html>

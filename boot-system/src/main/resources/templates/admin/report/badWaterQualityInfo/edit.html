@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+<th:block th:include="admin/include :: header('修改水厂水质数据信息(污水处理厂/排水厂)')" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+	<form class="form-horizontal m" id="form-badWaterQualityInfo-edit" th:object="${badWaterQualityInfo}">
+		<input name="id" th:field="*{id}" type="hidden">
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">COD进水：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="codIn" class="form-control" placeholder="请输入COD进水"
+							type="number" min="0" max="10000" maxLength="5" oninput="autoformart($(this))" th:value="${#numbers.formatDecimal(badWaterQualityInfo.codIn,0,0)}">
+					<span class="input-group-addon">Mg/L</span>
+				</div>
+			</div>
+			<label class="col-sm-2 control-label label-left is-required">COD出水：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="codOut" class="form-control" placeholder="请输入COD出水" required
+							type="number" min="0" max="10000" maxLength="5" oninput="autoformart($(this))" th:value="${#numbers.formatDecimal(badWaterQualityInfo.codOut,0,0)}">
+					<span class="input-group-addon">Mg/L</span>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">NH3-N进水：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="nh3NIn" class="form-control" placeholder="请输入NH3-N进水"
+							type="number" min="0" max="10000" maxLength="5" oninput="autoformart($(this))" th:value="${#numbers.formatDecimal(badWaterQualityInfo.nh3NIn,0,0)}">
+					<span class="input-group-addon">Mg/L</span>
+				</div>
+			</div>
+			<label class="col-sm-2 control-label label-left is-required">NH3-N出水：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="nh3NOut" class="form-control" placeholder="请输入NH3-N出水" required
+							type="number" min="0" max="10000" maxLength="5" oninput="autoformart($(this))" th:value="${#numbers.formatDecimal(badWaterQualityInfo.nh3NOut,0,0)}">
+					<span class="input-group-addon">Mg/L</span>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">SS进水：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="ssIn" class="form-control" placeholder="请输入SS进水"
+							type="number" min="0" max="10000" maxLength="5" oninput="autoformart($(this))" th:value="${#numbers.formatDecimal(badWaterQualityInfo.ssIn,0,0)}">
+					<span class="input-group-addon">Mg/L</span>
+				</div>
+			</div>
+			<label class="col-sm-2 control-label label-left is-required">SS出水：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="ssOut" class="form-control" placeholder="请输入SS出水" required
+							type="number" min="0" max="10000" maxLength="5" oninput="autoformart($(this))" th:value="${#numbers.formatDecimal(badWaterQualityInfo.ssOut,0,0)}">
+					<span class="input-group-addon">Mg/L</span>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">PH值进水：</label>
+			<div class="col-sm-4">
+				<input name="phIn" class="form-control" placeholder="请输入PH值进水"
+						type="number" min="0" max="14" maxLength="3" oninput="autoformart($(this))" th:value="${#numbers.formatDecimal(badWaterQualityInfo.phIn,0,0)}">
+			</div>
+			<label class="col-sm-2 control-label label-left is-required">PH值出水：</label>
+			<div class="col-sm-4">
+				<input name="phOut" class="form-control" placeholder="请输入PH值出水" required
+						type="number" min="0" max="14" maxLength="3" oninput="autoformart($(this))" th:value="${#numbers.formatDecimal(badWaterQualityInfo.phOut,0,0)}">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">TP进水：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="tpIn" class="form-control" placeholder="请输入TP进水"
+							type="number" min="0" max="10000" maxLength="5" oninput="autoformart($(this))" th:value="${#numbers.formatDecimal(badWaterQualityInfo.tpIn,0,0)}">
+					<span class="input-group-addon">Mg/L</span>
+				</div>
+			</div>
+			<label class="col-sm-2 control-label label-left is-required">TP出水：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="tpOut" class="form-control" placeholder="请输入TP出水" required
+							type="number" min="0" max="10000" maxLength="5" oninput="autoformart($(this))" th:value="${#numbers.formatDecimal(badWaterQualityInfo.tpOut,0,0)}">
+					<span class="input-group-addon">Mg/L</span>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">TN进水：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="tnIn" class="form-control" placeholder="请输入TN进水"
+							type="number"min="0" max="10000" maxLength="5" oninput="autoformart($(this))" th:value="${#numbers.formatDecimal(badWaterQualityInfo.tnIn,0,0)}">
+					<span class="input-group-addon">Mg/L</span>
+				</div>
+			</div>
+			<label class="col-sm-2 control-label label-left is-required">TN出水：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="tnOut" class="form-control" placeholder="请输入TN出水" required
+							type="number" min="0" max="10000" maxLength="5" oninput="autoformart($(this))" th:value="${#numbers.formatDecimal(badWaterQualityInfo.tnOut,0,0)}">
+					<span class="input-group-addon">Mg/L</span>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left is-required">MLSS：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="mlssIn" class="form-control" placeholder="请输入MLSS" required
+							type="number" min="0" max="10000" maxLength="5" oninput="autoformart($(this))" th:value="${#numbers.formatDecimal(badWaterQualityInfo.mlssIn,0,0)}">
+					<span class="input-group-addon">Mg/L</span>
+				</div>
+			</div>
+			<label class="col-sm-2 control-label label-left">SV30：</label>
+			<div class="col-sm-4">
+				<div class="input-group">
+					<input name="sv30In" class="form-control" placeholder="请输入SV30"
+							type="number" min="0" max="100" maxLength="5" oninput="autoformart($(this))" th:value="${#numbers.formatDecimal(badWaterQualityInfo.sv30In,0,0)}">
+					<span class="input-group-addon">%</span>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: form" />
+<script th:inline="javascript">
+var prefix = ctx + "admin/report/badWaterQualityInfo";
+
+$("#form-badWaterQualityInfo-edit").validate({
+	focusCleanup : true
+});
+
+function submitHandler() {
+	if ($.validate.form()) {
+		$.operate.save(prefix + "/doEdit", $(
+				'#form-badWaterQualityInfo-edit').serialize(), null,
+				"put");
+	}
+}
+
+// input限制
+function autoformart(obj) {
+	var val = obj.val();
+	if (val == null || val == undefined || val == "") {
+		obj.val("");
+		return;
+	}
+	var maxLength = obj.attr("maxLength");
+	var max = obj.attr("max");
+	if (val.length > maxLength) {
+		obj.val(val.slice(0, maxLength)); // 限制长度
+		return;
+	}
+	if (parseFloat(val) > parseFloat(max)) {
+		obj.val(val.slice(0, val.length - 1)); // 限制大小
+		return;
+	}
+	obj.val(parseFloat(val));
+}
+</script>
+</body>
+</html>

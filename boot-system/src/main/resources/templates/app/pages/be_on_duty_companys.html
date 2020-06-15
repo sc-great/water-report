@@ -1,0 +1,121 @@
+<!doctype html>
+<html class="no-js" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=ideal viewport, initial-scale=1 user-scalable=0"/>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="0"/>
+    <title>各公司值班统计</title>
+    <link rel="stylesheet" th:href="${'/webapp/css/font-awesome.css?v='+@toolsUtils.version()}">
+    <link rel="stylesheet" th:href="${'/webapp/css/com.css?v='+@toolsUtils.version()}">
+    <link rel="stylesheet" th:href="${'/webapp/css/style.css?v='+@toolsUtils.version()}">
+    <script th:src="${'/webapp/js/jquery.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/pace.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/plugin/layer_mobile/layer.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/common.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/jdate.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/dateUtil.js?v='+@toolsUtils.version()}"></script>
+</head>
+<body>
+<div class="main">
+    <input type="hidden" id="areaIds" th:value="${areaIds}">
+    <div class="nav">
+        <div class="go-back" onclick="goBack();"><i class="fa fa-chevron-left"></i></div>
+        <div class="date"><span id="check_date">2020-03-23</span>&nbsp;<i class="fa fa-calendar-check-o"></i></div>
+        <div class="nav-main">
+            <label>
+                <span th:text="${areaGroupName}"></span>
+                <i class="fa fa-angle-right"></i>
+            </label>
+            <label>
+                全部
+            </label>
+        </div>
+    </div>
+    <div class="content center font-size-14">
+        <table class="cross-color">
+            <thead class="bg-color1 color-3">
+            <tr>
+                <th style="width: 40%;">
+                    项目名称
+                </th>
+                <th>
+                    到岗（人）
+                </th>
+                <th>
+                    现场/远程（人）
+                </th>
+            </tr>
+            </thead>
+            <tbody id="company_list">
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+<script th:inline="javascript">
+    var dateTime=getCurDate("yyyy-MM-dd");
+    $(function () {
+        // 日期格式
+        new Jdate({
+            el: '#check_date',
+            format: 'YYYY-MM-DD',
+            beginYear: 2000,
+            endYear: 2100,
+            value: dateTime,
+            confirm: function(date) {
+                loadData(date);
+            }
+        });
+        loadData(dateTime);
+        var nav_height=$(".nav").outerHeight();
+        //滚动条事件
+        $('.main').scroll(function(){
+            var top_height = $(this).scrollTop();
+            var $this=$("thead");
+            if(top_height+$this.outerHeight()>nav_height){
+                if(!$this.hasClass("top")){
+                    var width_1=$this.next("tbody").find("tr:eq(0) td:eq(0)").outerWidth();
+                    var width_2=$this.next("tbody").find("tr:eq(0) td:eq(1)").outerWidth();
+                    var width_3=$this.next("tbody").find("tr:eq(0) td:eq(2)").outerWidth();
+                    $this.find("th").eq(0).width(width_1);
+                    $this.find("th").eq(1).width(width_2);
+                    $this.find("th").eq(2).width(width_3);
+                    $this.next("tbody").find("tr:eq(0) td:eq(0)").width(width_1);
+                    $this.next("tbody").find("tr:eq(0) td:eq(1)").width(width_2);
+                    $this.next("tbody").find("tr:eq(0) td:eq(2)").width(width_3);
+                    $this.addClass("top");
+                }
+            }else{
+                if($this.hasClass("top")){
+                    $this.removeClass("top");
+                }
+            }
+        });
+    });
+    function loadData(date){
+        $("#company_list").empty();
+        var areaIds=$("#areaIds").val();
+        req('/app/beOnDutyWaterWorksData',{areaIds:areaIds,date:date},function(result){
+            if(result.code=="0"){
+                var companyList=result.data;
+                $.each(companyList,function(index,item){
+                    $("#company_list").append(' <tr>\n' +
+                        '                    <td class="left">\n' +
+                        '                        <a href="/app/beOnDutyWaterWorks/'+item.orgId+'">'+item.orgName+'</a>\n' +
+                        '                    </td>\n' +
+                        '                    <td>\n' +
+                        '                        <span class="color-2">'+item.params.workerCount+'</span>/<span class="color-1">'+item.params.workerTotal+'</span>\n' +
+                        '                        <span class="font-size-12">'+(item.params.workerTotal>0?(item.params.workerCount*100/item.params.workerTotal).toFixed(1):0)+'%</span>\n' +
+                        '                    </td>\n' +
+                        '                    <td>\n' +
+                        '                        <span class="color-2">'+item.params.sceneWorkerCount+'</span>/<span class="color-1">'+item.params.onlineWorkerCount+'</span>\n' +
+                        '                    </td>\n' +
+                        '                </tr>');
+                });
+            }
+        });
+    }
+</script>
+</html>

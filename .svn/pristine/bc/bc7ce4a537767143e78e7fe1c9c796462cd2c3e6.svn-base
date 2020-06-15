@@ -1,0 +1,13 @@
+<!doctype html>
+<html class="no-js" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>退出登录</title>
+    <script th:src="${'/webapp/js/jquery.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:inline="javascript">
+        window.top.location.href="/app/login";
+    </script>
+</head>
+<body>
+</body>
+</html>

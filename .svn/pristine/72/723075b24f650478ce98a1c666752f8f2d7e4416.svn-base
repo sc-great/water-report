@@ -1,0 +1,137 @@
+<!doctype html>
+<html class="no-js" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport"
+	content="width=ideal viewport, initial-scale=1 user-scalable=0" />
+<meta http-equiv="Cache-Control"
+	content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<title>备品备件</title>
+<link rel="stylesheet"
+	th:href="${'/webapp/css/font-awesome.css?v='+@toolsUtils.version()}">
+<link rel="stylesheet"
+	th:href="${'/webapp/css/com.css?v='+@toolsUtils.version()}">
+<link rel="stylesheet"
+	th:href="${'/webapp/css/style.css?v='+@toolsUtils.version()}">
+<script th:src="${'/webapp/js/jquery.min.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/webapp/js/pace.min.js?v='+@toolsUtils.version()}"></script>
+<script
+	th:src="${'/webapp/js/plugin/layer_mobile/layer.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/webapp/js/common.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/webapp/js/jdate.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/webapp/js/dateUtil.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/webapp/js/chart/echarts.min.js'}"></script>
+<script th:src="${'/webapp/js/chart/myCharts.js'}"></script>
+</head>
+<body>
+	<div class="factoryInfo_header">
+		<div class="title" onclick="goBack();">
+			<i class="fa fa-chevron-left"></i><span>备品备件</span>
+		</div>
+	</div>
+	<div class="factoryInfo_formBox">
+		<form>
+			<div><span>水厂名称</span><p><input></p></div>
+			<div><span>建成时间</span><p><input></p></div>
+			<div><span>开始运营时间</span><p><input></p></div>
+			<div class="youDanWei"><span>设计处理能力</span><p><input><i>吨/天</i></p></div>
+			<div><span>工艺</span><p><input></p></div>
+			<div><span>排放标准</span><p><input></p></div>
+		</form>
+		<div class="button_group">
+           	<a class="reset">重置</a>
+           	<a class="submit">提交</a>
+        </div>
+	</div>
+</body>
+<style>
+.factoryInfo_header {
+    background: #ededed;
+    line-height: 6vh;
+}
+.factoryInfo_header .title {
+    padding-left: 8px;
+    color: #000;
+    font-weight: bold;
+    font-size: 1.6rem;
+}
+.factoryInfo_header .title i {
+    float: left;
+    line-height: 6vh;
+}
+.factoryInfo_header .title span {
+	display: flex;
+    justify-content: center;
+    font-weight: bold;
+}
+.factoryInfo_formBox {
+	font-size: 1.5rem;
+}
+.factoryInfo_formBox div {
+	line-height: 6vh;
+	margin-left: 3vh;
+}
+.factoryInfo_formBox div p {
+	display: inline-block;
+	border: 1px #dcdcdc solid;
+	background: #f9f9f9;
+	width: 65%;
+	line-height: 4vh;
+}
+.factoryInfo_formBox div span {
+	display: inline-block;
+	width: 26%;
+}
+input {
+	border: 0;
+	outline: none;
+	background-color: rgba(0, 0, 0, 0);
+}
+.factoryInfo_formBox form {
+	margin-top: 3vh;
+}
+.factoryInfo_formBox div p input {
+	width: 56%;
+	line-height: 4vh;
+	padding-left: 0.5vh;
+	width: 98%;
+}
+.factoryInfo_formBox .youDanWei p input {
+	width: 78%;
+}
+.factoryInfo_formBox div p i {
+	margin: 0 1vh;
+	font-style: normal;
+	float: right;
+}
+.factoryInfo_formBox .button_group {
+	width: 80%;
+	margin: 3vh auto;
+}
+.factoryInfo_formBox .button_group a {
+	display: inline-block;
+    width: 45%;
+    text-align: center;
+    line-height: 4ch;
+    font-size: 1.6rem;
+    margin-top: 2vh;
+}
+.factoryInfo_formBox .button_group .reset {
+	background: #f4f4f4;
+	float: left;
+}
+.factoryInfo_formBox .button_group .submit {
+	background: #1d7bb8;
+    color: #fff;
+    float: right;
+}
+</style>
+<script>
+var object_p = $(".factoryInfo_formBox .youDanWei p");
+object_p.find("i").click(function() {
+	object_p.find("input").focus();
+});
+</script>
+</html>

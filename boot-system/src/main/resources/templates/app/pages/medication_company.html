@@ -1,0 +1,227 @@
+<!doctype html>
+<html class="no-js" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=ideal viewport, initial-scale=1 user-scalable=0"/>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="0"/>
+    <title>各公司用药分析</title>
+    <link rel="stylesheet" th:href="${'/webapp/css/font-awesome.css?v='+@toolsUtils.version()}">
+    <link rel="stylesheet" th:href="${'/webapp/css/com.css?v='+@toolsUtils.version()}">
+    <link rel="stylesheet" th:href="${'/webapp/css/style.css?v='+@toolsUtils.version()}">
+    <script th:src="${'/webapp/js/jquery.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/pace.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/plugin/layer_mobile/layer.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/common.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/jdate.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/dateUtil.js?v='+@toolsUtils.version()}"></script>
+</head>
+<body>
+<div class="main">
+    <input type="hidden" id="areaId" th:value="${area?.areaId}">
+    <input type="hidden" id="areaName" th:value="${area?.areaName}">
+    <div class="content center font-size-14">
+        <table class="cross-color">
+            <thead class="bg-color1 color-3" id="company_list">
+                <tr>
+                    <th style="width: 40%;">
+                        项目名称
+                    </th>
+                    <th>
+                        药品类型
+                    </th>
+                    <th>
+                        当日/累计
+                    </th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+</body>
+<script th:inline="javascript">
+    var dateTime=getCurDate("yyyy-MM-dd");
+    $(function () {
+        loadData(dateTime);
+        navControler(dateTime);
+        var nav_height=$(".nav").outerHeight();
+        //滚动条事件
+        $('.main').scroll(function(){
+            var top_height = $(this).scrollTop();
+            var $this=$("#company_list");
+            if(top_height+$this.outerHeight()>nav_height){
+                if(!$this.hasClass("top")){
+                    var width_1=$this.next("tbody").find("tr:eq(0) th").outerWidth();
+                    var width_2=$this.next("tbody").find("tr:eq(0) td:eq(0)").outerWidth();
+                    var width_3=$this.next("tbody").find("tr:eq(0) td:eq(1)").outerWidth();
+                    $this.find("th").eq(0).width(width_1);
+                    $this.find("th").eq(1).width(width_2);
+                    $this.find("th").eq(2).width(width_3);
+                    $this.next("tbody").find("tr:eq(0) th").width(width_1);
+                    $this.next("tbody").find("tr:eq(0) td:eq(0)").width(width_2);
+                    $this.next("tbody").find("tr:eq(0) td:eq(1)").width(width_3);
+                    $this.addClass("top");
+                }
+            }else{
+                if($this.hasClass("top")){
+                    $this.removeClass("top");
+                }
+            }
+        });
+    });
+    //导航控件
+    function navControler(dateTime){
+        var areaId=$("#areaId").val();
+        var areaName=$("#areaName").val();
+        var html='<div class="nav">\n' +
+                '<div class="go-back" onclick="goBack();"><i class="fa fa-chevron-left"></i></div>'+
+            '        <div class="date"><span id="check_date">'+dateTime+'</span>&nbsp;<i class="fa fa-calendar-check-o"></i></div>\n' +
+            '        <div class="select" id="area" data-value="'+areaId+'">'+areaName+' <i class="fa fa-angle-right"></i></div>\n' +
+            '    </div>';
+        var objHTML=$(html);
+        $(".main").prepend(objHTML);
+        // 日期格式
+        new Jdate({
+            el: '#check_date',
+            format: 'YYYY-MM-DD',
+            beginYear: 2000,
+            endYear: 2100,
+            value: dateTime,
+            confirm: function(date) {
+                loadData(date);
+            }
+        });
+        $("#area").bind("click",function(){
+            var $this=$(this);
+            $this.closest(".nav").toggleClass("active");
+            if($this.closest(".nav").hasClass("active")){
+                $this.find(".fa").addClass("fa-angle-down").removeClass("fa-angle-right");
+                var areaId=$(this).data("value");
+                req("/app/getAreaList",null,function (result) {
+                    if(result.code=="0"){
+                        var html='<div class="modal">\n' +
+                            '            <div class="tree_list">\n' +
+                            '                <div class="p_list">\n';
+                        var areaList=result.data;
+                        $.each(areaList,function(index,item){
+                            html+= '                    <div class="item '+(areaId==item.areaId?"active":"")+'" data-value="'+item.areaId+'">'+item.areaName+'</div>\n';
+                        });
+                        html+=   '                </div>\n' +
+                            '                <div class="s_list">\n' +
+                            '                    <div class="item">全部</div>\n';
+                        req("/app/getCompanyList",{areaId:areaId},function (result) {
+                            if(result.code=="0"){
+                                var companyList=result.data;
+                                $.each(companyList,function(index,item){
+                                    html+='                    <a class="item" href="/app/medicationWaterWorks/'+item.orgId+'">'+item.orgName+'</a>\n';
+                                })
+                            }
+                        },"get",false);
+                        html+='                </div>\n' +
+                            '            </div>\n' +
+                            '        </div>';
+                        var objHTML=$(html);
+                        objHTML.find(".p_list .item").bind("click",function(){
+                            $(this).addClass("active").siblings().removeClass("active");
+                            objHTML.find(".s_list").empty();
+                            var areaId=$(this).data("value");
+                            var html= '                    <div class="item">全部</div>\n';
+                            req("/app/getCompanyList",{areaId:areaId},function (result) {
+                                if(result.code=="0"){
+                                    var companyList=result.data;
+                                    $.each(companyList,function(index,item){
+                                        html+='                    <a class="item" href="/app/medicationWaterWorks/'+item.orgId+'">'+item.orgName+'</a>\n';
+                                    })
+                                }
+                            },"get",false);
+                            objHTML.find(".s_list").append(html);
+                        });
+                        $this.after(objHTML);
+                    }
+                },"get",false);
+            }else{
+                $this.closest(".nav").find(".modal").remove();
+                $this.find(".fa").addClass("fa-angle-right").removeClass("fa-angle-down");
+            }
+
+        });
+    }
+    function loadData(date){
+        $("#company_list").nextAll("tbody").remove();
+        var areaId=$("#areaId").val();
+        req('/app/medicationCompanyData',{areaId:areaId,date:date},function(result){
+            if(result.code=="0"){
+                var companyList=result.data;
+                $.each(companyList,function(index,item){
+                    $("#company_list").after('<tbody class="cross-color">\n' +
+                        '                <tr>\n' +
+                        '                    <th class="left" rowspan="10">\n' +
+                        '                        <a href="/app/medicationWaterWorks/'+item.orgId+'">'+item.orgName+'</a>\n' +
+                        '                    </th>\n' +
+                        '                    <td class="left">PAC</td>\n' +
+                        '                    <td>\n' +
+                        '                        <span class="color-2">'+item.params.sumMedicine.sumTodayPAC+'</span>/<span class="color-1">'+item.params.sumMedicine.sumTotalPAC+'</span>\n' +
+                        '                    </td>\n' +
+                        '                </tr>\n' +
+                        '                <tr>\n' +
+                        '                    <td class="left">PAM阴离子</td>\n' +
+                        '                    <td>\n' +
+                        '                        <span class="color-2">'+item.params.sumMedicine.sumTodayPAMYin+'</span>/<span class="color-1">'+item.params.sumMedicine.sumTotalPAMYin+'</span>\n' +
+                        '                    </td>\n' +
+                        '                </tr>\n' +
+                        '                <tr>\n' +
+                        '                    <td class="left">PAM阳离子</td>\n' +
+                        '                    <td>\n' +
+                        '                        <span class="color-2">'+item.params.sumMedicine.sumTodayPAMYang+'</span>/<span class="color-1">'+item.params.sumMedicine.sumTotalPAMYang+'</span>\n' +
+                        '                    </td>\n' +
+                        '                </tr>\n' +
+                        '                <tr>\n' +
+                        '                    <td class="left">复核除磷剂</td>\n' +
+                        '                    <td>\n' +
+                        '                        <span class="color-2">'+item.params.sumMedicine.sumTodayPhosphorus+'</span>/<span class="color-1">'+item.params.sumMedicine.sumTotalPhosphorus+'</span>\n' +
+                        '                    </td>\n' +
+                        '                </tr>\n' +
+                        '                <tr>\n' +
+                        '                    <td class="left">葡萄糖</td>\n' +
+                        '                    <td>\n' +
+                        '                        <span class="color-2">'+item.params.sumMedicine.sumTodayGlucose+'</span>/<span class="color-1">'+item.params.sumMedicine.sumTotalGlucose+'</span>\n' +
+                        '                    </td>\n' +
+                        '                </tr>\n' +
+                        '                <tr>\n' +
+                        '                    <td class="left">NaCLO</td>\n' +
+                        '                    <td>\n' +
+                        '                        <span class="color-2">'+item.params.sumMedicine.sumTodayNaCLO+'</span>/<span class="color-1">'+item.params.sumMedicine.sumTotalNaCLO+'</span>\n' +
+                        '                    </td>\n' +
+                        '                </tr>\n' +
+                        '                <tr>\n' +
+                        '                    <td class="left">HCL</td>\n' +
+                        '                    <td>\n' +
+                        '                        <span class="color-2">'+item.params.sumMedicine.sumTodayHCL+'</span>/<span class="color-1">'+item.params.sumMedicine.sumTotalHCL+'</span>\n' +
+                        '                    </td>\n' +
+                        '                </tr>\n' +
+                        '                <tr>\n' +
+                        '                    <td class="left">乙酸钠</td>\n' +
+                        '                    <td>\n' +
+                        '                        <span class="color-2">'+item.params.sumMedicine.sumTodaySA+'</span>/<span class="color-1">'+item.params.sumMedicine.sumTotalSA+'</span>\n' +
+                        '                    </td>\n' +
+                        '                </tr>\n' +
+                        '                <tr>\n' +
+                        '                    <td class="left">石灰</td>\n' +
+                        '                    <td>\n' +
+                        '                        <span class="color-2">'+item.params.sumMedicine.sumTodayLime+'</span>/<span class="color-1">'+item.params.sumMedicine.sumTotalLime+'</span>\n' +
+                        '                    </td>\n' +
+                        '                </tr>\n' +
+                        '                <tr>\n' +
+                        '                    <td class="left">氯酸钠</td>\n' +
+                        '                    <td>\n' +
+                        '                        <span class="color-2">'+item.params.sumMedicine.sumTodaySC+'</span>/<span class="color-1">'+item.params.sumMedicine.sumTotalSC+'</span>\n' +
+                        '                    </td>\n' +
+                        '                </tr>\n' +
+                        '            </tbody>');
+                });
+            }
+        });
+    }
+</script>
+</html>

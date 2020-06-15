@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+<th:block th:include="admin/include :: header('修改水厂电耗信息')" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-todayElectricityInfo-edit" th:object="${todayElectricityInfo}">
+        <input name="id" th:field="*{id}" type="hidden">
+        <div class="form-group">
+            <label class="col-sm-2 control-label is-required label-left">当日水厂电耗：</label>
+            <div class="col-sm-10">
+                <div class="input-group">
+                    <input name="todayElectricity" id="todayElectricity" class="form-control" placeholder="请输入当日水厂电耗" required
+                    		type="number" min="0" max="100000" maxLength="6" oninput="autoformart($(this));todaya()" th:value="${#numbers.formatDecimal(todayElectricityInfo.todayElectricity,0,0)}">
+                    <span class="input-group-addon">KWH</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label label-left">累计水厂电耗：</label>
+            <div class="col-sm-10">
+                <div class="input-group">
+                    <input name="totalElectricity" id="totalElectricity" class="form-control" placeholder="请输入累计水厂电耗" 
+                    		type="number" th:value="*{totalElectricity}" readonly>
+                    <span class="input-group-addon">KWH</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label label-left">泵站当日电耗：</label>
+            <div class="col-sm-10">
+                <div class="input-group">
+                    <input name="pumpTodayEletricity" id="pumpTodayEletricity" class="form-control" placeholder="请输入泵站当日电耗" 
+                    		type="number" min="0" max="100000" maxLength="6" oninput="autoformart($(this));todayb()" th:value="${#numbers.formatDecimal(todayElectricityInfo.pumpTodayEletricity,0,0)}">
+                    <span class="input-group-addon">KWH</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label label-left">泵站累计电耗：</label>
+            <div class="col-sm-10">
+                <div class="input-group">
+                    <input name="pumpTotalEletricity" id="pumpTotalEletricity" class="form-control" placeholder="请输入泵站累计电耗" 
+                    		type="number" th:value="*{pumpTotalEletricity}" readonly>
+                    <span class="input-group-addon">KWH</span>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: form" />
+<script th:inline="javascript">
+var prefix = ctx + "admin/report/todayElectricityInfo";
+
+var totala = 0; // 水厂原有当天日期以前的累计量
+var totalb = 0; // 泵站原有当天日期以前的累计量
+
+$.post(prefix + "/getLatest", function (data) {
+    if (data.data != null && data.data != undefined) {
+        totala = data.data.totalElectricity;
+        totalb = data.data.pumpTotalEletricity;
+
+    }
+});
+function todaya() {
+    var a = document.getElementById("todayElectricity").value;
+    var c = Number(a) + Number(totala);
+    document.getElementById("totalElectricity").value = c.toFixed(2);
+}
+function todayb() {
+    var a = document.getElementById("pumpTodayEletricity").value;
+    var c = Number(a) + Number(totalb);
+    document.getElementById("pumpTotalEletricity").value = c.toFixed(2);
+}
+
+$("#form-todayElectricityInfo-edit").validate({
+    focusCleanup: true
+});
+
+function submitHandler() {
+    if ($.validate.form()) {
+        $.operate.save(prefix + "/doEdit", $('#form-todayElectricityInfo-edit').serialize(), null, "put");
+    }
+}
+
+// input限制
+function autoformart(obj) {
+    var val = obj.val();
+    if (val == null || val == undefined || val == "") {
+        obj.val("");
+        return;
+    }
+    var maxLength = obj.attr("maxLength");
+    var max = obj.attr("max");
+    if (val.length > maxLength) {
+        obj.val(val.slice(0, maxLength)); // 限制长度
+        return;
+    }
+    if (parseFloat(val) > parseFloat(max)) {
+        obj.val(val.slice(0, val.length - 1)); // 限制大小
+        return;
+    }
+    obj.val(parseFloat(val));
+}
+</script>
+</body>
+</html>

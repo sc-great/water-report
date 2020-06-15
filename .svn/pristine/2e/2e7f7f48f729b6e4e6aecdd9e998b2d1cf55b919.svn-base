@@ -1,0 +1,116 @@
+<!doctype html>
+<html class="no-js" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=ideal viewport, initial-scale=1 user-scalable=0"/>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="0"/>
+    <title>各公司备品备件</title>
+    <link rel="stylesheet" th:href="${'/webapp/css/font-awesome.css?v='+@toolsUtils.version()}">
+    <link rel="stylesheet" th:href="${'/webapp/css/com.css?v='+@toolsUtils.version()}">
+    <link rel="stylesheet" th:href="${'/webapp/css/style.css?v='+@toolsUtils.version()}">
+    <script th:src="${'/webapp/js/jquery.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/pace.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/plugin/layer_mobile/layer.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/common.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/jdate.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/dateUtil.js?v='+@toolsUtils.version()}"></script>
+</head>
+<body>
+<div class="main">
+    <input type="hidden" id="areaId" th:value="${areaId}">
+    <div class="nav">
+        <div class="go-back" onclick="goBack();"><i class="fa fa-chevron-left"></i></div>
+        <div class="nav-main">
+            <label>
+                <span th:text="${areaName}"></span>
+                <i class="fa fa-angle-right"></i>
+            </label>
+            <label>全部</label>
+        </div>
+    </div>
+    <div class="content center font-size-14">
+        <table class="cross-color">
+            <thead class="bg-color1 color-3" id="area_list">
+	            <tr class="font-size-12">
+	                <th style="width:45%;">区域</th>
+	                <th>物品名称</th>
+	                <th>库存</th>
+	            </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+</body>
+<script th:inline="javascript">
+var dateTime = getCurDate("yyyy-MM-dd");
+var areaTypes = [[${areaTypes}]];
+$(function () {
+    // 日期格式
+    new Jdate({
+        el: '#date',
+        format: 'YYYY-MM-DD',
+        beginYear: 2000,
+        endYear: 2100,
+        value: dateTime,
+        confirm: function (date) {
+            loadData(date);
+        }
+    });
+    loadData(dateTime);
+});
+
+function loadData(date) {
+	var areaId = $("#areaId").val();
+    req('/app/consumableCompanysData', {
+    	areaId: areaId,
+        date: date
+    }, function (result) {
+        if (result.code == "0") {
+            var orgList = result.data;
+            $.each(orgList, function (index, item) {
+                var sumConsumable = item.params.sumConsumable;
+                var rowspan = sumConsumable.length;
+                var html = '<tbody class="cross-color">\n';
+                if (rowspan > 0) {
+                    for (var i = 0; i < rowspan; i++) {
+                        var name = sumConsumable[i].name;
+                        var model = sumConsumable[i].model;
+                        var total = sumConsumable[i].total;
+                        var unit = sumConsumable[i].unit;
+                        name += ((model != null && model != undefined && model != "") ? ("（" + model + "）") : "");
+                        if (i == 0) {
+                            html += '<tr>\n' +
+                            '        	<th class="left" rowspan="' + rowspan + '">' + item.orgName + '</th>\n' +
+                            '           <td class="left" ' + (sumConsumable[i].total <= 3 ? 'style="background:yellow;"' : '') + '>' + name + '</td>\n' +
+                            '           <td ' + (sumConsumable[i].total <= 3 ? 'style="background:yellow;"' : '') + '>\n' +
+                            '           	<span class="color-2">' + total + '（' + unit + '）' + '</span>\n' +
+                            '           </td>\n' +
+                            '        </tr>\n';
+                        } else {
+                            html += '<tr>\n' +
+                            '        	<td class="left">' + name + '</td>\n' +
+                            '        	<td>\n' +
+                            '           	<span class="color-2">' + total + '（' + unit + '）' + '</span>\n' +
+                            '           </td>\n' +
+                            '        </tr>\n';
+                        }
+                    }
+                } else {
+                    html += '<tr>\n' +
+                    '        	<th class="left">' + item.orgName + '</th>\n' +
+                    '           <td class="left"></td>\n' +
+                    '           <td>\n' +
+                    '             	<span class="color-2"></span>\n' +
+                    '           </td>\n' +
+                    '       </tr>\n';
+                }
+                html += '</tbody>';
+                $("#area_list").after(html);
+            });
+        }
+    });
+}
+</script>
+</html>

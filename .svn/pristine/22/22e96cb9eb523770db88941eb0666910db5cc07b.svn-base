@@ -1,0 +1,157 @@
+package com.boot.common.utils;
+
+import java.math.BigDecimal;
+
+/**
+ * 计量单位自动转化升级
+ * @author yangxiaojun
+ * date:2020-05-12
+ * 水量:   吨、万吨、亿吨
+ * 污泥量：吨、万吨、亿吨
+ * 电量:   度、万度、亿度
+ * 药量：     KG、吨、万吨
+ */
+public class InitsUtils {
+	
+	/**
+	 * 水量:   吨、万吨、亿吨
+	 * @param inits
+	 * @return
+	 */
+	public static String  waterInits(Double inits) {
+		String  returnValue="";
+		Double  one=new Double (10000);
+		Double  two=new Double (100000000);
+		
+		if (inits.compareTo(two)>=0){
+			  returnValue=div(inits, two, 2)+"亿吨";
+	    }else  if (inits.compareTo(one)>=0){
+		     
+	    	    returnValue=div(inits, one, 2)+"万吨";
+
+		      
+		}else{
+			  returnValue=inits+"吨";
+		}
+	    return returnValue;
+	}
+	/**
+	 * 污泥量：吨、万吨、亿吨
+	 * @param inits
+	 * @return
+	 */
+	public static String  mudInits(Double inits) {
+		String  returnValue="";
+		Double  one=new Double (10000);
+		Double  two=new Double (100000000);
+		
+		if (inits.compareTo(two)>=0){
+			  returnValue=div(inits, two, 2)+"亿吨";
+	    }else  if (inits.compareTo(one)>=0){
+		       returnValue=div(inits, one, 2)+"万吨";
+	    	 
+		}else{
+			  returnValue=inits+"吨";
+		}
+	    return returnValue;
+	}
+	/**
+	 * 电量:   度、万度、亿度
+	 * @param inits
+	 * @return
+	 */
+	public static String  electricityInits(Double inits) {
+		String  returnValue="";
+		Double  one=new Double (10000);
+		Double  two=new Double (100000000);
+		
+		if (inits.compareTo(two)>=0){
+			  returnValue=div(inits, two, 2)+"亿度";
+	    }else  if (inits.compareTo(one)>=0){
+		      returnValue=div(inits, one, 2)+"万度";
+	    	 
+		}else{
+			  returnValue=inits+"度";
+		}
+	    return returnValue;
+	}
+	/**
+	 * 药量：     KG、吨、万吨
+	 * @param inits
+	 * @return
+	 */
+	public static String  medicineInits(Double inits) {
+		String  returnValue="";
+		Double  one=new Double (1000);
+		Double  two=new Double (10000);
+		
+		if (inits.compareTo(two)>=0){
+			  returnValue=div(inits, two, 2)+"万吨";
+	    }else  if (inits.compareTo(one)>=0){
+		      returnValue=div(inits, one, 2)+"吨";
+		}else{
+			  returnValue=inits+"KG";
+		}
+	    return returnValue;
+	}
+	
+	/**
+	 * 最小单位是万元，逢亿进亿
+	 */
+	public static String  costInits(Double inits) {
+		String  returnValue="";
+		Double  one=new Double (10000);
+		
+       if (inits.compareTo(one)>=0){
+		      returnValue=div(inits, one, 2)+"亿元";
+		}else{
+			  returnValue=inits+"万元";
+		}
+	    return returnValue;
+	}
+	
+	
+	// double类型-加减乘除高精度运算
+
+	/**
+	 * 进行加法运算
+ 	 */
+	public static  double add(double v1, double v2) {
+		BigDecimal b1 = new BigDecimal(Double.toString(v1));
+		BigDecimal b2 = new BigDecimal(Double.toString(v2));
+		return b1.add(b2).doubleValue();
+	}
+
+	/**
+	 * 进行减法运算
+ 	 */
+	public static double subtract(double v1,double v2){
+	   BigDecimal b1 = new BigDecimal(Double.toString(v1)); 
+       BigDecimal b2 = new BigDecimal(Double.toString(v2)); 
+       return   b1.subtract(b2).doubleValue();
+	}
+
+	/**
+	 * 进行乘法运算
+ 	 */
+	public static double mul(double d1, double d2) {
+		BigDecimal b1 = new BigDecimal(d1);
+		BigDecimal b2 = new BigDecimal(d2);
+		return  (double)Math.round(b1.multiply(b2).doubleValue());
+	}
+
+	/**
+	 * 进行除法运算
+	 */
+	public static double div(double d1, double d2, int len) {
+		BigDecimal b1 = new BigDecimal(d1);
+		BigDecimal b2 = new BigDecimal(d2);
+		return b1.divide(b2, len, BigDecimal.ROUND_HALF_UP).doubleValue(); //四舍五入
+	}
+
+	public static void main(String[] args) {
+		Double t=new Double(0.001123);
+		Double b=new Double(0.001123);
+		System.out.println(add(t,b));
+	}
+}

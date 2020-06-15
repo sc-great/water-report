@@ -1,0 +1,264 @@
+<style>
+#topwindows {
+	z-index: 999;
+
+	width: 400px;
+	height: 300px;
+	position: fixed;
+    bottom: 10px;
+    right: 10px;
+    
+    user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+}
+#topPanel {
+	border: 2px solid darkgrey;
+	box-shadow: darkgrey 10px 10px 30px 5px;
+	background: #fff;
+	width: 100%;
+	height: 100%;
+}
+#topwindows .title p {
+	margin: 0;
+    line-height: 30px;
+    background: #3c8dbc;
+    color: #fff;
+    padding-left: 10px;
+}
+#topPanel .title span {
+	float: right;
+    display: inline;
+    width: 29px;
+    height: 29px;
+    text-align: center;
+    cursor: pointer;
+}
+#topPanel .title span:hover {
+	background: #333;
+}
+#animateButton {
+	position: absolute;
+    top: 0;
+    left: 0px;
+    width: 5px;
+    height: 100%;
+    line-height: 300px;
+    font-size: 50px;
+    cursor: pointer;
+}
+#animateButton:hover p {
+	color: #3c8dbc;
+}
+#animateButton p {
+	left: -10px;
+	position: absolute;
+}
+#topwindowsContent {
+	width: 100%;
+	height: 270px;
+	overflow-y: scroll;
+}
+#topwindowsContent ul {
+	margin: 0;
+	line-height: 30px;
+    margin-top: 5px;
+    cursor: pointer;
+    padding-left: 30px;
+}
+#topwindowsContent li:hover {
+	color: #3c8dbc;
+}
+#topwindowsContent ul li p {
+	float: left;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin: 0;
+}
+#topwindowsContent ul li span {
+	float: right;
+	margin-right: 5px;
+}
+#alarmInfo_orgName {
+	width: 190px;
+}
+#alarmInfo_alarminfo {
+	width: 70px;
+}
+#alarmInfo_alarmType {
+	width: 40px;
+}
+</style>
+<script th:src="${'/js/jquery.min.js?v='+@toolsUtils.version()}"></script>
+<div id="topwindows" hidden="hidden">
+	<div id="animateButton" onClick="animateFunction()"><p>》</p></div>
+	<div id="topPanel">
+		<div class="title" ondblclick="alarmInfoToObjPage('/admin/report/alarmInfo', '',)"><p>报警信息<span id="hiddenButton">✖</span><span onClick="animateFunction()">—</span></p></div>
+		<div id="topwindowsContent">
+			<ul id="alarmInfoList"></ul>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+// 窗口样式和操作
+$("#hiddenButton").click(function() {
+	$("#topwindows").hide();
+})
+$("#topwindowsContent").hover(function() {
+	$("#animateButton").fadeOut();
+}, function() {
+	$("#animateButton").fadeIn();
+})
+var topPanel_isHide = false;
+function animateFunction() {
+	if (topPanel_isHide) {
+		$("#topPanel").fadeIn();
+		$("#topwindows").animate({right: "10px"}, 1000, function() {
+			$("#animateButton p").html("》");
+			topPanel_isHide = false;
+		});
+	} else {
+		$("#topwindows").animate({right: "-360px"}, 1000, function() {
+			$("#animateButton p").html("《");
+			$("#topPanel").fadeOut();
+			topPanel_isHide = true;
+		});
+	}
+}
+</script>
+<script type="text/javascript">
+// 数据来源
+$(function() {
+	
+	$.post("/admin/report/alarmInfo/list", function(data) {
+		if (data.code != 0)
+			return;
+		if (data.data == null || data.data == undefined || data.data.length <= 0) 
+			return;
+		$("#alarmInfoList").html("");
+		for (var i = 0; i < data.data.length; i ++) {
+			var info = data.data[i];
+			var type = info.alarmType;
+			var dataUrl = "";
+			
+			if (type == "1") {
+				dataUrl = "/admin/materialControl/consumable";
+				type = "低库存";
+			}
+			if (type == "2") {
+				dataUrl = "/admin/materialControl/mandatoryCheckInfo";
+				type = "待检测";
+			}
+			if (type == "3") {
+				if (info.factoryType == "1") // 污水厂
+					dataUrl = "/admin/report/badWaterQualityInfo";
+				if (info.factoryType == "2") // 供水厂
+					dataUrl = "/admin/report/goodWaterHealthInfo";
+				type = "不达标";
+			}
+			
+			var li = '<li onClick="alarmInfoToObjPage(\'' + dataUrl + '\', \'' + info.objId + '\')">' +
+				'		  <p id="alarmInfo_orgName" title="' + info.orgName + '">' + info.orgName + '</p>' +
+				'		  <p id="alarmInfo_alarminfo" title="' + info.alarmItem + '">' + info.alarmItem + '</p>' +
+				'		  <p id="alarmInfo_alarmType">' + type + '</p>' +
+				'		  <span id="alarmInfo_fillDate" title="' + info.fillDate + '">' + info.fillDate.substr(5, 9) + '</span>' +
+				'	  </li>';
+			$("#alarmInfoList").append(li);
+		}
+		$("#topwindows").show();
+	})
+})
+// 页面跳转
+function alarmInfoToObjPage(dataUrl, objId) {
+	
+	var menuItem = $(".menuItem[href='" + dataUrl + "']");
+	var menuName = menuItem.html();
+	var dataIndex = menuItem.attr("data-index");
+	
+    // 获取标识数据
+    var flag = true;
+    $(".nav ul li, .nav li").removeClass("selected");
+    
+    $("#side-menu li").removeClass("active");
+    $("#side-menu li ul").removeClass("in");
+    $(".menuItem[href='" + dataUrl + "']").parent("li").parent("ul").parent("li").addClass("active");
+    $(".menuItem[href='" + dataUrl + "']").parent("li").parent("ul").addClass("in");
+    $(".menuItem[href='" + dataUrl + "']").parent("li").addClass("selected");
+
+    // 选项卡菜单已存在
+    $('.menuTab').each(function () {
+        if ($(this).data('id') == dataUrl) {
+            if (!$(this).hasClass('active')) {
+                $(this).addClass('active').siblings('.menuTab').removeClass('active');
+                scrollToTab(this);
+                // 显示tab对应的内容区
+                $('.mainContent .RuoYi_iframe').each(function () {
+                    if ($(this).data('id') == dataUrl) {
+                        $(this).attr('src', dataUrl);
+                        $(this).show().siblings('.RuoYi_iframe').hide();
+                        return false;
+                    }
+                });
+            }
+            flag = false;
+        }
+    });
+    // 选项卡菜单不存在
+    if (flag) {
+        var str = '<a href="javascript:;" class="active menuTab" data-id="' + dataUrl + '">' + menuName + ' <i class="fa fa-times-circle"></i></a>';
+        $('.menuTab').removeClass('active');
+
+        // 添加选项卡对应的iframe
+        var str1 = '<iframe class="RuoYi_iframe" name="iframe' + dataIndex + '" width="100%" height="100%" src="' + dataUrl + "?id=" + objId + '" frameborder="0" data-id="' + dataUrl + '" seamless></iframe>';
+        $('.mainContent').find('iframe.RuoYi_iframe').hide().parents('.mainContent').append(str1);
+
+        $.modal.loading("数据加载中，请稍后...");
+
+        $('.mainContent iframe:visible').load(function () {
+            $.modal.closeLoading();
+        });
+
+        // 添加选项卡
+        $('.menuTabs .page-tabs-content').append(str);
+        scrollToTab($('.menuTab.active'));
+    }
+}
+// 滚动到指定选项卡
+function scrollToTab(element) {
+    var marginLeftVal = calSumWidth($(element).prevAll()),
+    marginRightVal = calSumWidth($(element).nextAll());
+    // 可视区域非tab宽度
+    var tabOuterWidth = calSumWidth($(".content-tabs").children().not(".menuTabs"));
+    //可视区域tab宽度
+    var visibleWidth = $(".content-tabs").outerWidth(true) - tabOuterWidth;
+    //实际滚动宽度
+    var scrollVal = 0;
+    if ($(".page-tabs-content").outerWidth() < visibleWidth) {
+        scrollVal = 0;
+    } else if (marginRightVal <= (visibleWidth - $(element).outerWidth(true) - $(element).next().outerWidth(true))) {
+        if ((visibleWidth - $(element).next().outerWidth(true)) > marginRightVal) {
+            scrollVal = marginLeftVal;
+            var tabElement = element;
+            while ((scrollVal - $(tabElement).outerWidth()) > ($(".page-tabs-content").outerWidth() - visibleWidth)) {
+                scrollVal -= $(tabElement).prev().outerWidth();
+                tabElement = $(tabElement).prev();
+            }
+        }
+    } else if (marginLeftVal > (visibleWidth - $(element).outerWidth(true) - $(element).prev().outerWidth(true))) {
+        scrollVal = marginLeftVal - $(element).prev().outerWidth(true);
+    }
+    $('.page-tabs-content').animate({
+        marginLeft: 0 - scrollVal + 'px'
+    }, "fast");
+}
+// 计算元素集合的总宽度
+function calSumWidth(elements) {
+    var width = 0;
+    $(elements).each(function () {
+        width += $(this).outerWidth(true);
+    });
+    return width;
+}
+</script>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+<th:block th:include="admin/include :: header('新增污水验化数据信息')" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-badWaterQualityInfo-add" th:object="${testBadWaterInfo}">
+        <input id="badWaterQualityInfo_params" name="params[icon]" th:value="${icon}" type="hidden">
+        <div class="form-group">
+            <label class="col-sm-2 control-label label-left">pH值（进水）：</label>
+            <div class="col-sm-4">
+                <div class="input-group">
+                    <input name="phIn" class="form-control" th:value="*{phIn}"
+                    		type="number" min="0" max="14" maxLength="4" oninput="autoformart($(this))">
+                    <span class="input-group-addon"></span>
+                </div>
+            </div>
+            <label class="col-sm-2 control-label label-left">pH值（出水）：</label>
+            <div class="col-sm-4">
+                <div class="input-group">
+                    <input name="phOut" class="form-control" th:value="*{phOut}"
+							type="number" min="0" max="14" maxLength="4" oninput="autoformart($(this))">
+					<span class="input-group-addon"></span>
+                </div>
+            </div>
+        </div>
+         <div class="form-group">
+            <label class="col-sm-2 control-label label-left">氨氮（进水）：</label>
+            <div class="col-sm-4">
+                <div class="input-group">
+                    <input name="adanIn" class="form-control" th:value="*{adanIn}"
+                    		type="number" min="0" max="1000" maxLength="6" oninput="autoformart($(this))">
+                    <span class="input-group-addon">Mg/L</span>
+                </div>
+            </div>
+            <label class="col-sm-2 control-label label-left">氨氮（出水）：</label>
+            <div class="col-sm-4">
+                <div class="input-group">
+                    <input name="adanOut" class="form-control" th:value="*{adanOut}"
+							type="number" min="0" max="1000" maxLength="6" oninput="autoformart($(this))">
+                    <span class="input-group-addon">Mg/L</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label label-left">总氮（进水）：</label>
+            <div class="col-sm-4">
+                <div class="input-group">
+                    <input name="zdanIn" class="form-control" th:value="*{zdanIn}"
+                    		type="number" min="0" max="1000" maxLength="6" oninput="autoformart($(this))">
+                    <span class="input-group-addon">Mg/L</span>
+                </div>
+            </div>
+            <label class="col-sm-2 control-label label-left">总氮（出水）：</label>
+            <div class="col-sm-4">
+                <div class="input-group">
+                    <input name="zdanOut" class="form-control" th:value="*{zdanOut}"
+                    		type="number" min="0" max="1000" maxLength="6" oninput="autoformart($(this))">
+                    <span class="input-group-addon">Mg/L</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label label-left">总磷（进水）：</label>
+            <div class="col-sm-4">
+                <div class="input-group">
+                    <input name="zlinIn" class="form-control" th:value="*{zlinIn}"
+                    		type="number" min="0" max="1000" maxLength="7" oninput="autoformart($(this))">
+                    <span class="input-group-addon">Mg/L</span>
+                </div>
+            </div>
+            <label class="col-sm-2 control-label label-left">总磷（出水）：</label>
+            <div class="col-sm-4">
+                <div class="input-group">
+                    <input name="zlinOut" class="form-control" th:value="*{zlinOut}"
+                    		type="number" min="0" max="1000" maxLength="7" oninput="autoformart($(this))">
+                    <span class="input-group-addon"></span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label label-left">化学需氧量（进水）：</label>
+            <div class="col-sm-4">
+                <div class="input-group">
+                    <input name="codIn" class="form-control" th:value="*{codIn}"
+                    		type="number" min="0" max="1000" maxLength="4" oninput="autoformart($(this), true)">
+                    <span class="input-group-addon">Mg/L</span>
+                </div>
+            </div>
+            <label class="col-sm-2 control-label label-left">化学需氧量（出水）：</label>
+            <div class="col-sm-4">
+                <div class="input-group">
+                    <input name="codOut" class="form-control" th:value="*{codOut}"
+                    		type="number" min="0" max="1000" maxLength="4" oninput="autoformart($(this), true)">
+                    <span class="input-group-addon">Mg/L</span>
+                </div>
+            </div>
+        </div>
+		<div class="form-group">
+            <label class="col-sm-2 control-label label-left">五日生化需氧量（进水）：</label>
+            <div class="col-sm-4">
+            	<div class="input-group">
+                	<input name="bod5In" class="form-control" th:value="*{bod5In}"
+                    		type="number" min="0" max="10000" maxLength="6" oninput="autoformart($(this))">
+                    <span class="input-group-addon">Mg/L</span>
+            	</div>
+            </div>
+            <label class="col-sm-2 control-label label-left">五日生化需氧量（出水）：</label>
+            <div class="col-sm-4">
+            	<div class="input-group">
+                	<input name="bod5Out" class="form-control" th:value="*{bod5Out}"
+                    		type="number" min="0" max="10000" maxLength="6" oninput="autoformart($(this))">
+                    <span class="input-group-addon">Mg/L</span>
+                </div>
+            </div>
+        </div>     
+        <div class="form-group">
+            <label class="col-sm-2 control-label label-left">总悬浮物（进水）：</label>
+            <div class="col-sm-4">
+            	<div class="input-group">
+                	<input name="xfuIn" class="form-control" th:value="*{xfuIn}"
+                			type="number" min="0" max="10000" maxLength="4" oninput="autoformart($(this), true)">
+                	<span class="input-group-addon">Mg/L</span>
+                </div>
+            </div>
+            <label class="col-sm-2 control-label label-left">总悬浮物（出水）：</label>
+            <div class="col-sm-4">
+            	<div class="input-group">
+                	<input name="xfuOut" class="form-control" th:value="*{xfuOut}"
+                			type="number" min="0" max="10000" maxLength="4" oninput="autoformart($(this), true)">
+                	<span class="input-group-addon">Mg/L</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label label-left">温度（进水）：</label>
+            <div class="col-sm-4">
+            	<div class="input-group">
+                	<input name="tempIn" class="form-control" th:value="*{tempIn}"
+                			type="number" min="0" max="100" maxLength="5" oninput="autoformart($(this))">
+                	<span class="input-group-addon">℃</span>
+                </div>
+            </div>
+            <label class="col-sm-2 control-label label-left">温度（出水）：</label>
+            <div class="col-sm-4">
+            	<div class="input-group">
+                	<input name="tempOut" class="form-control" th:value="*{tempOut}"
+                			type="number" min="0" max="100" maxLength="5" oninput="autoformart($(this))">
+                	<span class="input-group-addon">℃</span>
+                </div>
+            </div>
+        </div>            
+        <div class="form-group">
+            <label class="col-sm-2 control-label label-left">粪大肠菌：</label>
+            <div class="col-sm-4">
+                <div class="input-group">
+                    <input name="fengJun" class="form-control" th:value="*{fengJun}"
+                   			type="number" min="0" max="24000" maxLength="5" oninput="autoformart($(this), true)">
+                	<span class="input-group-addon">Mg/L</span>
+                </div>
+            </div>
+            <label class="col-sm-2 control-label label-left">SV30：</label>
+            <div class="col-sm-4">
+                <div class="input-group">
+                    <input name="sv30" id="sv30" class="form-control" th:value="*{sv30}"
+                    		type="number" min="0" max="100" maxLength="5" oninput="autoformart($(this), true);autoSVI()">
+                    <span class="input-group-addon">%</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+           <label class="col-sm-2 control-label label-left">MLSS：</label>
+            <div class="col-sm-4">
+                <div class="input-group">
+                    <input name="mlss" id="mlss" class="form-control" th:value="*{mlss}"
+                    		type="number" min="1" max="10000" maxLength="5" oninput="autoformart($(this));autoSVI()">
+                	<span class="input-group-addon">Mg/L</span>
+                </div>
+            </div>
+            <label class="col-sm-2 control-label label-left">SVI：</label>
+            <div class="col-sm-4">
+                <div class="input-group">
+                    <input name="svt" id="svt" class="form-control" th:value="*{svt}"
+                    		type="number" readonly="readonly">
+                	<span class="input-group-addon">Mg/L</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label label-left">MLVSS：</label>
+            <div class="col-sm-4">
+                <div class="input-group">
+                    <input name="mlvss" class="form-control" th:value="*{mlvss}"
+                    		type="number" min="0" max="10000" maxLength="5" oninput="autoformart($(this), true)">
+                	<span class="input-group-addon">Mg/L</span>
+                </div>
+            </div>
+            <label class="col-sm-2 control-label label-left">DO：</label>
+            <div class="col-sm-4">
+                <div class="input-group">
+                    <input name="testDo" class="form-control" th:value="*{testDo}"
+                    		type="number" min="0" max="4" maxLength="3" oninput="autoformart($(this))">
+                	<span class="input-group-addon">Mg/L</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label label-left">污泥含水率：</label>
+            <div class="col-sm-4">
+                <div class="input-group">
+                    <input name="waterSludge" class="form-control" th:value="*{waterSludge}"
+                    		type="number" min="0" max="100" maxLength="5" oninput="autoformart($(this))">
+                    <span class="input-group-addon">%</span>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: form" />
+</body>
+<script th:inline="javascript">
+var form_badWaterQualityInfo_add_prefix = ctx + "admin/report/testBadWaterInfo";
+
+$("#form-badWaterQualityInfo-add").validate({
+    focusCleanup: true
+});
+
+function submitHandler() {
+    if ($.validate.form()) {
+        $.operate.save(form_badWaterQualityInfo_add_prefix + "/doAdd", $('#form-badWaterQualityInfo-add').serialize());
+    }
+}
+
+function index_badWaterQualityInfo_submitHandler() {
+    if ($.validate.formRequired("form-badWaterQualityInfo-add")) {
+        $.operate.saveModal(form_badWaterQualityInfo_add_prefix + "/doAdd", $('#form-badWaterQualityInfo-add').serialize());
+    }
+}
+function autoSVI() {
+    var sv30 = $("#sv30").val();
+    var mlss = $("#mlss").val();
+    if (sv30 != "" && mlss != "") {
+    	if (parseFloat(mlss) == 0){
+    	    $("#svt").val("");
+    		return;
+    	}
+        var z = parseFloat(sv30) / parseFloat(mlss);
+        $("#svt").val(Math.round(z * 100) / 100);
+    }else{
+       $("#svt").val("");
+    }
+}
+
+// input限制
+function autoformart(obj, isInt) {
+    var val = obj.val();
+    if (val == null || val == undefined || val == "") {
+        obj.val("");
+        return;
+    }
+    if (isInt && val.indexOf(".") != -1) { // 整数限制
+    	val = val.slice(0, val.length - 2);
+    }
+    var maxLength = obj.attr("maxLength");
+    var max = obj.attr("max");
+    if (val.length > maxLength) {
+        obj.val(val.slice(0, maxLength)); // 限制长度
+        return;
+    }
+    if (parseFloat(val) > parseFloat(max)) {
+        obj.val(val.slice(0, val.length - 1)); // 限制大小
+        return;
+    }
+    obj.val(parseFloat(val));
+}
+</script>
+</html>

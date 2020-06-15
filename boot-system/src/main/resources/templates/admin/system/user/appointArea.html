@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="admin/include :: header('修改参数')" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-area-appoint" th:object="${user}">
+        <input id="userId" name="userId" th:field="*{userId}"  type="hidden">
+        <div class="form-group" style="margin:0;height: 629px;">
+            <div class="left-to-right">
+                <div class="left" style="border: none;">
+                    <div class="table-list">
+                        <div class="table-header">
+                            <div class="table-row">
+                                <div class="table-cel2">序号</div>
+                                <div class="table-cel8">区域</div>
+                            </div>
+                        </div>
+                        <div class="table-body" id="area_list" style="height: 585px;">
+                            <div class="table-row" th:each="area,stat:${notSelAreaList}" th:attr="data-id=${area.areaId},data-name=${area.areaName},data-sortno=${stat.index+1}">
+                                <div class="table-cel2" th:text="${stat.index+1}"></div>
+                                <div class="table-cel8" th:text="${area.areaName}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="to">
+                    <div class="arrow-right" id="distribute">管辖区域</div>
+                </div>
+                <div class="right" style="border: none;">
+                    <div class="table-list">
+                        <div class="table-header">
+                            <div class="table-row">
+                                <div class="table-cel2">序号</div>
+                                <div class="table-cel8">区域</div>
+                            </div>
+                        </div>
+                        <div class="table-body" id="check_area_list" style="height: 585px;">
+                            <div class="table-row" th:each="area,stat:${selAreaList}" th:attr="data-id=${area.areaId},data-name=${area.areaName},data-sortno=${stat.index+1}">
+                                <div class="table-cel2" th:text="${stat.index+1}"></div>
+                                <div class="table-cel8" th:text="${area.areaName}"></div>
+                                <div class="del fa fa-trash-o" onclick="removeArea(this);"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: form" />
+<th:block th:include="admin/include :: custom-plugins" />
+<script type="text/javascript">
+    var prefix = ctx + "admin/system/user";
+
+    $(function () {
+        $("#area_list .table-row").bind("click",function(){
+            $(this).addClass("checked").siblings(".checked").removeClass("checked");
+        });
+
+        $("#distribute").click(function(){
+            if($("#area_list .checked").length == 0){
+                $.modal.alertWarning("请先选择左边区域！");
+            }else{
+                var checkedRow = $("#area_list .checked");
+                var areaId = checkedRow.data("id");
+                var areaName = checkedRow.data("name");
+                var sortNo = checkedRow.data("sortno");
+                if($("#check_area_list .table-row").length==0){
+                    checkAreaSelect();
+                }else{
+                    var b=true;
+                    $("#check_area_list .table-row").each(function(index,item){
+                        var checkedAreaId = $(item).data("id");
+                        if(areaId == checkedAreaId){
+                            b = false;
+                        }
+                    });
+                    if(b){
+                        checkAreaSelect();
+                    }
+                }
+                checkedRow.remove();
+                resort();
+                function checkAreaSelect(){
+                    var html='<div class="table-row" data-id="'+areaId+'" data-sortno="'+sortNo+'" data-name="'+areaName+'">\n' +
+                        '   <div class="table-cel2">'+sortNo+'</div>\n' +
+                        '   <div class="table-cel8">'+areaName+'</div>\n' +
+                        '   <div class="del fa fa-trash-o"></div>\n' +
+                        '</div>';
+                    var objhtml = $(html);
+                    objhtml.find(".del").bind("click",function(){
+                        var checkedhtml='<div class="table-row" data-id="'+areaId+'" data-sortno="'+sortNo+'" data-name="'+areaName+'">\n' +
+                            '   <div class="table-cel2">'+sortNo+'</div>\n' +
+                            '   <div class="table-cel8">'+areaName+'</div>\n' +
+                            '</div>';
+                        var objcheckedhtml = $(checkedhtml);
+                        objcheckedhtml.bind("click",function(){
+                            $(this).addClass("checked").siblings(".checked").removeClass("checked");
+                        });
+                        $("#area_list").append(objcheckedhtml);
+                        $(this).parent().remove();
+                        resort();
+                    });
+                    $("#check_area_list").append(objhtml);
+                }
+            }
+        });
+    });
+
+    //移除区域
+    function removeArea(obj) {
+        var areaId = $(obj).parent().data("id");
+        var areaName = $(obj).parent().data("name");
+        var sortNo = $(obj).parent().data("sortno");
+        var checkedHtml = '<div class="table-row" data-id="'+areaId+'" data-sortno="'+sortNo+'" data-name="'+areaName+'">\n' +
+            '   <div class="table-cel2">'+sortNo+'</div>\n' +
+            '   <div class="table-cel8">'+areaName+'</div>\n' +
+            '</div>';
+        $(obj).parent().remove();
+        var objCheckedHtml = $(checkedHtml);
+        objCheckedHtml.bind("click",function(){
+            $(this).addClass("checked").siblings(".checked").removeClass("checked");
+        });
+        $("#area_list").append(objCheckedHtml);
+        resort();
+    }
+
+    //重新排序编号
+    function resort() {
+        $.each($("#area_list").find(".table-row"),function (i,item) {
+            $(item).find("div").eq(0).text(i+1);
+        });
+        $.each($("#check_area_list").find(".table-row"),function (i,item) {
+            $(item).find("div").eq(0).text(i+1);
+        });
+    }
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            var userId = $("#userId").val();
+            var selAreaList = [];
+            $("#check_area_list .table-row").each(function(index,item){
+                selAreaList.push($(item).data("id"));
+            });
+            if (selAreaList.length == 0) {
+                $.modal.alertWarning("请选择区域！");
+                return false;
+            }
+            var field = $('#form-area-appoint').serializeJSON();
+            field["areaStr"] = $.common.join(selAreaList,",");
+            $.operate.save(prefix + "/appointArea", field);
+        }
+    }
+</script>
+</body>
+</html>

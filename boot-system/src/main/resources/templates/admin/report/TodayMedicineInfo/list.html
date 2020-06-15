@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+<th:block th:include="admin/include :: header('水厂药耗信息列表')"/>
+</head>
+<style>
+table {
+    white-space: nowrap;
+}
+</style>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            <p>填报日期：</p>
+                            <input type="text" class="time-input" name="fillDate" data-type="date"
+                                   data-format="yyyy-MM-dd"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="addUrl()" shiro:hasPermission="report:TodayMedicineInfo:add">
+                <i class="fa fa-plus"></i> 添加
+            </a>
+            <a class="btn btn-danger multiple disabled" onclick="deleteAllUrl()"
+               shiro:hasPermission="report:TodayMedicineInfo:delete">
+                <i class="fa fa-remove"></i> 删除
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped table-bordered table-groupheader">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="admin/include :: common"/>
+<th:block th:include="admin/include :: table"/>
+<script th:inline="javascript">
+var editFlag = [[${@permission.hasPermi('report:TodayMedicineInfo:edit')}]];
+var removeFlag = [[${@permission.hasPermi('report:TodayMedicineInfo:delete')}]];
+
+var prefix = ctx + "admin/report/TodayMedicineInfo";
+
+$(function () {
+    var options = {
+        url: prefix + "/doList",
+        modalName: "水厂药耗信息",
+        rememberSelected: true,
+        uniqueId: "id",
+        columns: [
+            [
+                {
+                    field: 'state',
+                    checkbox: true,
+                    valign: 'middle',
+                    rowspan: 2
+                },
+                {
+                    field: 'fillDate',
+                    title: '日期',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                },
+                {
+                    field: 'Pac',
+                    title: 'PAC（KG）',
+                    align: 'center',
+                    colspan: 2
+                },
+                {
+                    field: 'PamYin',
+                    title: 'PAM阴离子（KG）',
+                    align: 'center',
+                    colspan: 2
+                },
+                {
+                    field: 'PamYang',
+                    title: 'PAM阳离子（KG）',
+                    align: 'center',
+                    colspan: 2
+                },
+                {
+                    field: 'Lime',
+                    title: '石灰（KG）',
+                    align: 'center',
+                    colspan: 2
+                },
+                {
+                    field: 'Phosphorus',
+                    title: '复核除磷剂（KG）',
+                    align: 'center',
+                    colspan: 2
+                },
+                {
+                    field: 'HCL',
+                    title: '氯化氢（KG）',
+                    align: 'center',
+                    colspan: 2
+                },
+                {
+                    field: 'Sc',
+                    title: '氯酸钠（KG）',
+                    align: 'center',
+                    colspan: 2
+                },
+                {
+                    field: 'Naclo',
+                    title: 'NaCLO（KG）',
+                    align: 'center',
+                    colspan: 2
+                },
+                {
+                    field: 'Glucose',
+                    title: '葡萄糖（KG）',
+                    align: 'center',
+                    colspan: 2
+                },
+                {
+                    field: 'Sa',
+                    title: '乙酸钠（KG）',
+                    align: 'center',
+                    colspan: 2
+                },
+                {
+                    field: 'fillUserName',
+                    title: '填报人',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                },
+                {
+                    field: 'fillTime',
+                    title: '填报时间',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2,
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="editUrl(\'' + row.id + '\' ,\'' + row.fillDate + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="deleteUrl(\'' + row.id + '\',\'' + row.fillDate + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }
+            ],
+            [
+                {
+                    field: 'todayPac',
+                    title: '当日',
+                    align: 'center'
+                },
+                {
+                    field: 'totalPac',
+                    title: '累计',
+                    align: 'center'
+                },
+                {
+                    field: 'todayPamYin',
+                    title: '当日',
+                    align: 'center'
+                },
+                {
+                    field: 'totalPamYin',
+                    title: '累计',
+                    align: 'center'
+                },
+                {
+                    field: 'todayPamYang',
+                    title: '当日',
+                    align: 'center'
+                },
+                {
+                    field: 'totalPamYang',
+                    title: '累计',
+                    align: 'center'
+                },
+                {
+                    field: 'todayLime',
+                    title: '当日',
+                    align: 'center'
+                },
+                {
+                    field: 'totalLime',
+                    title: '累计',
+                    align: 'center'
+                },
+                {
+                    field: 'todayPhosphorus',
+                    title: '当日',
+                    align: 'center'
+                },
+                {
+                    field: 'totalPhosphorus',
+                    title: '累计',
+                    align: 'center'
+                },
+                {
+                    field: 'todayHCL',
+                    title: '当日',
+                    align: 'center'
+                },
+                {
+                    field: 'totalHCL',
+                    title: '累计',
+                    align: 'center'
+                },
+                {
+                    field: 'todaySc',
+                    title: '当日',
+                    align: 'center'
+                },
+                {
+                    field: 'totalSc',
+                    title: '累计',
+                    align: 'center'
+                },
+                {
+                    field: 'todayNaclo',
+                    title: '当日',
+                    align: 'center'
+                },
+                {
+                    field: 'totalNaclo',
+                    title: '累计',
+                    align: 'center'
+                },
+                {
+                    field: 'todayGlucose',
+                    title: '当日',
+                    align: 'center'
+                },
+                {
+                    field: 'totalGlucose',
+                    title: '累计',
+                    align: 'center'
+                },
+                {
+                    field: 'todaySa',
+                    title: '当日',
+                    align: 'center'
+                },
+                {
+                    field: 'totalSa',
+                    title: '累计',
+                    align: 'center'
+                }
+            ]
+        ]
+    };
+    $.table.init(options);
+});
+
+//添加水厂当日用药信息
+function addUrl() {
+    var config = {
+        url: prefix + "/checkIsOver",
+        type: "get",
+        dataType: "json",
+        data: {operateIcon: "add"},
+        beforeSend: function () {
+            $.modal.loading("正在处理中，请稍后...");
+            $.modal.disable();
+        },
+        success: function (result) {
+            $.modal.closeLoading();
+            $.modal.enable();
+            if (result.code == web_status.SUCCESS) {
+                $.modal.open("添加水厂药量统计信息", prefix + "/add/1", "940", "640");
+            } else if (result.code == web_status.FAIL) {
+                $.modal.confirm(result.msg, function () {
+                    $.modal.open("添加水厂药量统计信息", prefix + "/add/2", "940", "640");
+                });
+            } else if (result.code == web_status.WARNING) {
+                $.modal.alertWarning(result.msg);
+            }
+        }
+    };
+    $.ajax(config);
+}
+    
+// 编辑当日用药信息
+function editUrl(id, fillDate) {
+
+    var curDate = getNowFormatDate();
+    if (fillDate != curDate) {
+        $.modal.alertWarning("只允许修改当日的信息！");
+    } else {
+    	$.modal.open("编辑水厂药量统计信息", prefix + "/edit/" + id, "940", "640");
+    }
+}
+
+// 删除选中的用药信息
+function deleteAllUrl() {
+    var rows = $.table.selectColumns("id");
+    if (rows.length == 0) {
+        $.modal.alertWarning("请至少选择一条记录");
+        return;
+    }
+    // 只允许删除当日信息
+    var curDate = getNowFormatDate();
+    var fillDate = $.table.selectColumns("fillDate")[0]; //最新日期的一条记录
+    if (rows.length == 1 && fillDate == curDate) {
+        $.modal.confirm("确认要删除选中的" + rows.length + "条数据吗?", function () {
+            var url = prefix + "/doDelete";
+            var data = {
+                "ids": rows.join()
+            };
+            $.operate.submit(url, "post", "json", data);
+        });
+    } else {
+    	$.modal.alertWarning("只允许删除当日信息！");
+    }
+}
+
+// 删除单条用药信息
+function deleteUrl(id, fillDate) {
+    var curDate = getNowFormatDate();
+    if (fillDate != curDate) {
+    	$.modal.alertWarning("只允许删除当日信息！");
+    } else {
+        $.modal.confirm("确定删除该条药耗信息吗？", function () {
+            var data = {
+                "ids": id
+            };
+            $.operate.submit(prefix + "/doDelete", "post", "json", data);
+        });
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// 计算一个日期和当天相差天数的函数，通用
+////////////////////////////////////////////////////////////////////////////////////////////
+function dateDiff(sDate) { // sDate1是yyyy-MM-dd格式
+    var oDate1,
+    oDate2,
+    iDays;
+    oDate1 = new Date();
+    oDate2 = new Date(sDate);
+    iDays = parseInt(Math.abs(oDate1 - oDate2) / 1000 / 60 / 60 / 24); // 把相差的毫秒数转换为天数
+    return iDays; // 返回相差天数
+}
+
+function getNowFormatDate() {
+    var date = new Date();
+    var seperator1 = "-";
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1;
+    var strDate = date.getDate();
+    if (month >= 1 && month <= 9) {
+        month = "0" + month;
+    }
+    if (strDate >= 0 && strDate <= 9) {
+        strDate = "0" + strDate;
+    }
+    var currentdate = year + seperator1 + month + seperator1 + strDate;
+    return currentdate;
+}
+</script>
+</body>
+</html>

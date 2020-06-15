@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+<th:block th:include="admin/include :: header('强制检测信息数据信息列表')" />
+</head>
+<style>
+.warning {
+	background: yellow;
+}
+.warningError {
+	background: red;
+	color: #000;
+}
+</style>
+<body class="gray-bg">
+	<div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<form id="formId">
+					<div class="select-list">
+						<ul>
+							<li>
+								<p>填报日期：</p> <input type="text" class="time-input" name="fillDate" data-type="date" data-format="yyyy-MM-dd" />
+							</li>
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			<div class="btn-group-sm" id="toolbar" role="group">
+				<a class="btn btn-success" onclick="addUrl()" shiro:hasPermission="materialControl:mandatoryCheckInfo:add">
+					<i class="fa fa-plus"></i> 添加</a>
+				<a class="btn btn-danger multiple disabled" onclick="deleteAllUrl()" shiro:hasPermission="materialControl:mandatoryCheckInfo:delete">
+					<i class="fa fa-remove"></i> 删除</a>
+				<a class="btn btn-warning" onclick="exportData()" shiro:hasPermission="materialControl:mandatoryCheckInfo:export">
+	                <i class="fa fa-download"></i> 导出</a>
+			</div>
+			<div class="col-sm-12 select-table table-striped">
+				<table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+	<th:block th:include="admin/include :: common" />
+	<th:block th:include="admin/include :: table" />
+</body>
+<script th:inline="javascript">
+var editFlag = [[${@permission.hasPermi('materialControl:mandatoryCheckInfo:edit')}]];
+var delayFlag = [[${@permission.hasPermi('materialControl:mandatoryCheckInfo:delay')}]];
+var disposeFlag = [[${@permission.hasPermi('materialControl:mandatoryCheckInfo:dispose')}]];
+var removeFlag = [[${@permission.hasPermi('materialControl:mandatoryCheckInfo:delete')}]];
+var prefix = ctx + "admin/materialControl/mandatoryCheckInfo";
+
+function rowStyle(row) {
+	var t = row.nextCheckDate;
+	var d = new Date();
+	var mm = d.getMonth() + 1;
+	mm = mm < 10 ? ("0" + mm) : mm;
+	var dd = d.getDate();
+	dd = dd < 10 ? ("0" + dd) : dd;
+	var str = d.getFullYear() + "-" + mm + "-" + dd;
+	
+	if (t != null && t != undefined && t != "") {
+		if (t <= str) {
+			var iDays = dateDifference(dateAddDays(row.checkDate, Number(row.checkCycle)), t);
+			if (iDays > 0) {
+				return {
+					classes: "warningError"
+				};
+			}
+			return {
+				classes: "warning"
+			};
+		}
+	}
+	return {};
+}
+
+$(function () {
+/*
+	var params = {
+			
+	};
+	var info = [[${info}]];
+	if (info != null && info != undefined) {
+		params = {
+			id: info.id
+		};
+	}
+*/
+    var options = {
+        url: prefix + "/doList",
+        modalName: "强制检测数据信息",
+        rememberSelected: true,
+        uniqueId: "id",
+        rowStyle: rowStyle, // 通过自定义函数设置行样式
+//        queryParams: params,
+        columns: [{
+                field: 'state',
+                checkbox: true
+            }, {
+                field: 'factoryName',
+                title: '水厂',
+                align: 'center'
+            }, {
+                field: 'fillDate',
+                title: '填报日期',
+                align: 'center'
+            }, {
+                field: 'checkDate',
+                title: '检测日期',
+                align: 'center'
+            }, {
+                field: 'checkCycle',
+                title: '检测周期（天）',
+                align: 'center'
+            }, {
+                field: 'nextCheckDate',
+                title: '下次检测日期',
+				formatter: function (value, row, index) {
+					var iDays = dateDifference(dateAddDays(row.checkDate, Number(row.checkCycle)), value);
+					if (iDays > 0)
+						return value + "（延期 " + iDays + " 天）";
+					return value;
+                },
+                align: 'center'
+            }, {
+                field: 'checkProject',
+                title: '检测项目',
+                formatter: function (value, row, index) {
+                    return $.table.tooltip(value);
+                },
+                align: 'center'
+            }, {
+                field: 'checkInfo',
+                title: '检测内容',
+                formatter: function (value, row, index) {
+                    return $.table.tooltip(value);
+                },
+                align: 'center'
+            }, {
+                field: 'checkResult',
+                title: '检测结果',
+                formatter: function (value, row, index) {
+                    return $.table.tooltip(value);
+                },
+                align: 'center'
+            }, {
+                field: 'note',
+                title: '备注',
+                formatter: function (value, row, index) {
+                    return $.table.tooltip(value);
+                },
+                align: 'center'
+            }, {
+                field: 'fillUserName',
+                title: '填报人',
+                align: 'center'
+            }, {
+                field: 'fillTime',
+                title: '填报时间',
+                align: 'center'
+            }, {
+                title: '操作',
+                align: 'center',
+                formatter: function (value, row, index) {
+                    var actions = [];
+                    actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="editUrl(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a>');
+                    actions.push('<a class="btn btn-success btn-xs ' + delayFlag + '" href="javascript:void(0)" onclick="delayUrl(\'' + row.id + '\',\'' + row.checkDate + '\',\'' + row.checkCycle + '\',\'' + row.nextCheckDate + '\')" style=\'background:orange;\'><i class="fa fa-edit"></i>延期</a>');
+                    actions.push('<a class="btn btn-success btn-xs ' + disposeFlag + '" href="javascript:void(0)" onclick="disposeUrl(\'' + row.id + '\')" style=\'background:darkcyan;\'><i class="fa fa-edit"></i>处理</a>');
+                    actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="deleteUrl(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
+                    return actions.join('');
+                }
+            }
+        ]
+    };
+    $.table.init(options);
+});
+
+// 添加信息
+function addUrl() {
+	var config = {
+		url: prefix + "/checkIsOver",
+		type: "get",
+		dataType: "json",
+		data: {
+			operateIcon: "add"
+		},
+		beforeSend: function () {
+			$.modal.loading("正在处理中，请稍后...");
+			$.modal.disable();
+		},
+		success: function (result) {
+			$.modal.closeLoading();
+			$.modal.enable();
+			if (result.code == web_status.SUCCESS) {
+				$.modal.open("添加信息", prefix + "/add/1", "870", "520");
+			} else if (result.code == web_status.FAIL) {
+				$.modal.open("添加信息", prefix + "/add/2", "870", "520");
+			} else if (result.code == web_status.WARNING) {
+				$.modal.alertWarning(result.msg);
+			}
+		}
+	};
+	$.ajax(config);
+}
+
+// 编辑信息
+function editUrl(id) {
+	$.modal.open("编辑信息", prefix + "/edit/" + id, "870", "520");
+}
+
+// 删除选中的信息
+function deleteAllUrl() {
+	var rows = $.table.selectColumns("id");
+	if (rows.length == 0) {
+		$.modal.alertWarning("请至少选择一条记录");
+			return;
+	}
+	$.modal.confirm("确认要删除选中的" + rows.length + "条数据吗?", function () {
+		var url = prefix + "/doDelete";
+   		var data = {
+   			"ids": rows.join()
+		};
+		$.operate.submit(url, "post", "json", data);
+	});
+}
+
+// 删除单条信息
+function deleteUrl(id) {
+	$.modal.confirm("确定删除该条强制检测信息吗？", function () {
+			var data = {
+			"ids": id
+		};
+ 		$.operate.submit(prefix + "/doDelete", "post", "json", data);
+	});
+}
+
+// 延期
+function delayUrl(id,checkDate,checkCycle,nextCheckDate) {
+   //只能延期一次
+   //dateDifference(dateAddDays(row.checkDate, Number(row.checkCycle)), value);
+   var days=dateDifference(dateAddDays(checkDate, Number(checkCycle)), nextCheckDate);
+   if (days>0){
+     // alert("已经延期，不能再次延期了！");
+      layer.open({
+                content: '已经延期，不能再次延期了！',
+                btn: '知道了'
+            });
+       return false;
+   }
+	var config = {
+		url: prefix + "/checkIsOver",
+		type: "get",
+		dataType: "json",
+		data: {
+			operateIcon: "edit"
+		},
+		beforeSend: function () {
+			$.modal.loading("正在处理中，请稍后...");
+			$.modal.disable();
+		},
+		success: function (result) {
+			$.modal.closeLoading();
+			$.modal.enable();
+			if (result.code == web_status.SUCCESS) {
+				$.modal.open("延期", prefix + "/delay/" + id, "500", "400");
+			} else if (result.code == web_status.WARNING) {
+				$.modal.alertWarning(result.msg);
+			}
+		}
+	};
+	$.ajax(config);
+}
+
+// 处理事件
+function disposeUrl(id) {
+	var config = {
+		url: prefix + "/checkForDispose",
+		type: "get",
+		dataType: "json",
+		data: {
+			id: id
+		},
+		beforeSend: function () {
+			$.modal.loading("正在处理中，请稍后...");
+			$.modal.disable();
+		},
+		success: function (result) {
+			$.modal.closeLoading();
+			$.modal.enable();
+			if (result.code == web_status.SUCCESS) {
+				$.modal.open("事件处理", prefix + "/dispose/" + id, "870", "520");
+            } else if (result.code == web_status.FAIL) {
+                $.modal.confirm(result.msg, function () {
+                	$.modal.open("事件处理", prefix + "/dispose/" + id, "870", "520");
+                });
+            } else if (result.code == web_status.WARNING) {
+                $.modal.alertWarning(result.msg);
+            }
+		}
+	};
+	$.ajax(config);
+}
+
+function getNowFormatDate() {
+	var date = new Date();
+	var seperator1 = "-";
+	var year = date.getFullYear();
+	var month = date.getMonth() + 1;
+	var strDate = date.getDate();
+	if (month >= 1 && month <= 9) {
+		month = "0" + month;
+	}
+	if (strDate >= 0 && strDate <= 9) {
+		strDate = "0" + strDate;
+	}
+	var currentdate = year + seperator1 + month + seperator1 + strDate;
+	return currentdate;
+}
+
+/**
+指定日期增加天数
+ */
+function dateAddDays(dateStr, dayCount) {
+    var tempDate = new Date(dateStr.replace(/-/g, "/")); // 把日期字符串转换成日期格式
+    var resultDate = new Date((tempDate / 1000 + (86400 * dayCount)) * 1000); // 增加n天后的日期
+    
+    var y = resultDate.getFullYear();
+    var m = resultDate.getMonth() + 1;
+    var d = resultDate.getDate();
+    var mm = m < 10 ? ("0" + m) : m;
+    var dd = d < 10 ? ("0" + d) : d;
+    
+    return y + "-" + mm + "-" + dd;
+}
+
+// 计算两个时间相差天数
+function dateDifference(sDate1, sDate2) { // sDate1和sDate2是2020-12-18格式  
+    var dateSpan,
+        tempDate,
+        iDays;
+    sDate1 = Date.parse(sDate1);
+    sDate2 = Date.parse(sDate2);
+    dateSpan = sDate2 - sDate1;
+    dateSpan = Math.abs(dateSpan);
+    iDays = Math.floor(dateSpan / (24 * 3600 * 1000));
+    return iDays
+};
+
+// 导出功能--------------------------------------------------------------------------------------------------------------
+function exportData() {
+	$.modal.confirm("确定导出强制检测数据信息吗？", function () {
+        // 获取已勾选的数据信息
+        var rows = $.table.selectColumns("id");
+        if (rows.length == 0) {
+            $.modal.alertWarning("请至少选择一条记录！");
+            return;
+        }
+        
+        $.modal.loading("正在导出数据，请稍后...");
+        $.post(prefix + "/export", {ids: $.common.join(rows, ",")}, function (result) {
+            if (result.code == web_status.SUCCESS) {
+                window.location.href = ctx + "common/download?fileName=" + encodeURI(result.msg) + "&delete=" + true;
+            } else if (result.code == web_status.WARNING) {
+                $.modal.alertWarning(result.msg)
+            } else {
+                $.modal.alertError(result.msg);
+            }
+            $.modal.closeLoading();
+        });
+    });
+}
+</script>
+</html>

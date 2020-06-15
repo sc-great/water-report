@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="admin/include :: header('新增水厂信息')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-info-edit"  th:object="${sysFactoryInfo}">
+          <input name="factId" th:field="*{factId}" type="hidden">
+            <div class="form-group">    
+                <label class="col-sm-2 control-label is-required">水厂名称：</label>
+                <div class="col-sm-10">
+                    <input name="factName" class="form-control" placeholder="请输入水厂名称" type="text" required maxLength="50" th:field="*{factName}" readonly>
+                </div>
+            </div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label label-right is-required">竣工日期：</label>
+				<div class="col-sm-4">
+					<div class="input-group" style="width:100%">
+						<input name="finiDate"  id="finiDate" class="form-control" readonly required
+							type="text" th:field="*{finiDate}">
+					</div>
+				</div>
+				<label class="col-sm-2 control-label label-right is-required">开始运营日期：</label>
+				<div class="col-sm-4">
+					<div class="input-group" style="width:100%">
+						<input name="startDate"  id="startDate" class="form-control" readonly required
+							 type="text" th:field="*{startDate}">
+					</div>
+				</div>
+			</div>	
+            <div class="form-group">    
+                <label class="col-sm-2 control-label label-right is-required">设计处理能力：</label>
+                <div class="col-sm-10">
+                   <div class="input-group" >
+                    <input name="ton" class="form-control" placeholder="请输入设计处理能力" type="text" required readonly   oninput = "value=value.replace(/[^\d]/g,'')"  maxlength="12" th:field="*{ton}" ><span class="input-group-addon">（吨/天）</span>
+                    </div>
+                </div>
+                
+            </div>
+         <div class="form-group">  
+            <label class="col-sm-2 control-label label-right is-required">人员配置：</label>
+                <div class="col-sm-10">
+                   <div class="input-group">
+                    <input name="personNum" class="form-control" placeholder="请输入人员配置" type="text" required readonly oninput = "value=value.replace(/[^\d]/g,'')"  maxlength="10" th:field="*{personNum}"><span class="input-group-addon">（人）</span>
+                   </div>
+                </div>
+             </div>   
+            <div class="form-group">    
+                <label class="col-sm-2 control-label label-right">工艺：</label>
+                <div class="col-sm-10">
+                  <div class="input-group" style="width:100%">
+                    <input name="technology" class="form-control" placeholder="请输入工艺" type="text" maxlength="20" th:field="*{technology}" readonly>
+                  </div>
+                </div>
+                
+            </div>
+    	 <div class="form-group">    
+                                <label class="col-sm-2 control-label label-right is-required">现执行单价</label>
+                <div class="col-sm-10">
+                  <div class="input-group">
+                    <input name="price" class="form-control" placeholder="请输入现执行单价" type="number" min="0"  maxLength="10" oninput="autoformart($(this))" required readonly  onkeyup="num(this)" th:field="*{price}"><span class="input-group-addon">（元/吨）</span>
+                  </div>
+                </div>
+            </div>
+		</form>
+		
+    </div>
+ 
+
+  </body>
+</html>

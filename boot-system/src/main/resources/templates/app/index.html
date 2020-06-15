@@ -1,0 +1,19 @@
+<!doctype html>
+<html class="no-js" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=ideal viewport, initial-scale=1 user-scalable=0"/>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="0"/>
+    <title>中国水环境</title>
+    <link rel="stylesheet" th:href="${'/webapp/css/com.css?v='+@toolsUtils.version()}"/>
+    <script th:src="${'/webapp/js/jquery.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/common.js?v='+@toolsUtils.version()}"></script>
+</head>
+<body>
+<div class="main">
+    <iframe class="iframe" scrolling="no" id="iframe" th:src="${url=='login'?'/app/login':url}"></iframe>
+</div>
+</body>
+</html>

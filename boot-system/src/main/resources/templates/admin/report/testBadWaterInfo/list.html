@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+<th:block th:include="admin/include :: header('化验数据_污水_信息列表')" />
+</head>
+<style>
+table {
+	white-space: nowrap;
+}
+</style>
+<body class="gray-bg">
+<div class="container-div">
+	<div class="row">
+		<div class="col-sm-12 search-collapse">
+			<form id="formId">
+				<div class="select-list">
+					<ul>
+						<li>
+							<p>填报日期：</p>
+							<input type="text" class="time-input" name="fillDate" data-type="date" data-format="yyyy-MM-dd" />
+						</li>
+						<li>
+							<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()">
+								<i class="fa fa-search"></i>&nbsp;搜索
+							</a>
+							<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()">
+								<i class="fa fa-refresh"></i>&nbsp;重置
+							</a>
+						</li>
+					</ul>
+				</div>
+			</form>
+		</div>
+		<div class="btn-group-sm" id="toolbar" role="group">
+			<a class="btn btn-success" onclick="addUrl()" shiro:hasPermission="report:badWaterQualityInfo:add">
+				<i class="fa fa-plus"></i> 添加
+			</a>
+			<a class="btn btn-danger multiple disabled" onclick="deleteAllUrl()" shiro:hasPermission="report:badWaterQualityInfo:delete">
+				<i class="fa fa-remove"></i> 删除
+			</a>
+		</div>
+		<div class="col-sm-12 select-table table-striped table-bordered table-groupheader">
+			<table id="bootstrap-table" data-mobile-responsive="true"></table>
+		</div>
+	</div>
+</div>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: table" />
+<script th:inline="javascript">
+var prefix = ctx + "admin/report/testBadWaterInfo";
+var editFlag = [[${@permission.hasPermi('report:testBadWaterInfo:edit')}]];
+var removeFlag = [[${@permission.hasPermi('report:testBadWaterInfo:delete')}]];
+$(function () {
+    var options = {
+        url: prefix + "/doList",
+        modalName: "水质数据信息(污水处理厂/排水厂)",
+        rememberSelected: true,
+        uniqueId: "id",
+        columns: [
+            [{
+                    field: 'state',
+                    checkbox: true,
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'id',
+                    title: '编号',
+                    visible: false,
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'fillDate',
+                    title: '日期',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'ph',
+                    title: 'pH值',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'anDan',
+                    title: '氨氮（Mg/L）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'zongDan',
+                    title: '总氮（Mg/L）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'zongLin',
+                    title: '总磷（Mg/L）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'cod',
+                    title: '化学需氧量COD（Mg/L）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'bod5',
+                    title: '五日生化需氧量BOD5（Mg/L）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'xunFu',
+                    title: '总悬浮物（Mg/L）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'temp',
+                    title: '温度',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'fengJun',
+                    title: '粪大肠菌',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'sv30',
+                    title: 'SV30',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'svt',
+                    title: 'SVT',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'mlss',
+                    title: 'MLSS',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'mlvss',
+                    title: 'MLVSS',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'testDo',
+                    title: 'DO',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'waterSludge',
+                    title: '污泥含水率(%)',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'fillUserName',
+                    title: '填报人',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'fillTime',
+                    title: '填报时间',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    title: '操作',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2,
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="editUrl(\'' + row.id + '\',\'' + row.fillDate + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="deleteUrl(\'' + row.id + '\',\'' + row.fillDate + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }
+            ],
+            [
+                {
+                    field: 'phIn',
+                    title: '进水',
+                    align: 'center'
+                }, {
+                    field: 'phOut',
+                    title: '出水',
+                    align: 'center'
+                }, {
+                    field: 'adanIn',
+                    title: '进水',
+                    align: 'center'
+                }, {
+                    field: 'adanOut',
+                    title: '出水',
+                    align: 'center'
+                }, {
+                    field: 'zdanIn',
+                    title: '进水',
+                    align: 'center'
+                }, {
+                    field: 'zdanOut',
+                    title: '出水',
+                    align: 'center'
+                }, {
+                    field: 'zlinIn',
+                    title: '进水',
+                    align: 'center'
+                }, {
+                    field: 'zlinOut',
+                    title: '出水',
+                    align: 'center'
+                }, {
+                    field: 'codIn',
+                    title: '进水',
+                    align: 'center'
+                }, {
+                    field: 'codOut',
+                    title: '出水',
+                    align: 'center'
+                }, {
+                    field: 'bod5In',
+                    title: '进水',
+                    align: 'center'
+                }, {
+                    field: 'bod5Out',
+                    title: '出水',
+                    align: 'center'
+                }, {
+                    field: 'xfuIn',
+                    title: '出水',
+                    align: 'center'
+                }, {
+                    field: 'xfuOut',
+                    title: '出水',
+                    align: 'center'
+                }, {
+                    field: 'tempIn',
+                    title: '出水',
+                    align: 'center'
+                }, {
+                    field: 'tempOut',
+                    title: '出水',
+                    align: 'center'
+                }
+            ]
+        ]
+    };
+    $.table.init(options);
+});
+// 添加
+function addUrl() {
+    var config = {
+        url: prefix + "/checkIsOver",
+        type: "get",
+        dataType: "json",
+        data: {
+            operateIcon: "add"
+        },
+        beforeSend: function () {
+            $.modal.loading("正在处理中，请稍后...");
+            $.modal.disable();
+        },
+        success: function (result) {
+            $.modal.closeLoading();
+            $.modal.enable();
+            if (result.code == web_status.SUCCESS) {
+                $.modal.open("添加数据信息", prefix + "/add/1", "800", "600");
+            } else if (result.code == web_status.FAIL) {
+                $.modal.confirm(result.msg, function () {
+                    $.modal.open("添加数据信息", prefix + "/add/2", "800", "600");
+                });
+            } else if (result.code == web_status.WARNING) {
+                $.modal.alertWarning(result.msg);
+            }
+        }
+    };
+    $.ajax(config);
+}
+// 编辑数据信息
+function editUrl(id, fillDate) {
+	$.modal.open("编辑数据信息", prefix + "/edit/" + id, "800", "600");
+}
+// 删除选中的质数据信息
+function deleteAllUrl() {
+	var rows = $.table.selectColumns("id");
+    if (rows.length == 0) {
+        $.modal.alertWarning("请至少选择一条记录");
+        return;
+    }
+    $.modal.confirm("确认要删除选中的" + rows.length + "条数据吗?", function () {
+        var url = prefix + "/doDelete";
+        var data = {
+            "ids": rows.join()
+        };
+        $.operate.submit(url, "post", "json", data);
+    });
+}
+// 删除单条质数据信息
+function deleteUrl(id, fillDate) {
+	$.modal.confirm("确定删除该条数据信息吗？", function () {
+        var data = {
+            "ids": id
+        };
+        $.operate.submit(prefix + "/doDelete", "post", "json", data);
+    });
+}
+function getNowFormatDate() {
+    var date = new Date();
+    var seperator1 = "-";
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1;
+    var strDate = date.getDate();
+    if (month >= 1 && month <= 9) {
+        month = "0" + month;
+    }
+    if (strDate >= 0 && strDate <= 9) {
+        strDate = "0" + strDate;
+    }
+    var currentdate = year + seperator1 + month + seperator1 + strDate;
+    return currentdate;
+}
+</script>
+</body>
+</html>

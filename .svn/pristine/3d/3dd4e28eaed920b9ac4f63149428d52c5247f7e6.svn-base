@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.system.mapper.SysMsgMapper">
+    <resultMap type="SysMsg" id="resultMapping">
+        <result property="id" column="id"/>
+        <result property="receiveUserId" column="receive_user_id"/>
+        <result property="receiveUserCode" column="receive_user_code"/>
+        <result property="receiveUserName" column="receive_user_name"/>
+        <result property="msgTitle" column="msg_title"/>
+        <result property="msgContent" column="msg_content"/>
+        <result property="msgParams" column="msg_params"/>
+        <result property="msgType" column="msg_type"/>
+        <result property="msgState" column="msg_state"/>
+        <result property="readTime" column="read_time"/>
+        <result property="userId" column="user_id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+
+    </resultMap>
+
+    <insert id="insert" parameterType="SysMsg">
+        <selectKey keyProperty="id" resultType="String" order="BEFORE">
+            select replace(uuid(),'-','') from dual
+        </selectKey>
+        insert into sys_msg
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null ">id,</if>
+            <if test="receiveUserId != null ">receive_user_id,</if>
+            <if test="receiveUserCode != null ">receive_user_code,</if>
+            <if test="receiveUserName != null ">receive_user_name,</if>
+            <if test="msgTitle != null ">msg_title,</if>
+            <if test="msgContent != null ">msg_content,</if>
+            <if test="msgParams != null ">msg_params,</if>
+            <if test="msgType != null ">msg_type,</if>
+            <if test="msgState != null ">msg_state,</if>
+            <if test="readTime != null ">read_time,</if>
+            <if test="userId != null ">user_id,</if>
+            <if test="createBy != null ">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null ">#{id},</if>
+            <if test="receiveUserId != null ">#{receiveUserId},</if>
+            <if test="receiveUserCode != null ">#{receiveUserCode},</if>
+            <if test="receiveUserName != null ">#{receiveUserName},</if>
+            <if test="msgTitle != null ">#{msgTitle},</if>
+            <if test="msgContent != null ">#{msgContent},</if>
+            <if test="msgParams != null ">#{msgParams},</if>
+            <if test="msgType != null ">#{msgType},</if>
+            <if test="msgState != null ">#{msgState},</if>
+            <if test="readTime != null ">#{readTime},</if>
+            <if test="userId != null ">#{userId},</if>
+            <if test="createBy != null ">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="SysMsg">
+        update sys_msg
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="receiveUserId != null ">receive_user_id = #{receiveUserId},</if>
+            <if test="receiveUserCode != null ">receive_user_code = #{receiveUserCode},</if>
+            <if test="receiveUserName != null ">receive_user_name = #{receiveUserName},</if>
+            <if test="msgTitle != null ">msg_title = #{msgTitle},</if>
+            <if test="msgContent != null ">msg_content = #{msgContent},</if>
+            <if test="msgParams != null ">msg_params=#{msgParams},</if>
+            <if test="msgType != null ">msg_type = #{msgType},</if>
+            <if test="msgState != null ">msg_state = #{msgState},</if>
+            <if test="readTime != null ">read_time = #{readTime},</if>
+            <if test="userId != null ">user_id = #{userId},</if>
+            <if test="createBy != null ">create_by = #{createBy},</if>
+            <if test="createTime != null ">create_time = #{createTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+    <update id="updateRead" parameterType="String">
+        <if test="ids!=null">
+            update sys_msg set msg_state = 1,read_time=sysdate() where id in
+            <foreach collection="ids" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+    </update>
+
+    <sql id="where">
+        <where>
+            <if test="id!=null  and id != ''">
+                and t.id=#{id}
+            </if>
+            <if test="receiveUserId != null  and receiveUserId != ''">
+                and t.receive_user_id = #{receiveUserId}
+            </if>
+            <if test="receiveUserCode != null  and receiveUserCode != ''">
+                and t.receive_user_code = #{receiveUserCode}
+            </if>
+            <if test="receiveUserName != null  and receiveUserName != ''">
+                and t.receive_user_name like concat('%', #{receiveUserName}, '%')
+            </if>
+            <if test="msgTitle != null  and msgTitle != ''">
+                and t.msg_title = #{msgTitle}
+            </if>
+            <if test="msgContent != null  and msgContent != ''">
+                and t.msg_content = #{msgContent}
+            </if>
+            <if test="msgType != null  and msgType != ''">
+                and t.msg_type = #{msgType}
+            </if>
+            <if test="msgState != null  and msgState != ''">
+                and t.msg_state = #{msgState}
+            </if>
+            <if test="readTime != null  and readTime != ''">
+                and t.read_time = #{readTime}
+            </if>
+            <if test="userId != null  and userId != ''">
+                and t.user_id = #{userId}
+            </if>
+            <if test="searchValue!=null and searchValue!=''">
+                and (
+                t.msg_title like concat('%',#{searchValue}, '%')
+                or t.msg_content like concat('%',#{searchValue}, '%')
+                or t.create_by like concat('%',#{searchValue}, '%')
+                )
+            </if>
+            <if test="params.sendTime!=null and params.sendTime!=''">
+                and t.create_time BETWEEN  '${params.sendTime} 00:00:00' AND '${params.sendTime} 59:59:00'
+            </if>
+        </where>
+    </sql>
+
+    <delete id="delete" parameterType="String">
+        <if test="ids!=null">
+            delete t from sys_msg t where t.id in
+            <foreach collection="ids" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+    </delete>
+
+    <select id="getCount" parameterType="SysMsg" resultType="int">
+        select count(*) from sys_msg t
+        <include refid="where"/>
+    </select>
+
+    <sql id="select">
+        select t.* from sys_msg t
+    </sql>
+
+    <select id="getEntity" parameterType="SysMsg" resultMap="resultMapping">
+        <include refid="select"/>
+        <include refid="where"/>
+        LIMIT 1
+    </select>
+
+    <select id="getList" parameterType="SysMsg" resultMap="resultMapping">
+        <include refid="select"/>
+        <include refid="where"/>
+        order by t.create_time desc
+    </select>
+</mapper>

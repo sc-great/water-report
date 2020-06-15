@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="admin/include :: header('新增水厂信息')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-info-edit"  th:object="${sysFactoryInfo}">
+          <input name="factId" th:field="*{factId}" type="hidden">
+            <div class="form-group">    
+                <label class="col-sm-2 control-label is-required">水厂名称：</label>
+                <div class="col-sm-10">
+                    <input name="factName" class="form-control" placeholder="请输入水厂名称" type="text" required maxLength="50" th:value="*{factName}">
+                </div>
+            </div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label label-right is-required">竣工日期：</label>
+				<div class="col-sm-4">
+					<div class="input-group" style="width:100%">
+						<input name="finiDate"  id="finiDate" class="form-control" readonly required
+							type="text" th:value="*{finiDate}">
+					</div>
+				</div>
+				<label class="col-sm-2 control-label label-right is-required">开始运营日期：</label>
+				<div class="col-sm-4">
+					<div class="input-group" style="width:100%">
+						<input name="startDate"  id="startDate" class="form-control" readonly required
+							 type="text" th:value="*{startDate}">
+					</div>
+				</div>
+			</div>	
+            <div class="form-group">    
+                <label class="col-sm-2 control-label label-right is-required">设计处理能力：</label>
+                <div class="col-sm-4">
+                   <div class="input-group" >
+                    <input name="ton" class="form-control" placeholder="请输入设计处理能力" type="text" required   oninput = "value=value.replace(/[^\d]/g,'')"  maxlength="8" th:value="*{ton}"><span class="input-group-addon">（吨/天）</span>
+                    </div>
+                </div>
+                 <label class="col-sm-2 control-label label-right is-required">人员配置：</label>
+                <div class="col-sm-4">
+                   <div class="input-group">
+                    <input name="personNum" class="form-control" placeholder="请输入人员配置" type="text" required oninput = "value=value.replace(/[^\d]/g,'')"  maxlength="6" th:value="*{personNum}"><span class="input-group-addon">（人）</span>
+                   </div>
+                </div>
+            </div>
+       
+            <div class="form-group">    
+                <label class="col-sm-2 control-label label-right">工艺：</label>
+                <div class="col-sm-4">
+                  <div class="input-group" style="width:100%">
+                    <input name="technology" class="form-control" placeholder="请输入工艺" type="text" maxlength="16" th:value="*{technology}">
+                  </div>
+                </div>
+                 <label class="col-sm-2 control-label label-right is-required">现执行单价(元/吨)：</label>
+                <div class="col-sm-4">
+                  <div class="input-group">
+                    <input name="price" class="form-control" placeholder="请输入现执行单价"  type="number"  min="0"  max="100" maxLength="5" oninput="autoformart($(this))"  required   th:value="*{price}"><span class="input-group-addon">（元/吨）</span>
+                  </div>
+                </div>
+            </div>
+   
+       <div class="form-group faq-answer" >水质预警值上下限配置</div>
+			<div class="form-group">
+				
+				<label class="col-sm-2 control-label label-right">COD进水上限：</label>
+				<div class="col-sm-4">
+					<div class="input-group"  style="width:100%">
+						<input name="codInMaxBad" class="form-control"
+							type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)"  onChange="limitNum('codInMaxBad')"   th:value="${#numbers.formatDecimal(sysFactoryInfo.codInMaxBad,0,0)}"  >
+					</div>
+				</div>
+				<label class="col-sm-2 control-label label-right">COD进水下限：</label>
+				<div class="col-sm-4">
+					<div class="input-group" style="width:100%">
+						<input name="codInMinBad" class="form-control"
+							 type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)"  onChange="limitNum('codInMinBad')"   th:value="${#numbers.formatDecimal(sysFactoryInfo.codInMinBad,0,0)}">
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				
+				<label class="col-sm-2 control-label label-right">COD出水上限：</label>
+				<div class="col-sm-4">
+					<div class="input-group"  style="width:100%">
+						<input name="codOutMaxBad" class="form-control"
+						   type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)"  onChange="limitNum('codOutMaxBad')"  th:value="${#numbers.formatDecimal(sysFactoryInfo.codOutMaxBad,0,0)}">
+					</div>
+				</div>
+				<label class="col-sm-2 control-label label-right">COD出水下限：</label>
+				<div class="col-sm-4">
+					<div class="input-group"  style="width:100%">
+						<input name="codOutMinBad" class="form-control"
+							type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)"  onChange="limitNum('codOutMinBad')"   th:value="${#numbers.formatDecimal(sysFactoryInfo.codOutMinBad,0,0)}" >
+					</div>
+				</div>
+			</div>
+
+			<div class="form-group">    
+                                
+                 <label class="col-sm-2 control-label label-right">NH3-N进水上限：</label>
+                <div class="col-sm-4">
+                 <div class="input-group"  style="width:100%">
+                    <input name="nh3NInMaxBad" class="form-control"  
+                    type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)"  onChange="limitNum('nh3NInMaxBad')"  th:value="${#numbers.formatDecimal(sysFactoryInfo.nh3NInMaxBad,0,0)}">
+                 </div>
+                </div>
+                 <label class="col-sm-2 control-label label-right">NH3-N进水下限：</label>
+                <div class="col-sm-4">
+                  <div class="input-group"  style="width:100%">
+                    <input name="nh3NInMinBad" class="form-control"
+                       type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)"  onChange="limitNum('nh3NInMinBad')"   th:value="${#numbers.formatDecimal(sysFactoryInfo.nh3NInMinBad,0,0)}">
+                  </div>
+                </div>
+            </div>  
+            <div class="form-group">    
+                                
+                 <label class="col-sm-2 control-label label-right">NH3-N出水上限：</label>
+                <div class="col-sm-4">
+                 <div class="input-group"  style="width:100%">
+                    <input name="nh3NOutMaxBad" class="form-control"  
+                    type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)"  onChange="limitNum('nh3NOutMaxBad')"  th:value="${#numbers.formatDecimal(sysFactoryInfo.nh3NOutMaxBad,0,0)}">
+                 </div>
+                </div>
+                 <label class="col-sm-2 control-label label-right">NH3-N出水下限：</label>
+                <div class="col-sm-4">
+                  <div class="input-group"  style="width:100%">
+                    <input name="nh3NOutMinBad" class="form-control"
+                       type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)"  onChange="limitNum('nh3NOutMinBad')"  th:value="${#numbers.formatDecimal(sysFactoryInfo.nh3NOutMinBad,0,0)}">
+                  </div>
+                </div>
+            </div>       
+               
+            <div class="form-group">    
+              
+                <label class="col-sm-2 control-label label-right">SS进水上限：</label>
+                <div class="col-sm-4">
+                  <div class="input-group"  style="width:100%">
+                    <input name="ssInMaxBad" class="form-control"  
+                    type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)"  onChange="limitNum('ssInMaxBad')"  th:value="${#numbers.formatDecimal(sysFactoryInfo.ssInMaxBad,0,0)}">
+                  </div>
+                </div>
+                  <label class="col-sm-2 control-label label-right">SS进水下限：</label>
+                <div class="col-sm-4">
+                  <div class="input-group"  style="width:100%">
+                    <input name="ssInMinBad" class="form-control" 
+                    type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)"  onChange="limitNum('ssInMinBad')"  th:value="${#numbers.formatDecimal(sysFactoryInfo.ssInMinBad,0,0)}">
+                  </div>
+                </div>
+            </div>
+
+            <div class="form-group">    
+               
+                 <label class="col-sm-2 control-label label-right">SS出水上限：</label>
+                <div class="col-sm-4">
+                   <div class="input-group"  style="width:100%">
+                    <input name="ssOutMaxBad" class="form-control" 
+                    type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('ssOutMaxBad')"  th:value="${#numbers.formatDecimal(sysFactoryInfo.ssOutMaxBad,0,0)}">
+                  </div>
+                </div>
+                 <label class="col-sm-2 control-label label-right">SS出水下限：</label>
+                <div class="col-sm-4">
+                   <div class="input-group"  style="width:100%">
+                    <input name="ssOutMinBad" class="form-control" 
+                    type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)"  onChange="limitNum('ssOutMinBad')"  th:value="${#numbers.formatDecimal(sysFactoryInfo.ssOutMinBad,0,0)}">
+                   </div>
+                </div>
+            </div>
+           
+            <div class="form-group">    
+               
+                 <label class="col-sm-2 control-label label-right">PH值进水上限：</label>
+                <div class="col-sm-4">
+                 <div class="input-group"  style="width:100%">
+                    <input name="phInMaxBad" class="form-control"  
+                    type="number" min="0" max="14"  maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('phInMaxBad')"  th:value="${#numbers.formatDecimal(sysFactoryInfo.phInMaxBad,0,0)}">
+                 </div>
+                </div>
+                 <label class="col-sm-2 control-label label-right">PH值进水下限：</label>
+                <div class="col-sm-4">
+                <div class="input-group"  style="width:100%">
+                    <input name="phInMinBad" class="form-control"  
+                    type="number" min="0"  max="14"  maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('phInMinBad')" th:value="${#numbers.formatDecimal(sysFactoryInfo.phInMinBad,0,0)}">
+                </div>
+                </div>
+            </div>
+           
+            <div class="form-group">    
+               
+                <label class="col-sm-2 control-label label-right">PH值出水上限：</label>
+                <div class="col-sm-4">
+                 <div class="input-group"  style="width:100%">
+                    <input name="phOutMaxBad" class="form-control" 
+                    type="number" min="0" max="14" maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('phOutMaxBad')"  th:value="${#numbers.formatDecimal(sysFactoryInfo.phOutMaxBad,0,0)}">
+                 </div>
+                </div>
+                 <label class="col-sm-2 control-label label-right">PH值出水下限：</label>
+                <div class="col-sm-4">
+                  <div class="input-group"  style="width:100%">
+                    <input name="phOutMinBad" class="form-control" 
+                    type="number" min="0"  max="14"  maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('phOutMinBad')"   th:value="${#numbers.formatDecimal(sysFactoryInfo.phOutMinBad,0,0)}">
+                  </div>
+                </div>
+            </div>
+            
+            <div class="form-group">    
+                
+                 <label class="col-sm-2 control-label label-right">TP进水上限：</label>
+                <div class="col-sm-4">
+                 <div class="input-group"  style="width:100%">
+                    <input name="tpInMaxBad" class="form-control" 
+                    type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('tpInMaxBad')"   th:value="${#numbers.formatDecimal(sysFactoryInfo.tpInMaxBad,0,0)}">
+                </div>
+                </div>
+                <label class="col-sm-2 control-label label-right">TP进水下限：</label>
+                <div class="col-sm-4">
+                  <div class="input-group"  style="width:100%">
+                    <input name="tpInMinBad" class="form-control" 
+                    type="number" min="0"  maxLength="6" oninput="autoformart($(this);num(this))"  onChange="limitNum('tpInMinBad')"  th:value="${#numbers.formatDecimal(sysFactoryInfo.tpInMinBad,0,0)}">
+                  </div>
+                </div>
+            </div>
+			<div class="form-group">
+				
+				<label class="col-sm-2 control-label label-right">TP出水上限：</label>
+				<div class="col-sm-4">
+				 <div class="input-group"  style="width:100%">
+					<input name="tpOutMaxBad" class="form-control"
+						 type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)"  onChange="limitNum('tpOutMaxBad')"  th:value="${#numbers.formatDecimal(sysFactoryInfo.tpOutMaxBad,0,0)}">
+				</div>
+				</div>
+				<label class="col-sm-2 control-label label-right">TP出水下限：</label>
+				<div class="col-sm-4">
+					<div class="input-group"  style="width:100%">
+						<input name="tpOutMinBad" class="form-control"
+							 type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)"  onChange="limitNum('tpOutMinBad')"  th:value="${#numbers.formatDecimal(sysFactoryInfo.tpOutMinBad,0,0)}">
+					</div>
+				</div>
+			</div>
+
+			<div class="form-group">    
+               
+                   <label class="col-sm-2 control-label label-right">TN进水上限：</label>
+                <div class="col-sm-4">
+                <div class="input-group"  style="width:100%">
+                    <input name="tnInMaxBad" class="form-control" 
+                    type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)"  onChange="limitNum('tnInMaxBad')"  th:value="${#numbers.formatDecimal(sysFactoryInfo.tnInMaxBad,0,0)}">
+                </div>
+                </div>
+                 <label class="col-sm-2 control-label label-right">TN进水下限：</label>
+                <div class="col-sm-4">
+                 <div class="input-group"  style="width:100%">
+                    <input name="tnInMinBad" class="form-control"
+                     type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)"  onChange="limitNum('tnInMinBad')"  th:value="${#numbers.formatDecimal(sysFactoryInfo.tnInMinBad,0,0)}">
+                </div>
+                 </div>
+            </div>
+			<div class="form-group">
+				
+				<label class="col-sm-2 control-label label-right">TN出水上限：</label>
+				<div class="col-sm-4">
+					<div class="input-group"  style="width:100%">
+						<input name="tnOutMaxBad" class="form-control"
+							 type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)"  onChange="limitNum('tnOutMaxBad')"  th:value="${#numbers.formatDecimal(sysFactoryInfo.tnOutMaxBad,0,0)}">						
+					</div>
+			    </div>
+			    <label class="col-sm-2 control-label label-right">TN出水下限：</label>
+				<div class="col-sm-4">
+					<div class="input-group"  style="width:100%">
+						<input name="tnOutMinBad" class="form-control"
+							 type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)"  onChange="limitNum('tnOutMinBad')"  th:value="${#numbers.formatDecimal(sysFactoryInfo.tnOutMinBad,0,0)}">
+					</div>
+				</div>
+			</div>
+		
+		</form>
+		<div class="row">
+		<div class="col-sm-offset-5 col-sm-5">
+			<button type="button" class="btn btn-sm btn-primary" onclick="submitHandler()">
+				<i class="fa fa-check"></i>保 存
+			</button>
+			&nbsp;
+			<button type="button" class="btn btn-sm btn-danger" onclick="closeItem()">
+				<i class="fa fa-reply-all"></i>关 闭
+			</button>
+		</div>
+	</div>
+    </div>
+    <th:block th:include="admin/include :: common" />
+    <th:block th:include="admin/include :: form" />
+
+
+ <script th:inline="javascript">
+ 
+    
+    var prefix = ctx + "admin/system/factory";
+     // 时间控件
+layui.use('laydate', function () {
+    var laydate = layui.laydate;
+    // 执行一个laydate实例
+    laydate.render({
+        elem: '#finiDate', //指定元素
+        showBottom: false,
+        format: 'yyyy-MM-dd',
+        trigger: 'click'
+    });
+     laydate.render({
+        elem: '#startDate', //指定元素
+        showBottom: false,
+        format: 'yyyy-MM-dd',
+        trigger: 'click'
+    });
+});
+function submitHandler() {
+    		if ($.validate.form()) {
+    			var filed = $("#form-info-edit").serializeJSON();
+    			
+    			$.ajax({
+    				cache : true,
+    				type : "POST",
+    				url : ctx + "admin/system/factory/doEdit",
+    				data : filed,
+    				async : false,
+    				error : function(request) {
+    					$.modal.alertError("系统错误");
+    				},
+    				success : function(data) {
+    					
+    					layer.open({
+    						content : "修改成功！",
+    						btn : '知道了'
+    					});
+    
+    				
+    					
+    				}
+    			});
+    		}
+    		}
+// input限制
+function autoformart(obj) {
+	var val = obj.val();
+	if (val == null || val == undefined || val == "") {
+		obj.val("");
+		return;
+	}
+	var maxLength = obj.attr("maxLength");
+	var max = obj.attr("max");
+	if (val.length > maxLength) {
+		obj.val(val.slice(0, maxLength)); // 限制长度
+		return;
+	}
+	if (parseFloat(val) > parseFloat(max)) {
+		obj.val(val.slice(0, val.length - 1)); // 限制大小
+		return;
+	}
+	obj.val(parseFloat(val));
+}
+//2位小数
+function num(obj){
+	obj.value = obj.value.replace(/[^\d.]/g,""); 
+	obj.value = obj.value.replace(/^\./g,""); 
+	obj.value = obj.value.replace(/\.{2,}/g,"."); 
+	obj.value = obj.value.replace(".","$#$").replace(/\./g,"").replace("$#$",".");
+	obj.value = obj.value.replace(/^(\-)*(\d+)\.(\d\d).*$/,'$1$2.$3');
+ 	}
+ 	//下限不能超上限，上限不能小于下限
+ 	function limitNum(str) {
+ 		if (str == 'codInMinBad' || str == 'codInMaxBad') {
+ 			var codInMinBad = $("#codInMinBad").val();
+ 			var codInMaxBad = $("#codInMaxBad").val();
+ 			if (codInMinBad == null || codInMinBad == undefined || codInMinBad == "") {
+ 				return;
+ 			}
+ 			if (codInMaxBad == null || codInMaxBad == undefined || codInMaxBad == "") {
+ 				return;
+ 			}
+ 			if (Number(codInMinBad) > Number(codInMaxBad)) {
+ 				layer.open({
+ 					content : "cod进水下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#codInMinBad").val(0);
+ 			}
+ 		}
+ 		if (str == 'codOutMinBad' || str == 'codOutMaxBad') {
+ 			var codOutMinBad = $("#codOutMinBad").val();
+ 			var codOutMaxBad = $("#codOutMaxBad").val();
+ 			if (codOutMinBad == null || codOutMinBad == undefined || codOutMinBad == "") {
+ 				return;
+ 			}
+ 			if (codOutMaxBad == null || codOutMaxBad == undefined || codOutMaxBad == "") {
+ 				return;
+ 			}
+ 			if (Number(codOutMinBad) >Number(codOutMaxBad)) {
+ 				layer.open({
+ 					content : "cod出水下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#codOutMinBad").val(0);
+ 			}
+ 		}
+ 
+ 		if (str == 'nh3NInMinBad' || str == 'nh3NInMaxBad') {
+ 			var nh3NInMinBad = $("#nh3NInMinBad").val();
+ 			var nh3NInMaxBad = $("#nh3NInMaxBad").val();
+ 			if (nh3NInMinBad == null || nh3NInMinBad == undefined || nh3NInMinBad == "") {
+ 				return;
+ 			}
+ 			if (nh3NInMaxBad == null || nh3NInMaxBad == undefined || nh3NInMaxBad == "") {
+ 				return;
+ 			}
+ 			if (Number(nh3NInMinBad) > Number(nh3NInMaxBad)) {
+ 				layer.open({
+ 					content : "NH3-N进水下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#nh3NInMinBad").val(0);
+ 			}
+ 		}
+ 		//nh3NOutMinBad
+ 		if (str == 'nh3NOutMinBad' || str == 'nh3NOutMaxBad') {
+ 			var nh3NOutMinBad = $("#nh3NOutMinBad").val();
+ 			var nh3NOutMaxBad = $("#nh3NOutMaxBad").val();
+ 			if (nh3NOutMinBad == null || nh3NOutMinBad == undefined || nh3NOutMinBad == "") {
+ 				return;
+ 			}
+ 			if (nh3NOutMaxBad == null || nh3NOutMaxBad == undefined || nh3NOutMaxBad == "") {
+ 				return;
+ 			}
+ 			if (Number(nh3NOutMinBad) > Number(nh3NOutMaxBad)) {
+ 				layer.open({
+ 					content : "NH3-N出水下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#nh3NOutMinBad").val(0);
+ 			}
+ 		}
+ 		//ssInMinBad
+ 		if (str == 'ssInMinBad' || str == 'ssInMaxBad') {
+ 			var ssInMinBad = $("#ssInMinBad").val();
+ 			var ssInMaxBad = $("#ssInMaxBad").val();
+ 			if (ssInMinBad == null || ssInMinBad == undefined || ssInMinBad == "") {
+ 				return;
+ 			}
+ 			if (ssInMaxBad == null || ssInMaxBad == undefined || ssInMaxBad == "") {
+ 				return;
+ 			}
+ 			if (Number(ssInMinBad) > Number(ssInMaxBad)) {
+ 				layer.open({
+ 					content : "SS进水下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#ssInMinBad").val(0);
+ 			}
+ 		}
+ 		//ssOutMinBad
+ 		if (str == 'ssOutMinBad' || str == 'ssOutMaxBad') {
+ 			var ssOutMinBad = $("#ssOutMinBad").val();
+ 			var ssOutMaxBad = $("#ssOutMaxBad").val();
+ 			if (ssOutMinBad == null || ssOutMinBad == undefined || ssOutMinBad == "") {
+ 				return;
+ 			}
+ 			if (ssOutMaxBad == null || ssOutMaxBad == undefined || ssOutMaxBad == "") {
+ 				return;
+ 			}
+ 			if (Number(ssOutMinBad) >Number(ssOutMaxBad)) {
+ 				layer.open({
+ 					content : "SS出水下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#ssOutMinBad").val(0);
+ 			}
+ 		}
+ 		//phInMinBad
+ 		if (str == 'phInMinBad' || str == 'phInMaxBad') {
+ 			var phInMinBad = $("#phInMinBad").val();
+ 			var phInMaxBad = $("#phInMaxBad").val();
+ 			if (phInMinBad == null || phInMinBad == undefined || phInMinBad == "") {
+ 				return;
+ 			}
+ 			if (phInMaxBad == null || phInMaxBad == undefined || phInMaxBad == "") {
+ 				return;
+ 			}
+ 			if (Number(phInMinBad) > Number(phInMaxBad)) {
+ 				layer.open({
+ 					content : "PH进水下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#phInMinBad").val(0);
+ 			}
+ 		}
+ 
+ 		//phOutMinBad
+ 		if (str == 'phOutMinBad' || str == 'phOutMaxBad') {
+ 			var phOutMinBad = $("#phOutMinBad").val();
+ 			var phOutMaxBad = $("#phOutMaxBad").val();
+ 			if (phOutMinBad == null || phOutMinBad == undefined || phOutMinBad == "") {
+ 				return;
+ 			}
+ 			if (phOutMaxBad == null || phOutMaxBad == undefined || phOutMaxBad == "") {
+ 				return;
+ 			}
+ 			if (Number(phOutMinBad) > Number(phOutMaxBad)) {
+ 				layer.open({
+ 					content : "PH出水下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#phOutMinBad").val(0);
+ 			}
+ 		}
+ 		//tpInMinBad
+ 		if (str == 'tpInMinBad' || str == 'tpInMaxBad') {
+ 			var tpInMinBad = $("#tpInMinBad").val();
+ 			var tpInMaxBad = $("#tpInMaxBad").val();
+ 			if (tpInMinBad == null || tpInMinBad == undefined || tpInMinBad == "") {
+ 				return;
+ 			}
+ 			if (tpInMaxBad == null || tpInMaxBad == undefined || tpInMaxBad == "") {
+ 				return;
+ 			}
+ 				//alert("max="+tpInMaxBad+ " min="+tpInMinBad);
+ 			if (Number(tpInMinBad) > Number(tpInMaxBad)) {
+ 				layer.open({
+ 					content : "TP进水下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#tpInMinBad").val(0);
+ 			}
+ 		}
+ 		//tpOutMinBad
+ 		if (str == 'tpOutMinBad' || str == 'tpOutMaxBad') {
+ 			var tpOutMinBad = $("#tpOutMinBad").val();
+ 			var tpOutMaxBad = $("#tpOutMaxBad").val();
+ 			if (tpOutMinBad == null || tpOutMinBad == undefined || tpOutMinBad == "") {
+ 				return;
+ 			}
+ 			if (tpOutMaxBad == null || tpOutMaxBad == undefined || tpOutMaxBad == "") {
+ 				return;
+ 			}
+ 			
+ 			if (Number(tpOutMinBad) > Number(tpOutMaxBad)) {
+ 				layer.open({
+ 					content : "TP出水下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#tpOutMinBad").val(0);
+ 			}
+ 		}
+ 
+ 		//tnInMinBad 		
+ 		if (str == 'tnInMinBad' || str == 'tnInMaxBad') {
+ 			var tnInMinBad = $("#tnInMinBad").val();
+ 			var tnInMaxBad = $("#tnInMaxBad").val();
+ 			if (tnInMinBad == null || tnInMinBad == undefined || tnInMinBad == "") {
+ 				return;
+ 			}
+ 			if (tnInMaxBad == null || tnInMaxBad == undefined || tnInMaxBad == "") {
+ 				return;
+ 			}
+ 			if (Number(tnInMinBad) > Number(tnInMaxBad)) {
+ 				layer.open({
+ 					content : "TN进水下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#tnInMinBad").val(0);
+ 			}
+ 		}
+ 		//tnOutMinBad
+ 		if (str == 'tnOutMinBad' || str == 'tnOutMaxBad') {
+ 			var tnOutMinBad = $("#tnOutMinBad").val();
+ 			var tnOutMaxBad = $("#tnOutMaxBad").val();
+ 			if (tnOutMinBad == null || tnOutMinBad == undefined || tnOutMinBad == "") {
+ 				return;
+ 			}
+ 			if (tnOutMaxBad == null || tnOutMaxBad == undefined || tnOutMaxBad == "") {
+ 				return;
+ 			}
+ 			if (Number(tnOutMinBad) >Number(tnOutMaxBad)) {
+ 				layer.open({
+ 					content : "TN出水下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#tnOutMinBad").val(0);
+ 			}
+ 		}
+ 
+ 	}
+ </script>
+  </body>
+</html>

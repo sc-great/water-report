@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+<th:block th:include="admin/include :: header('水厂历史数据统计')"/>
+</head>
+<style>
+.select-list li p {
+	margin-right: 0;
+}
+.tree .node .node-text label {
+    width: 85%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#orgNames {
+	width: 250px;
+}
+</style>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            <p>开始：</p>
+                            <input type="text" id="dateSta" name="dateSta" data-type="date" data-format="yyyy-MM-dd"/>
+                        </li>
+                        <li>
+                        	<p>结束：</p>
+                            <input type="text" id="dateEnd" name="dateEnd" data-type="date" data-format="yyyy-MM-dd"/>
+                        </li>
+                        <li>
+                           	<p>组织机构：</p>
+                           	<input id="orgType" name="orgType" hidden="hidden"/>
+                           	<input id="orgId" name="orgId" hidden="hidden"/>
+                            <div class="col-sm-10" style="width:auto;">
+                            	<div id="orgs_div" class="tree-select">
+                            		<div style="line-height: 34px;"><i class="fa fa-spinner fa-spin"></i>正在初始化</div>
+                            	</div>
+                            </div>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()">
+                            	<i class="fa fa-search"></i>&nbsp;查询</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()">
+                            	<i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-warning" onclick="exportData()" shiro:hasPermission="report:his:export">
+                <i class="fa fa-download"></i> 导出
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped table-bordered table-groupheader">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="admin/include :: common"/>
+<th:block th:include="admin/include :: table"/>
+<th:block th:include="admin/include :: custom-plugins" />
+<script type="text/javascript">
+// 得到当前时间
+var dateNow = getCurDate("yyyy-MM-dd");
+// laydate 时间控件绑定
+layui.use("laydate", function () {
+    var laydate = layui.laydate;
+    var startDate = laydate.render({
+        elem: "#dateSta",
+        max: $("#dateEnd").val(),
+        theme: "molv",
+        trigger: "click",
+        done: function (value, date) {
+            // 结束时间大于开始时间
+            if (value !== "") {
+                endDate.config.min.year = date.year;
+                endDate.config.min.month = date.month - 1;
+                endDate.config.min.date = date.date;
+            } else {
+                endDate.config.min.year = "";
+                endDate.config.min.month = "";
+                endDate.config.min.date = "";
+            }
+        }
+    });
+    var endDate = laydate.render({
+        elem: "#dateEnd",
+        min: $("#dateSta").val(),
+        max: dateNow,
+        theme: "molv",
+        trigger: "click",
+        done: function (value, date) {
+            // 开始时间小于结束时间
+            if (value !== "") {
+                startDate.config.max.year = date.year;
+                startDate.config.max.month = date.month - 1;
+                startDate.config.max.date = date.date;
+            } else {
+                startDate.config.max.year = "";
+                startDate.config.max.month = "";
+                startDate.config.max.date = "";
+            }
+        }
+    });
+});
+</script>
+<script th:inline="javascript">
+$(function () {
+	var orgId = [[${orgId}]];
+	if (orgId == "1") {
+		loadOrgTree(0);
+	} else {
+		loadOrgTree("MARK" + orgId);
+	}
+});
+function loadOrgTree(pId) {
+    var params = {
+        url: ctx + "admin/system/org/treeListArea",
+        data: {
+            parentId: pId,
+            validStatus: 1
+        },
+        objId: 'orgs_div',
+        checkBox: false,
+        lastNodeShowCheckBox: true,
+        openLevel: 1,
+        valueId: 'orgIds',
+        textId: 'orgNames',
+        value_filed: 'orgId',
+        text_filed: 'orgName',
+        placeholder: '请选择所属机构',
+        required: 'required',
+        callback: function (values) {
+            if ($.common.isNotEmpty(values)) {
+                $.ajax({
+                    type: "get",
+                    url: ctx + "admin/system/org/get/" + values,
+                    dataType: 'json',
+                    data: {},
+                    success: function (r) {
+                        if (r.code == 0) {
+                            $("#orgType").val(r.data.orgType);
+                            $("#orgId").val(r.data.orgId);
+                        } else {
+                            $.modal.msgWarning(r.msg);
+                        }
+                    }
+                });
+            }
+        }
+    };
+    selectTree(params);
+}
+</script>
+<script th:inline="javascript">
+// 导出功能--------------------------------------------------------------------------------------------------------------
+function exportData() {
+	var dateSta = $("#dateSta").val();
+	var dateEnd = $("#dateEnd").val();
+	var orgType = $("#orgType").val();
+	var orgId = $("#orgId").val();
+	
+	if (dateSta == null || dateSta == undefined || dateSta == "") {
+		$.modal.alertWarning("请选择开始时间！");
+		return;
+	}
+	
+	if (dateEnd == null || dateEnd == undefined || dateEnd == "") {
+		$.modal.alertWarning("请选择结束时间！");
+		return;
+	}
+
+	if (orgId == null || orgId == undefined || orgId == "") {
+		$.modal.alertWarning("请选择组织结构！");
+		return;
+	}
+	
+	$.modal.loading("正在导出数据，请稍后...");
+    $.post("/admin/his/exportStatisticsReport", {
+    	"dateSta": dateSta,
+    	"dateEnd": dateEnd,
+    	"orgType": orgType,
+    	"orgId": orgId
+    }, function (result) {
+        if (result.code == web_status.SUCCESS) {
+            window.location.href = ctx + "common/download?fileName=" + encodeURI(result.msg) + "&delete=" + true;
+        } else if (result.code == web_status.WARNING) {
+            $.modal.alertWarning(result.msg);
+        } else {
+            $.modal.alertError(result.msg);
+        }
+        $.modal.closeLoading();
+    });
+}
+</script>
+<script type="text/javascript">
+// 查询功能--------------------------------------------------------------------------------------------------------------
+$(function () {
+    var options = {
+        url: "/admin/his/searchStatisticsReport",
+        modalName: "当日用药信息",
+        rememberSelected: true,
+        uniqueId: "id",
+        pagination: false, // 不分页
+        columns: [
+            [{
+                    field: 'reportDate',
+                    title: '序号',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 3,
+                    formatter: function (value, row, index) {
+                        return index + 1;
+                    }
+                }, {
+                    field: 'orgName',
+                    title: '区域/项目公司名称',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 3
+                }, {
+                    field: 'iDays',
+                    title: '达标排放',
+                    align: 'center',
+                    colspan: 3
+                }, {
+                    field: 'today',
+                    title: '污水处理量',
+                    align: 'center',
+                    colspan: 4
+                }, {
+                    field: 'today',
+                    title: '收费情况',
+                    align: 'center',
+                    colspan: 3
+                }, {
+                    field: 'today',
+                    title: '用电量',
+                    align: 'center',
+                    colspan: 3
+                }, {
+                    field: 'today',
+                    title: '产泥量',
+                    align: 'center',
+                    colspan: 3
+                }, {
+                    field: 'today',
+                    title: '水处理药剂',
+                    align: 'center',
+                    colspan: 20
+                }
+            ],
+            [{
+                    field: 'iDays',
+                    title: '累计运行日（天）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'overNorm',
+                    title: '累计超标日（天）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'DBRate',
+                    title: '达标率（%）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'totalOut',
+                    title: '累计处理量（万吨）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'ton',
+                    title: '累计设计处理能力（万吨/日）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'loadRate',
+                    title: '负荷率（%）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'pjclnl',
+                    title: '平均处理能力（万吨/日）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'should',
+                    title: '累计应收水费（万元）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'reality',
+                    title: '累计实收取水费（万元）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'HKRate',
+                    title: '回款率（%）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'totalElec',
+                    title: '累计总电量（度）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'totalElecTon',
+                    title: '吨水电耗（度/吨）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'pjdsdh',
+                    title: '平均吨水电耗（度/吨）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'totalMud',
+                    title: '累计产泥量（吨）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'totalDryMud',
+                    title: '累计绝干泥总量（吨）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'wdsjgwnl',
+                    title: '万吨水绝干污泥量（吨/万吨）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'Sa',
+                    title: 'PAM（阳）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'Sa',
+                    title: 'PAM（阴）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'Sa',
+                    title: 'PAC',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'Sa',
+                    title: '石灰',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'Sa',
+                    title: '复核除磷剂',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'Sa',
+                    title: '盐酸（HCL）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'Sa',
+                    title: '氯酸钠（NaCL）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'Sa',
+                    title: '次氯酸钠（NaCLO）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'Sa',
+                    title: '葡萄糖（C6H12O6）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'Sa',
+                    title: '乙酸钠（C2H3O2Na）',
+                    align: 'center',
+                    colspan: 2
+                }
+            ],
+            [{
+                    field: 'totalPAMYang',
+                    title: '累计用量（kg）',
+                    align: 'center'
+                }, {
+                    field: 'tonPAMYang',
+                    title: '吨水单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                    field: 'totalPAMYin',
+                    title: '累计用量（kg）',
+                    align: 'center'
+                }, {
+                    field: 'tonPAMYin',
+                    title: '吨水单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                    field: 'totalPAC',
+                    title: '累计用量（kg）',
+                    align: 'center'
+                }, {
+                    field: 'tonPAC',
+                    title: '吨水单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                    field: 'totalLime',
+                    title: '累计用量（kg）',
+                    align: 'center'
+                }, {
+                    field: 'tonLime',
+                    title: '吨水单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                    field: 'totalPhosphorus',
+                    title: '累计用量（kg）',
+                    align: 'center'
+                }, {
+                    field: 'tonPhosphorus',
+                    title: '吨水单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                    field: 'totalHCL',
+                    title: '累计用量（kg）',
+                    align: 'center'
+                }, {
+                    field: 'tonHCL',
+                    title: '吨水单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                    field: 'totalSC',
+                    title: '累计用量（kg）',
+                    align: 'center'
+                }, {
+                    field: 'tonSC',
+                    title: '吨水单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                    field: 'totalNaCLO',
+                    title: '累计用量（kg）',
+                    align: 'center'
+                }, {
+                    field: 'tonNaCLO',
+                    title: '吨水单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                    field: 'totalGlucose',
+                    title: '累计用量（kg）',
+                    align: 'center'
+                }, {
+                    field: 'tonGlucose',
+                    title: '吨水单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                    field: 'totalSA',
+                    title: '累计用量（kg）',
+                    align: 'center'
+                }, {
+                    field: 'tonSA',
+                    title: '吨水单耗（KG/吨）',
+                    align: 'center'
+                }
+            ]
+        ]
+    };
+    $.table.init(options);
+});
+</script>
+</body>
+</html>

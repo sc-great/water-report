@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.report.mapper.TestTapWaterInfoMapper">
+	<resultMap type="TestTapWaterInfo" id="resultMapping">
+		<result property="id" column="id" />
+		<result property="fillDate" column="fill_date" />
+		<result property="fillTime" column="fill_time" />
+
+		<result property="ntuIn" column="ntu_in" />
+		<result property="ntuOut" column="ntu_out" />
+
+		<result property="colourIn" column="colour_in" />
+		<result property="colourOut" column="colour_out" />
+
+		<result property="cwIn" column="cw_in" />
+		<result property="cwOut" column="cw_out" />
+
+		<result property="eyeIn" column="eye_in" />
+		<result property="eyeOut" column="eye_out" />
+
+		<result property="hyIn" column="hy_in" />
+		<result property="hyOut" column="hy_out" />
+
+		<result property="adanIn" column="adan_in" />
+
+		<result property="xjzsIn" column="xjzs_in" />
+		<result property="xjzsOut" column="xjzs_out" />
+
+		<result property="zdjIn" column="zdj_in" />
+		<result property="zdjOut" column="zdj_out" />
+
+		<result property="nrjIn" column="nrj_in" />
+		<result property="nrjOut" column="nrj_out" />
+
+		<result property="twoOut" column="two_out" />
+
+		<result property="tempIn" column="temp_in" />
+		<result property="tempOut" column="temp_out" />
+
+		<result property="factoryId" column="factory_id" />
+		<result property="areaId" column="area_id" />
+		<result property="fillUserId" column="fill_user_id" />
+		<result property="fillUserName" column="fill_user_name" />
+		<result property="effectIcon" column="effect_icon" />
+	</resultMap>
+
+	<insert id="insert" parameterType="TestTapWaterInfo">
+		<selectKey keyProperty="id" resultType="String"
+			order="BEFORE">
+			select replace(uuid(),'-','') from dual
+		</selectKey>
+		insert into r_test_tap_water_info
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null ">id,</if>
+			fill_date,
+			fill_time,
+			<if test="ntuIn != null ">ntu_in,</if>
+			<if test="ntuOut != null ">ntu_out,</if>
+
+			<if test="colourIn != null ">colour_in,</if>
+			<if test="colourOut != null ">colour_out,</if>
+
+			<if test="cwIn != null ">cw_in,</if>
+			<if test="cwOut != null ">cw_out,</if>
+
+			<if test="eyeIn != null ">eye_in,</if>
+			<if test="eyeOut != null ">eye_out,</if>
+
+			<if test="hyIn != null ">hy_in,</if>
+			<if test="hyOut != null ">hy_out,</if>
+
+			<if test="adanIn != null ">adan_in,</if>
+
+			<if test="xjzsIn != null ">xjzs_in,</if>
+			<if test="xjzsOut != null ">xjzs_out,</if>
+
+			<if test="zdjIn != null ">zdj_in,</if>
+			<if test="zdjOut != null ">zdj_out,</if>
+
+			<if test="nrjIn != null ">nrj_in,</if>
+			<if test="nrjOut != null ">nrj_out,</if>
+
+			<if test="twoOut != null ">two_out,</if>
+
+			<if test="tempIn != null ">temp_in,</if>
+			<if test="tempOut != null ">temp_out,</if>
+
+			<if test="factoryId != null ">factory_id,</if>
+			<if test="areaId != null ">area_id,</if>
+			<if test="fillUserId != null ">fill_user_id,</if>
+			<if test="fillUserName != null ">fill_user_name,</if>
+			effect_icon
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null ">#{id},</if>
+			CURDATE(),
+			NOW(),
+			<if test="ntuIn != null ">#{ntuIn},</if>
+			<if test="ntuOut != null ">#{ntuOut},</if>
+
+			<if test="colourIn != null ">#{colourIn},</if>
+			<if test="colourOut != null ">#{colourOut},</if>
+
+			<if test="cwIn != null ">#{cwIn},</if>
+			<if test="cwOut != null ">#{cwOut},</if>
+
+			<if test="eyeIn != null ">#{eyeIn},</if>
+			<if test="eyeOut != null ">#{eyeOut},</if>
+
+			<if test="hyIn != null ">#{hyIn},</if>
+			<if test="hyOut != null ">#{hyOut},</if>
+
+			<if test="adanIn != null ">#{adanIn},</if>
+
+			<if test="xjzsIn != null ">#{xjzsIn},</if>
+			<if test="xjzsOut != null ">#{xjzsOut},</if>
+
+			<if test="zdjIn != null ">#{zdjIn},</if>
+			<if test="zdjOut != null ">#{zdjOut},</if>
+
+			<if test="nrjIn != null ">#{nrjIn},</if>
+			<if test="nrjOut != null ">#{nrjOut},</if>
+
+			<if test="twoOut != null ">#{twoOut},</if>
+
+			<if test="tempIn != null ">#{tempIn},</if>
+			<if test="tempOut != null ">#{tempOut},</if>
+
+			<if test="factoryId != null ">#{factoryId},</if>
+			<if test="areaId != null ">#{areaId},</if>
+			<if test="fillUserId != null ">#{fillUserId},</if>
+			<if test="fillUserName != null ">#{fillUserName},</if>
+			'1'
+		</trim>
+	</insert>
+
+	<update id="update" parameterType="TestTapWaterInfo">
+		update r_test_tap_water_info
+		<trim prefix="SET" suffixOverrides=",">
+
+			<if test="ntuIn != null ">ntu_in = #{ntuIn},</if>
+			<if test="ntuOut != null ">ntu_out = #{ntuOut},</if>
+
+			<if test="colourIn != null ">colour_in = #{colourIn},</if>
+			<if test="colourOut != null ">colour_out = #{colourOut},</if>
+
+			<if test="cwIn != null ">cw_in = #{cwIn},</if>
+			<if test="cwOut != null ">cw_out = #{cwOut},</if>
+
+			<if test="eyeIn != null ">eye_in = #{eyeIn},</if>
+			<if test="eyeOut != null ">eye_out = #{eyeOut},</if>
+
+			<if test="hyIn != null ">hy_in = #{hyIn},</if>
+			<if test="hyOut != null ">hy_out = #{hyOut},</if>
+
+			<if test="adanIn != null ">adan_in = #{adanIn},</if>
+
+			<if test="xjzsIn != null ">xjzs_in = #{xjzsIn},</if>
+			<if test="xjzsOut != null ">xjzs_out = #{xjzsOut},</if>
+
+			<if test="zdjIn != null ">zdj_in = #{zdjIn},</if>
+			<if test="zdjOut != null ">zdj_out = #{zdjOut},</if>
+
+			<if test="nrjIn != null ">nrj_in = #{nrjIn},</if>
+			<if test="nrjOut != null ">hy_out = #{nrjOut},</if>
+
+			<if test="twoOut != null ">two_out = #{twoOut},</if>
+
+			<if test="tempIn != null ">temp_in = #{tempIn},</if>
+			<if test="tempOut != null ">temp_out = #{tempOut},</if>
+
+			<if test="effectIcon != null ">effect_icon = #{effectIcon},</if>
+		</trim>
+		where id = #{id}
+	</update>
+
+	<sql id="where">
+		<where>
+			<if test="id!=null  and id != ''">
+				and t.id=#{id}
+			</if>
+			<if test="fillDate != null  and fillDate != ''">
+				and t.fill_date = #{fillDate}
+			</if>
+			<if test="factoryId != null  and factoryId != ''">
+				and t.factory_id = #{factoryId}
+			</if>
+			<if test="areaId != null  and areaId != ''">
+				and t.area_id = #{areaId}
+			</if>
+			<if test="fillUserId != null  and fillUserId != ''">
+				and t.fill_user_id = #{fillUserId}
+			</if>
+			<if test="effectIcon != null  and effectIcon != ''">
+				and t.effect_icon = #{effectIcon}
+			</if>
+			<if test="params.ids!=null">
+				and t.id in
+				<foreach collection="params.ids" item="id" open="("
+					separator="," close=")">
+					#{id}
+				</foreach>
+			</if>
+			<if test="params.areaIds != null and params.areaIds != ''">
+                and FIND_IN_SET(t.area_id,'${params.areaIds}')
+            </if>
+			<!-- 数据范围过滤 -->
+			${params.dataScope}
+		</where>
+	</sql>
+
+	<delete id="delete" parameterType="TestTapWaterInfo">
+		delete t from r_test_tap_water_info t
+		<include refid="where" />
+	</delete>
+
+	<select id="getCount" parameterType="TestTapWaterInfo"
+		resultType="int">
+		select count(*) from r_test_tap_water_info t
+		<include refid="where" />
+	</select>
+
+	<sql id="select">
+		select t.* from r_test_tap_water_info t
+	</sql>
+
+	<select id="getEntity" parameterType="TestTapWaterInfo"
+		resultMap="resultMapping">
+		<include refid="select" />
+		<include refid="where" />
+		LIMIT 1
+	</select>
+
+	<select id="getList" parameterType="TestTapWaterInfo"
+		resultMap="resultMapping">
+		<include refid="select" />
+		<include refid="where" />
+		order by t.fill_date desc
+	</select>
+</mapper>

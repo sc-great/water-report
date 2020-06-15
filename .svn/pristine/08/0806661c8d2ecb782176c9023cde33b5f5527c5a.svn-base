@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+<th:block th:include="admin/include :: header('新增水厂污泥数据信息')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content main_rigth">
+        <form class="form-horizontal m" id="form-mudInfo-add">
+            <input id="mudInfo_params" name="params[icon]" th:value="${icon}" type="hidden">
+            <div class="form-group">
+                <label class="col-sm-2 control-label label-left is-required">污泥日产量：</label>
+                <div class="col-sm-9">
+                    <div class="input-group">
+                        <input name="todayMud" class="form-control" placeholder="请输入污泥日产量" required
+                        		type="number" min="0" max="100000" maxLength="6" oninput="autoformart($(this));mudInfo_autoCalculate()"/>
+                        <span class="input-group-addon">吨</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-2 control-label label-left is-required">污泥含水率：</label>
+                <div class="col-sm-9">
+                    <div class="input-group">
+                        <input name="waterIn" id="waterIn" class="form-control" placeholder="请输入污泥含水率" required
+                        		type="number" min="0" max="100" maxLength="5" oninput="autoformart($(this));mudInfo_autoCalculate()"/>
+                        <span class="input-group-addon">%</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-2 control-label label-left">污泥累计量：</label>
+                <div class="col-sm-9">
+                    <div class="input-group">
+                        <input name="totalMud" class="form-control" type="number" readonly/>
+                        <span class="input-group-addon">吨</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-2 control-label label-left">绝干污泥量：</label>
+                <div class="col-sm-9">
+                    <div class="input-group">
+                        <input name="dryMud" class="form-control" value="0" type="number" readonly/>
+                        <span class="input-group-addon">吨</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-2 control-label label-left">绝干污泥累计：</label>
+                <div class="col-sm-9">
+                    <div class="input-group">
+                        <input name="dryMudTotal" class="form-control" value="0" type="number" readonly/>
+                        <span class="input-group-addon">吨</span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="admin/include :: common" />
+    <th:block th:include="admin/include :: form" />
+</body>
+<script th:inline="javascript">
+var form_mudInfo_add_prefix = ctx + "admin/report/mudInfo";
+
+$("#form-mudInfo-add").validate({
+    focusCleanup: true
+});
+
+function submitHandler() {
+    var waterIn_obj = $("#form-mudInfo-add .input-group input[name=\"waterIn\"]");
+    var waterIn = parseInt(waterIn_obj.val());
+    if (waterIn > 100 || waterIn < 0) {
+        if (!waterIn_obj.hasClass("error")) {
+            waterIn_obj.addClass("error");
+        }
+        var tipsMsg = $(this).data("tips");
+        if ($.common.isEmpty(tipsMsg)) {
+            tipsMsg = "请输入正确格式的污泥含水率！";
+        }
+        $.modal.alertWarning(tipsMsg);
+        return;
+    }
+    if ($.validate.form()) {
+        $.operate.save(form_mudInfo_add_prefix + "/doAdd", $('#form-mudInfo-add').serialize());
+    }
+}
+
+// 总量和绝干污泥量的自动计算
+function mudInfo_autoCalculate() {
+    var todayMud_str = $("#form-mudInfo-add .input-group input[name=\"todayMud\"]").val();
+    var waterIn_str = $("#form-mudInfo-add .input-group input[name=\"waterIn\"]").val();
+    if (todayMud_str == undefined || todayMud_str == "")
+        return;
+    if (waterIn_str == undefined || waterIn_str == "")
+        return;
+    var todayMud = parseFloat(todayMud_str);
+    var waterIn = parseFloat(waterIn_str);
+
+    var totalMud_val = (todayMud + totalMud).toFixed(2);
+    $("#form-mudInfo-add .input-group input[name=\"totalMud\"]").val(totalMud_val);
+    var dryMud_val = Math.round(todayMud * (100 - waterIn)) * 0.01;
+    $("#form-mudInfo-add .input-group input[name=\"dryMud\"]").val(dryMud_val.toFixed(2));
+    var dryMudTotal_val = Math.round((dryMud_val + dryMudTotal) * 100) * 0.01;
+    $("#form-mudInfo-add .input-group input[name=\"dryMudTotal\"]").val(dryMudTotal_val.toFixed(2));
+}
+
+var totalMud = 0;
+var dryMudTotal = 0;
+
+// 查询总量
+$.post(form_mudInfo_add_prefix + "/getLatest", function (data) {
+    if (data.data != null && data.data != undefined) {
+        if (data.data.totalMud != null && data.data.totalMud != undefined)
+            totalMud = data.data.totalMud;
+        if (data.data.dryMudTotal != null && data.data.dryMudTotal != undefined)
+            dryMudTotal = data.data.dryMudTotal;
+    }
+    $("#form-mudInfo-add .input-group input[name=\"totalMud\"]").val(totalMud);
+    $("#form-mudInfo-add .input-group input[name=\"dryMudTotal\"]").val(dryMudTotal);
+});
+
+function index_mudInfo_submitHandler() {
+    if ($.validate.formRequired("form-mudInfo-add")) {
+        var waterIn_obj = $("#form-mudInfo-add .input-group input[name=\"waterIn\"]");
+        var waterIn = parseInt(waterIn_obj.val());
+        if (waterIn > 100 || waterIn < 0) {
+            if (!waterIn_obj.hasClass("error")) {
+                waterIn_obj.addClass("error");
+            }
+            var tipsMsg = $(this).data("tips");
+            if ($.common.isEmpty(tipsMsg)) {
+                tipsMsg = "请输入正确格式的污泥含水率！";
+            }
+            $.modal.alertWarning(tipsMsg);
+            return;
+        }
+        $.operate.saveModal(form_mudInfo_add_prefix + "/doAdd", $('#form-mudInfo-add').serialize());
+    }
+}
+
+$.post(form_mudInfo_add_prefix + "/checkIsOver?operateIcon=add", function (data) {
+    if (data.code == web_status.SUCCESS) {
+        $("#mudInfo_params").val("1");
+    } else if (data.code == web_status.FAIL) {
+        $("#mudInfo_params").val("2");
+        // 赋值
+        $("#form-mudInfo-add .input-group input[name=\"todayMud\"]").val(data.data.todayMud);
+        $("#form-mudInfo-add .input-group input[name=\"waterIn\"]").val(data.data.waterIn);
+        $("#form-mudInfo-add .input-group input[name=\"totalMud\"]").val(data.data.totalMud);
+        $("#form-mudInfo-add .input-group input[name=\"dryMud\"]").val(data.data.dryMud);
+        $("#form-mudInfo-add .input-group input[name=\"dryMudTotal\"]").val(data.data.dryMudTotal);
+    }
+});
+
+// input限制
+function autoformart(obj) {
+    var val = obj.val();
+    if (val == null || val == undefined || val == "") {
+        obj.val("");
+        return;
+    }
+    var maxLength = obj.attr("maxLength");
+    var max = obj.attr("max");
+    if (val.length > maxLength) {
+        obj.val(val.slice(0, maxLength)); // 限制长度
+        return;
+    }
+    if (parseFloat(val) > parseFloat(max)) {
+        obj.val(val.slice(0, val.length - 1)); // 限制大小
+        return;
+    }
+    obj.val(parseFloat(val));
+}
+</script>
+</html>

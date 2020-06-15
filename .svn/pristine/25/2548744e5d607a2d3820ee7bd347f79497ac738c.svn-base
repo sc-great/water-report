@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+<th:block th:include="admin/include :: header('水厂当日用药信息填报列表')"/>
+</head>
+<style>
+table {
+    white-space: nowrap;
+}
+</style>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            <p>填报日期：</p>
+                            <input type="text" class="time-input" name="reportDate" data-type="date"
+                                   data-format="yyyy-MM-dd"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-warning" onclick="exportData()" shiro:hasPermission="report:todayInfo:export">
+                <i class="fa fa-download"></i> 导出
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped table-bordered table-groupheader">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="admin/include :: common"/>
+<th:block th:include="admin/include :: table"/>
+<script th:inline="javascript">
+var prefix = ctx + "admin/report/todayInfo";
+
+$(function () {
+    var options = {
+        url: prefix + "/doList",
+        modalName: "当日用药信息",
+        rememberSelected: true,
+        uniqueId: "id",
+        columns: [
+            [{
+                    field: 'state',
+                    checkbox: true,
+                    valign: 'middle',
+                    rowspan: 3
+                }, {
+                    field: 'reportDate',
+                    title: '日期',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 3
+                }, {
+                    field: 'today',
+                    title: '水质',
+                    align: 'center',
+                    colspan: 14
+                }, {
+                    field: 'today',
+                    title: '污泥量',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'today',
+                    title: '电量',
+                    align: 'center',
+                    colspan: 4
+                }, {
+                    field: 'today',
+                    title: '药量',
+                    align: 'center',
+                    colspan: 26
+                }
+            ],
+            [{
+                    field: '',
+                    title: 'COD',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: '',
+                    title: 'NH3-N',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: '',
+                    title: 'SS',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: '',
+                    title: 'PH值',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: '',
+                    title: 'TP',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: '',
+                    title: 'TN',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: '',
+                    title: 'MLSS',
+                    align: 'center'
+                }, {
+                    field: '',
+                    title: 'SV30',
+                    align: 'center'
+                }, {
+                    field: 'total',
+                    title: '累计量（吨）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'Electricity',
+                    title: '水厂电耗（KWH）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'pumpEletricity',
+                    title: '泵站电耗（KWH）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'Pac',
+                    title: 'PAC（KG）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'PamYin',
+                    title: 'PAM阴离子（KG）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'PamYang',
+                    title: 'PAM阳离子（KG）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'Lime',
+                    title: '石灰（KG）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'Phosphorus',
+                    title: '复核除磷剂（KG）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'HCL',
+                    title: '氯化氢（KG）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'Sc',
+                    title: '氯酸钠（KG）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'Naclo',
+                    title: 'NaCLO（KG）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'Glucose',
+                    title: '葡萄糖（KG）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'Sa',
+                    title: '乙酸钠（KG）',
+                    align: 'center',
+                    colspan: 2
+                }
+            ],
+            [{
+                    field: 'COD_in',
+                    title: '进水',
+                    align: 'center'
+                }, {
+                    field: 'COD_out',
+                    title: '出水',
+                    align: 'center'
+                }, {
+                    field: 'NH3_N_in',
+                    title: '进水',
+                    align: 'center'
+                }, {
+                    field: 'NH3_N_out',
+                    title: '出水',
+                    align: 'center'
+                }, {
+                    field: 'SS_in',
+                    title: '进水',
+                    align: 'center'
+                }, {
+                    field: 'SS_out',
+                    title: '出水',
+                    align: 'center'
+                }, {
+                    field: 'PH_in',
+                    title: '进水',
+                    align: 'center'
+                }, {
+                    field: 'PH_out',
+                    title: '出水',
+                    align: 'center'
+                }, {
+                    field: 'TP_in',
+                    title: '进水',
+                    align: 'center'
+                }, {
+                    field: 'TP_out',
+                    title: '出水',
+                    align: 'center'
+                }, {
+                    field: 'TN_in',
+                    title: '进水',
+                    align: 'center'
+                }, {
+                    field: 'TN_out',
+                    title: '出水',
+                    align: 'center'
+                }, {
+                    field: 'MLSS_in',
+                    title: '进水',
+                    align: 'center'
+                }, {
+                    field: 'SV30_in',
+                    title: '进水',
+                    align: 'center'
+                }, {
+                    field: 'today_mud',
+                    title: '当日',
+                    align: 'center'
+                }, {
+                    field: 'total_mud',
+                    title: '累计',
+                    align: 'center'
+                }, {
+                    field: 'todayElectricity',
+                    title: '当日',
+                    align: 'center'
+                }, {
+                    field: 'totalElectricity',
+                    title: '累计',
+                    align: 'center'
+                }, {
+                    field: 'pumpTodayEletricity',
+                    title: '当日',
+                    align: 'center'
+                }, {
+                    field: 'pumpTotalEletricity',
+                    title: '累计',
+                    align: 'center'
+                }, {
+                    field: 'todayPac',
+                    title: '当日',
+                    align: 'center'
+                }, {
+                    field: 'totalPac',
+                    title: '累计',
+                    align: 'center'
+                }, {
+                    field: 'todayPamYin',
+                    title: '当日',
+                    align: 'center'
+                }, {
+                    field: 'totalPamYin',
+                    title: '累计',
+                    align: 'center'
+                }, {
+                    field: 'todayPamYang',
+                    title: '当日',
+                    align: 'center'
+                }, {
+                    field: 'totalPamYang',
+                    title: '累计',
+                    align: 'center'
+                }, {
+                    field: 'todayLime',
+                    title: '当日',
+                    align: 'center'
+                }, {
+                    field: 'totalLime',
+                    title: '累计',
+                    align: 'center'
+                }, {
+                    field: 'todayPhosphorus',
+                    title: '当日',
+                    align: 'center'
+                }, {
+                    field: 'totalPhosphorus',
+                    title: '累计',
+                    align: 'center'
+                }, {
+                    field: 'todayHCL',
+                    title: '当日',
+                    align: 'center'
+                }, {
+                    field: 'totalHCL',
+                    title: '累计',
+                    align: 'center'
+                }, {
+                    field: 'todaySc',
+                    title: '当日',
+                    align: 'center'
+                }, {
+                    field: 'totalSc',
+                    title: '累计',
+                    align: 'center'
+                }, {
+                    field: 'todayNaclo',
+                    title: '当日',
+                    align: 'center'
+                }, {
+                    field: 'totalNaclo',
+                    title: '累计',
+                    align: 'center'
+                }, {
+                    field: 'todayGlucose',
+                    title: '当日',
+                    align: 'center'
+                }, {
+                    field: 'totalGlucose',
+                    title: '累计',
+                    align: 'center'
+                }, {
+                    field: 'todaySa',
+                    title: '当日',
+                    align: 'center'
+                }, {
+                    field: 'totalSa',
+                    title: '累计',
+                    align: 'center'
+                }
+            ]
+        ]
+    };
+    $.table.init(options);
+});
+
+// 导出质数据信息
+function exportData() {
+    var config = {
+        url: prefix + "/checkIsOver",
+        type: "get",
+        dataType: "json",
+        data: {
+            operateIcon: "export"
+        },
+        beforeSend: function () {
+            $.modal.loading("正在处理中，请稍后...");
+            $.modal.disable();
+        },
+        success: function (result) {
+            $.modal.closeLoading();
+            $.modal.enable();
+            if (result.code == web_status.SUCCESS) {
+                $.modal.confirm("确定导出水量/电耗/药耗数据信息吗？", function () {
+                    //获取已勾选的数据信息
+                    var rows = $.table.selectColumns("id");
+                    if (rows.length == 0) {
+                        $.modal.confirm("未选中任何数据，是否导出所有数据？", function () {
+                            postData({
+                                ids: ""
+                            });
+                        });
+                    } else if (rows.length > 0) {
+                        postData({
+                            ids: $.common.join(rows, ",")
+                        });
+                    }
+
+                    function postData(data) {
+                        $.modal.loading("正在导出数据，请稍后...");
+                        $.post(prefix + "/exportWS", data, function (result) {
+                            if (result.code == web_status.SUCCESS) {
+                                window.location.href = ctx + "common/download?fileName=" + encodeURI(result.msg) + "&delete=" + true;
+                            } else if (result.code == web_status.WARNING) {
+                                $.modal.alertWarning(result.msg)
+                            } else {
+                                $.modal.alertError(result.msg);
+                            }
+                            $.modal.closeLoading();
+                        });
+                    }
+                });
+            } else if (result.code == web_status.WARNING) {
+                $.modal.alertWarning(result.msg);
+            }
+        }
+    };
+    $.ajax(config);
+}
+</script>
+</body>
+</html>

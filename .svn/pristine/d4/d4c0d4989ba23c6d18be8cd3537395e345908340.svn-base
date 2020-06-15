@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.materialControl.mapper.ConsumableMapper">
+	<resultMap type="Consumable" id="resultMapping">
+		<result property="id" 				column="id" />
+		<result property="typeId" 			column="type_id" />
+		<result property="total" 			column="total" />
+		<result property="lastSetTime" 		column="last_set_time" />
+		<result property="lastSetNum" 		column="last_set_num" />
+		<result property="lastSetUserId" 	column="last_set_user_id" />
+		<result property="lastSetUserName" 	column="last_set_user_name" />
+		<result property="lastGetTime" 		column="last_get_time" />
+		<result property="lastGetNum" 		column="last_get_num" />
+		<result property="lastGetUserId" 	column="last_get_user_id" />
+		<result property="lastGetUserName" 	column="last_get_user_name" />
+		<result property="areaId" 			column="area_id" />
+		<result property="factoryId" 		column="factory_id" />
+		<result property="effectIcon" 		column="effect_icon" />
+		<result property="fillDate" 		column="fill_date" />
+		<result property="updateTime" 		column="update_time" />
+		<result property="updateUserId" 	column="update_user_id" />
+		<result property="updateBy" 		column="update_by" />
+	</resultMap>
+
+	<sql id="select">
+		SELECT
+			t.*,
+			m.t_name AS NAME,
+			m.t_model model,
+			m.t_unit AS unit,
+			( SELECT o.org_name FROM sys_org o WHERE o.org_id = t.factory_id ) AS factoryName 
+		FROM
+			m_consumable t,
+			m_consumable_type m
+	</sql>
+
+	<sql id="where">
+		<where>
+			m.id = t.type_id
+			<if test="id != null and id != ''">
+				and t.id = #{id}
+			</if>
+			<if test="typeId != null and typeId != ''">
+				and t.type_id = #{typeId}
+			</if>
+			<if test="fillDate != null and fillDate != ''">
+				and t.fill_date = #{fillDate}
+			</if>
+			<if test="areaId != null and areaId != ''">
+				and t.area_id = #{areaId}
+			</if>
+			<if test="factoryId != null and factoryId != ''">
+				and t.factory_id = #{factoryId}
+			</if>
+			<if test="effectIcon != null and effectIcon != ''">
+				and t.effect_icon = #{effectIcon}
+			</if>
+			<if test="params.ids != null">
+				and t.id in
+				<foreach collection="params.ids" item="id" open="(" separator="," close=")">
+					#{id}
+				</foreach>
+			</if>
+			<if test="params.factoryIds != null and params.factoryIds != ''">
+				and FIND_IN_SET(t.factory_id,'${params.factoryIds}')
+			</if>
+			<if test="params.companyId != null and params.companyId != ''">
+				and t.factory_id IN( 
+					SELECT org_id FROM sys_org WHERE parent_id='${params.companyId}' AND org_type='3'
+				)
+			</if>
+			<if test="params.areaIds != null  and params.areaIds != ''">
+				and FIND_IN_SET(t.area_id, '${params.areaIds}')
+			</if>
+			<!-- 数据范围过滤 -->
+			${params.dataScope}
+		</where>
+	</sql>
+
+	<select id="getList" parameterType="Consumable" resultMap="resultMapping">
+		<include refid="select" />
+		<include refid="where" />
+		order by t.update_time desc
+	</select>
+
+	<insert id="insert" parameterType="Consumable">
+		<selectKey keyProperty="id" resultType="String" order="BEFORE">
+			select replace(uuid(),'-','') from dual
+		</selectKey>
+		insert into m_consumable
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null ">id,</if>
+			<if test="typeId != null ">type_id,</if>
+			<if test="total != null ">total,</if>
+			<if test="lastSetTime != null ">last_set_time,</if>
+			<if test="lastSetNum != null ">last_set_num,</if>
+			<if test="lastSetUserId != null ">last_set_user_id,</if>
+			<if test="lastSetUserName != null ">last_set_user_name,</if>
+			<if test="lastGetTime != null ">last_get_time,</if>
+			<if test="lastGetNum != null ">last_get_num,</if>
+			<if test="lastGetUserId != null ">last_get_user_id,</if>
+			<if test="lastGetUserName != null ">last_get_user_name,</if>
+			<if test="areaId != null ">area_id,</if>
+			<if test="factoryId != null ">factory_id,</if>
+			<if test="updateTime != null ">update_time,</if>
+			<if test="updateUserId != null ">update_user_id,</if>
+			<if test="updateBy != null ">update_by,</if>
+			fill_date,
+			effect_icon
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null ">#{id},</if>
+			<if test="typeId != null ">#{typeId},</if>
+			<if test="total != null ">#{total},</if>
+			<if test="lastSetTime != null ">#{lastSetTime},</if>
+			<if test="lastSetNum != null ">#{lastSetNum},</if>
+			<if test="lastSetUserId != null ">#{lastSetUserId},</if>
+			<if test="lastSetUserName != null ">#{lastSetUserName},</if>
+			<if test="lastGetTime != null ">#{lastGetTime},</if>
+			<if test="lastGetNum != null ">#{lastGetNum},</if>
+			<if test="lastGetUserId != null ">#{lastGetUserId},</if>
+			<if test="lastGetUserName != null ">#{lastGetUserName},</if>
+			<if test="areaId != null ">#{areaId},</if>
+			<if test="factoryId != null ">#{factoryId},</if>
+			<if test="updateTime != null ">#{updateTime},</if>
+			<if test="updateUserId != null ">#{updateUserId},</if>
+			<if test="updateBy != null ">#{updateBy},</if>
+			CURDATE(),
+			'1'
+		</trim>
+	</insert>
+
+	<select id="getEntity" parameterType="Consumable" resultMap="resultMapping">
+		<include refid="select" />
+		<include refid="where" />
+		order by t.update_time desc LIMIT 1
+	</select>
+
+	<update id="update" parameterType="Consumable">
+		update m_consumable
+		<trim prefix="SET" suffixOverrides=",">
+			<if test="total != null ">total = #{total},</if>
+			<if test="lastSetNum != null ">last_set_num = #{lastSetNum},</if>
+			<if test="lastGetNum != null ">last_get_num = #{lastGetNum},</if>
+			<if test="updateTime != null ">update_time = #{updateTime},</if>
+			<if test="updateUserId != null ">update_user_id = #{updateUserId},</if>
+			<if test="updateBy != null ">update_by = #{updateBy},</if>
+			<if test="effectIcon != null ">effect_icon = #{effectIcon},</if>
+		</trim>
+		where id = #{id}
+	</update>
+
+	<delete id="delete" parameterType="Consumable">
+		delete t from m_consumable t 
+		<where>
+			1 = 1 
+			<if test="params.ids != null">
+				and t.id in
+				<foreach collection="params.ids" item="id" open="(" separator="," close=")">
+					#{id}
+				</foreach>
+			</if>
+			<if test="typeId != null and typeId != ''">
+				and t.type_id = #{typeId}
+			</if>
+		</where>
+	</delete>
+
+	<select id="getSum" parameterType="Consumable" resultType="map">
+		SELECT
+			m.t_name AS name,
+			m.t_model AS model,
+			m.t_unit AS unit,
+			sum( t.total ) AS total 
+		FROM
+			m_consumable t,
+			m_consumable_type m 
+		<where>
+				t.type_id = m.id 
+			<if test="areaId != null and areaId != ''">
+				and t.area_id = #{areaId}
+			</if>
+			<if test="factoryId != null and factoryId != ''">
+				and t.factory_id = #{factoryId}
+			</if>
+				and t.effect_icon = '1' 
+		</where>
+		GROUP BY
+			t.type_id
+	</select>
+</mapper>

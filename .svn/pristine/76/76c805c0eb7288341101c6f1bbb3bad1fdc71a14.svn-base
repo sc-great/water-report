@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中国水环境集团水厂运维数据填报系统</title>
+<link th:href="@{/favicon.ico}" rel="stylesheet" />
+<link th:href="${'/css/bootstrap.min.css?v='+@toolsUtils.version()}" rel="stylesheet" />
+<link th:href="${'/css/font-awesome.min.css?v='+@toolsUtils.version()}" rel="stylesheet" />
+<link th:href="${'/css/main/animate.min.css?v='+@toolsUtils.version()}" rel="stylesheet" />
+<link th:href="${'/css/style.css?v='+@toolsUtils.version()}" rel="stylesheet" />
+<link th:href="${'/css/main/index.css?v='+@toolsUtils.version()}" rel="stylesheet" />
+<script th:src="${'/js/jquery.min.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/ajax/libs/layer/layer.min.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/boot/js/common.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/boot/js/admin.js?v='+@toolsUtils.version()}"></script>
+<script src="../static/ajax/libs/blockUI/jquery.blockUI.js" th:src="${'/ajax/libs/blockUI/jquery.blockUI.js?v='+@toolsUtils.version()}"></script>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+	<div th:remove="tag" th:if="!${isAdmin}">
+		<div class="col-sm-6 col-md-6">
+			<div class="row">
+				<div class="col-sm-12 col-md-12">
+					<div class="ibox float-e-margins">
+						<div class="ibox-title" onClick="panelToObjPage('/admin/report/hrHealthInfo')">
+							<h5>当日值班统计</h5>
+						</div>
+						<div class="ibox-content">
+							<div class="row">
+								<div class="block-list">
+									<div class="item bg-color5">
+										<div class="item-text">
+											<span class="title">到岗</span> <span class="text" th:text="${workerCount+'/'+workerTotal}"></span>
+											<span class="per" th:text="${workerPer}"></span>
+										</div>
+									</div>
+									<div class="item bg-color7">
+										<div class="item-text">
+											<span class="title">现场/远程</span>
+											<span class="text" th:text="${sceneWorkerCount+'/'+onlineWorkerCount}"></span>
+										</div>
+									</div>
+									<div class="clear-float"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-12 col-md-12">
+					<div class="ibox float-e-margins">
+						<div class="ibox-title" onClick="panelToObjPage('/admin/report/todayWaterYieldInfo')">
+							<h5>水量数据</h5>
+						</div>
+						<div class="ibox-content">
+							<div class="row" th:if="${isWaterNormal}" th:object="${todayWaterYieldInfo}" id="waterYieldInfo">
+								<div class="block-list wodestyle">
+									<div class="item item-line-2 bg-color5">
+										<div class="item-text">
+											<span class="title">当日水量（进水）</span>
+											<span class="text" th:data="*{todayIn}" th:text="*{todayIn + '吨'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">当日水量（出水）</span>
+											<span class="text" th:data="*{todayOut}" th:text="*{todayOut + '吨'}"></span>
+										</div>
+									</div>
+									<div class="item item-line-2 bg-color7">
+										<div class="item-text">
+											<span class="title">累计水量（进水）</span>
+											<span class="text" th:data="*{totalIn}" th:text="*{totalIn + '万吨'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">累计水量（出水）</span>
+											<span class="text" th:data="*{totalOut}" th:text="*{totalOut + '万吨'}"></span>
+										</div>
+									</div>
+									<div class="clear-float"></div>
+								</div>
+							</div>
+							<div class="row" th:if="!${isWaterNormal}">
+								<div class="block-list wodestyle">
+									<div class="item item-line-2 bg-color5">
+										<div class="item-text">
+											<span class="title">当日水量（进水）</span>
+											<span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">当日水量（出水）</span>
+											<span class="text">/</span>
+										</div>
+									</div>
+									<div class="item item-line-2 bg-color7">
+										<div class="item-text">
+											<span class="title">累计水量（进水）</span>
+											<span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">累计水量（出水）</span>
+											<span class="text">/</span>
+										</div>
+									</div>
+									<div class="clear-float"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-12 col-md-12">
+					<div class="ibox float-e-margins">
+						<div class="ibox-title" onClick="panelToObjPage('/admin/report/todayElectricityInfo')">
+							<h5>电耗数据</h5>
+						</div>
+						<div class="ibox-content">
+							<div class="row" th:if="${isElectricNormal}" th:object="${todayElectricityInfo}" id="electricityInfo">
+								<div class="block-list wodestyle">
+									<div class="item item-line-2 bg-color5">
+										<div class="item-text">
+											<span class="title">电耗（当日）</span>
+											<span class="text" th:data="*{todayElectricity}" th:text="*{todayElectricity + '度'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">电耗（累计）</span>
+											<span class="text" th:data="*{totalElectricity}" th:text="*{totalElectricity + '度'}"></span>
+										</div>
+									</div>
+									<div class="item item-line-2 bg-color7">
+										<div class="item-text">
+											<span class="title">泵站电耗（当日）</span>
+											<span class="text" th:data="*{pumpTodayEletricity}" th:text="*{pumpTodayEletricity + '度'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">泵站电耗（累计）</span>
+											<span class="text" th:data="*{pumpTotalEletricity}" th:text="*{pumpTotalEletricity + '度'}"></span>
+										</div>
+									</div>
+									<div class="clear-float"></div>
+								</div>
+							</div>
+							<div class="row" th:if="!${isElectricNormal}">
+								<div class="block-list wodestyle">
+									<div class="item item-line-2 bg-color5">
+										<div class="item-text">
+											<span class="title">电耗（当日）</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">电耗（累计）</span> <span class="text">/</span>
+										</div>
+									</div>
+									<div class="item item-line-2 bg-color7">
+										<div class="item-text">
+											<span class="title">泵站电耗（当日）</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">泵站电耗（累计）</span> <span class="text">/</span>
+										</div>
+									</div>
+									<div class="clear-float"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row" th:if="${shiBuShiShuiChangLingDao}">
+				<div class="col-sm-12 col-md-12">
+					<div class="ibox float-e-margins" th:if="${factoryType} == '1'">
+						<div class="ibox-title" onClick="panelToObjPage('/admin/report/badWaterQualityInfo')">
+							<h5>水质数据</h5>
+						</div>
+						<div class="ibox-content">
+							<div class="row" th:if="${isBadWaterNormal}" th:object="${badWaterQualityInfo}">
+								<div class="block-list wodestyle">
+									<div class="item item-line-2 bg-color5" style="height:auto;">
+										<div class="item-text">
+											<span class="title">COD进水</span>
+											<span class="text" th:text="*{codIn + 'Mg/L'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">NH3-N进水</span>
+											<span class="text" th:text="*{nh3NIn + 'Mg/L'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">SS进水</span>
+											<span class="text" th:text="*{ssIn + 'Mg/L'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">PH值进水</span>
+											<span class="text" th:text="*{phIn}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">TP进水</span>
+											<span class="text" th:text="*{tpIn + 'Mg/L'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">TN进水</span>
+											<span class="text" th:text="*{tnIn + 'Mg/L'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">MLSS</span>
+											<span class="text" th:text="*{mlssIn + 'Mg/L'}"></span>
+										</div>
+									</div>
+									<div class="item item-line-2 bg-color7" style="height:auto;">
+										<div class="item-text">
+											<span class="title">COD出水</span>
+											<span class="text" th:text="*{codOut + 'Mg/L'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">NH3-N出水</span>
+											<span class="text" th:text="*{nh3NOut + 'Mg/L'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">SS出水</span>
+											<span class="text" th:text="*{ssOut + 'Mg/L'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">PH值出水</span>
+											<span class="text" th:text="*{phOut}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">TP出水</span>
+											<span class="text" th:text="*{tpOut + 'Mg/L'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">TN出水</span>
+											<span class="text" th:text="*{tnOut + 'Mg/L'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">SV30</span>
+											<span class="text" th:text="*{sv30In + '%'}"></span>
+										</div>
+									</div>
+									<div class="clear-float"></div>
+								</div>
+							</div>
+							<div class="row" th:if="!${isBadWaterNormal}">
+								<div class="block-list wodestyle">
+									<div class="item item-line-2 bg-color5" style="height:auto;">
+										<div class="item-text">
+											<span class="title">COD进水</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">NH3-N进水</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">SS进水</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">PH值进水</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">TP进水</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">TN进水</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">MLSS</span> <span class="text">/</span>
+										</div>
+									</div>
+									<div class="item item-line-2 bg-color7" style="height:auto;">
+										<div class="item-text">
+											<span class="title">NH3-N出水</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">COD出水</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">SS出水</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">PH值出水</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">TP出水</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">TN出水</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">SV30</span> <span class="text">/</span>
+										</div>
+									</div>
+									<div class="clear-float"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="ibox float-e-margins" th:if="${factoryType} == '2'">
+						<div class="ibox-title" onClick="panelToObjPage('/admin/report/goodWaterHealthInfo')">
+							<h5>水质数据</h5>
+						</div>
+						<div class="ibox-content">
+							<div class="row" th:if="${isGoodWaterNormal}" th:object="${goodWaterHealthInfo}">
+								<div class="block-list wodestyle">
+									<div class="item item-line-2 bg-color5" style="height:auto;">
+										<div class="item-text">
+											<span class="title">PH值进水</span>
+											<span class="text" th:text="*{phIn}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">PH值出水</span>
+											<span class="text" th:text="*{phOut}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">COL2出水</span>
+											<span class="text" th:text="*{col2Out + 'Mg/L'}"></span>
+										</div>
+									</div>
+									<div class="item item-line-2 bg-color7" style="height:auto;">
+										<div class="item-text">
+											<span class="title">浊度进水</span>
+											<span class="text" th:text="*{ntuIn + 'NTU'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">浊度出水</span>
+											<span class="text" th:text="*{ntuOut + 'NTU'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">出水细菌总数</span>
+											<span class="text" th:text="*{germOut + 'CFU/mL'}"></span>
+										</div>
+									</div>
+									<div class="clear-float"></div>
+								</div>
+							</div>
+							<div class="row" th:if="!${isGoodWaterNormal}">
+								<div class="block-list wodestyle">
+									<div class="item item-line-2 bg-color5" style="height:auto;">
+										<div class="item-text">
+											<span class="title">PH值进水</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">PH值出水</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">COL2出水</span> <span class="text">/</span>
+										</div>
+									</div>
+									<div class="item item-line-2 bg-color7" style="height:auto;">
+										<div class="item-text">
+											<span class="title">浊度进水</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">浊度出水</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">出水细菌总数</span> <span class="text">/</span>
+										</div>
+									</div>
+									<div class="clear-float"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-6 col-md-6">
+			<div class="row">
+				<div class="col-sm-12 col-md-12">
+					<div class="ibox float-e-margins">
+						<div class="ibox-title" onClick="panelToObjPage('/admin/report/TodayMedicineInfo')">
+							<h5>药耗数据</h5>
+						</div>
+						<div class="ibox-content">
+							<div class="row" th:if="${isMedicineNormal}" th:object="${todayMedicineInfo}" id="medicineInfo">
+								<div class="block-list wodestyle">
+									<div class="item item-line-2 bg-color5" style="height:auto;">
+										<div class="item-text">
+											<span class="title">当日：</span>
+										</div>
+										<div class="item-text">
+											<span class="title">PAC</span>
+											<span class="text" th:data="*{todayPac}" th:text="*{todayPac + 'KG'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">PAM阴离子</span>
+											<span class="text" th:data="*{todayPamYin}" th:text="*{todayPamYin + 'KG'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">PAM阳离子</span>
+											<span class="text" th:data="*{todayPamYang}" th:text="*{todayPamYang + 'KG'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">石灰</span>
+											<span class="text" th:data="*{todayLime}" th:text="*{todayLime + 'KG'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">复核除磷剂</span>
+											<span class="text" th:data="*{todayPhosphorus}" th:text="*{todayPhosphorus + 'KG'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">氯化氢</span>
+											<span class="text" th:data="*{todayHCL}" th:text="*{todayHCL + 'KG'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">氯酸钠</span>
+											<span class="text" th:data="*{todaySc}" th:text="*{todaySc + 'KG'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">NaCLO</span>
+											<span class="text" th:data="*{todayNaclo}" th:text="*{todayNaclo + 'KG'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">葡萄糖</span>
+											<span class="text" th:data="*{todayGlucose}" th:text="*{todayGlucose + 'KG'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">乙酸钠</span>
+											<span class="text" th:data="*{todaySa}" th:text="*{todaySa + 'KG'}"></span>
+										</div>
+									</div>
+									<div class="item item-line-2 bg-color7" style="height:auto;">
+										<div class="item-text">
+											<span class="title">累计：</span>
+										</div>
+										<div class="item-text">
+											<span class="title">PAC</span>
+											<span class="text" th:data="*{totalPac}" th:text="*{totalPac + 'KG'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">PAM阴离子</span>
+											<span class="text" th:data="*{totalPamYin}" th:text="*{totalPamYin + 'KG'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">PAM阳离子</span>
+											<span class="text" th:data="*{totalPamYang}" th:text="*{totalPamYang + 'KG'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">石灰</span>
+											<span class="text" th:data="*{totalLime}" th:text="*{totalLime + 'KG'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">复核除磷剂</span>
+											<span class="text" th:data="*{totalPhosphorus}" th:text="*{totalPhosphorus + 'KG'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">氯化氢</span>
+											<span class="text" th:data="*{totalHCL}" th:text="*{totalHCL + 'KG'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">氯酸钠</span>
+											<span class="text" th:data="*{totalSc}" th:text="*{totalSc + 'KG'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">NaCLO</span>
+											<span class="text" th:data="*{totalNaclo}" th:text="*{totalNaclo + 'KG'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">葡萄糖</span>
+											<span class="text" th:data="*{totalGlucose}" th:text="*{totalGlucose + 'KG'}"></span>
+										</div>
+										<div class="item-text">
+											<span class="title">乙酸钠</span>
+											<span class="text" th:data="*{totalSa}" th:text="*{totalSa + 'KG'}"></span>
+										</div>
+									</div>
+									<div class="clear-float"></div>
+								</div>
+							</div>
+							<div class="row" th:if="!${isMedicineNormal}">
+								<div class="block-list wodestyle">
+									<div class="item item-line-2 bg-color5" style="height:auto;">
+										<div class="item-text">
+											<span class="title">当日：</span>
+										</div>
+										<div class="item-text">
+											<span class="title">PAC</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">PAM阴离子</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">PAM阳离子</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">石灰</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">复核除磷剂</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">氯化氢</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">氯酸钠</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">NaCLO</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">葡萄糖</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">乙酸钠</span> <span class="text">/</span>
+										</div>
+									</div>
+									<div class="item item-line-2 bg-color7" style="height:auto;">
+										<div class="item-text">
+											<span class="title">累计：</span>
+										</div>
+										<div class="item-text">
+											<span class="title">PAC</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">PAM阴离子</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">PAM阳离子</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">石灰</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">复核除磷剂</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">氯化氢</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">氯酸钠</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">NaCLO</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">葡萄糖</span> <span class="text">/</span>
+										</div>
+										<div class="item-text">
+											<span class="title">乙酸钠</span> <span class="text">/</span>
+										</div>
+									</div>
+									<div class="clear-float"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row" th:if="${shiBuShiShuiChangLingDao}">
+				<div class="col-sm-12 col-md-12">
+					<div class="ibox float-e-margins">
+						<div class="ibox-title" onClick="panelToObjPage('/admin/materialControl/consumable')">
+							<h5>备品备件</h5>
+						</div>
+						<div class="ibox-content">
+							<div class="row">
+								<div class="block-list">
+									<div class="item item-line-2 bg-color5" style="height:auto;width:94%;">
+										<table th:if="${isConsumableNormal}" class="table">
+											<thead><tr><td>名称</td><td>库存</td><td>动态</td></tr></thead>
+											<tbody th:each="consumable, consumableStat : ${consumableList}">
+												<tr>
+													<td th:text="${consumable.name}"></td>
+													<td th:text="${consumable.total}"></td>
+													<td th:text="${consumable.info}"></td>
+												</tr>
+											</tbody>
+										</table>
+										<p th:if="!${isConsumableNormal}">暂无备品备件</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row" th:if="${shiBuShiShuiChangLingDao}">
+				<div class="col-sm-12 col-md-12">
+					<div class="ibox float-e-margins">
+						<div class="ibox-title" onClick="panelToObjPage('/admin/materialControl/mandatoryCheckInfo')">
+							<h5>强制检测</h5>
+						</div>
+						<div class="ibox-content">
+							<div class="row">
+								<div class="block-list">
+									<div class="item item-line-2 bg-color5" style="height:auto;width:94%;">
+										<table th:if="${isMandatoryCheckNormal}" class="table">
+											<thead><tr><td>项目</td><td>内容</td><td>下次检测时间</td></tr></thead>
+											<tbody th:each="mandatory, mandatoryStat : ${mandatoryCheckInfoList}">
+												<tr>
+													<td th:text="${mandatory.checkProject}"></td>
+													<td th:text="${mandatory.checkInfo}"></td>
+													<td th:text="${mandatory.nextCheckDate}"></td>
+												</tr>
+											</tbody>
+										</table>
+										<p th:if="!${isMandatoryCheckNormal}">暂无检测信息</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="clear-float"></div>
+	</div>
+	<div th:remove="tag" th:if="${isAdmin}">
+		<div style="line-height: 94vh; font-size: 30px; text-align: center">
+			<img th:src="@{/img/logo.png}" alt="logo" style="width: 60px; height: 60px;">
+			<span>中国水环境集团水厂运维数据填报系统</span>
+		</div>
+	</div>
+</div>
+<style>
+.table {
+	font-size: 14px;
+}
+.ibox-title {
+	cursor: pointer;
+}
+.wodestyle .item-text .title {
+	float: left;
+}
+.wodestyle .item-text .text {
+	float: right;
+}
+</style>
+<script type="text/javascript">
+// 药量信息，单位自适应
+$(function() {
+	var obj = $("#medicineInfo span.text");
+	for (var i = 0; i < obj.length; i ++) {
+		var html = "";
+		var unit = "KG";
+		var data = $(obj[i]).attr("data");
+		try {
+			data = parseFloat(data);
+		} catch (e) {
+			continue;
+		}
+		if (data > 999999999999999) { // 转科学计数法，单位吨
+			unit = "吨";
+			$(obj[i]).html(data.toExponential(2) + unit);
+			continue;
+		}
+		if (data > 99999999999) { // 转亿吨
+			unit = "亿吨";
+			data = data / 100000000000;
+			data = Math.round(data * 100) / 100;
+			$(obj[i]).html(data + unit);
+			continue;
+		}
+		if (data > 9999999) { // 转万吨
+			unit = "万吨";
+			data = data / 10000000;
+			data = Math.round(data * 100) / 100;
+			$(obj[i]).html(data + unit);
+			continue;
+		}
+		if (data > 999) { // 转吨
+			unit = "吨";
+			data = data / 1000;
+			data = Math.round(data * 100) / 100;
+			$(obj[i]).html(data + unit);
+			continue;
+		}
+	}
+})
+// 电量信息，单位自适应
+$(function() {
+	var obj = $("#electricityInfo span.text");
+	for (var i = 0; i < obj.length; i ++) {
+		var html = "";
+		var unit = "度";
+		var data = $(obj[i]).attr("data");
+		try {
+			data = parseFloat(data);
+		} catch (e) {
+			continue;
+		}
+		if (data > 999999999999) {  // 转科学计数法，单位度
+			$(obj[i]).html(data.toExponential(2) + unit);
+			continue;
+		}
+		if (data > 99999999) { // 转亿度
+			unit = "亿度";
+			data = data / 100000000;
+			data = Math.round(data * 100) / 100;
+			$(obj[i]).html(data + unit);
+			continue;
+		}
+		if (data > 9999) { // 转万度
+			unit = "万度";
+			data = data / 10000;
+			data = Math.round(data * 100) / 100;
+			$(obj[i]).html(data + unit);
+			continue;
+		}
+	}
+})
+// 水量信息（当日），单位自适应
+$(function() {
+	var obj = $("#waterYieldInfo span.text");
+	for (var i = 0; i < obj.length; i ++) {
+		var html = "";
+		var unit = "吨";
+		var data = $(obj[i]).attr("data");
+		try {
+			data = parseFloat(data);
+		} catch (e) {
+			continue;
+		}
+		if (data > 999999999999) { // 转科学计数法，单位吨
+			unit = "吨";
+			$(obj[i]).html(data.toExponential(2) + unit);
+			continue;
+		}
+		if (data > 99999999) { // 转亿吨
+			unit = "亿吨";
+			data = data / 100000000;
+			data = Math.round(data * 100) / 100;
+			$(obj[i]).html(data + unit);
+			continue;
+		}
+		if (data > 9999) { // 转万吨
+			unit = "万吨";
+			data = data / 10000;
+			data = Math.round(data * 100) / 100;
+			$(obj[i]).html(data + unit);
+			continue;
+		}
+	}
+})
+</script>
+<script type="text/javascript">
+// 页面跳转
+function panelToObjPage(dataUrl) {
+	
+	var menuItem = window.parent.$(".menuItem[href='" + dataUrl + "']");
+	var menuName = menuItem.html();
+	var dataIndex = menuItem.attr("data-index");
+	
+    // 获取标识数据
+    var flag = true;
+    window.parent.$(".nav ul li, .nav li").removeClass("selected");
+    
+    window.parent.$("#side-menu li").removeClass("active");
+    window.parent.$("#side-menu li ul").removeClass("in");
+    window.parent.$(".menuItem[href='" + dataUrl + "']").parent("li").parent("ul").parent("li").addClass("active");
+    window.parent.$(".menuItem[href='" + dataUrl + "']").parent("li").parent("ul").addClass("in");
+    window.parent.$(".menuItem[href='" + dataUrl + "']").parent("li").addClass("selected");
+
+    // 选项卡菜单已存在
+    window.parent.$('.menuTab').each(function () {
+        if ($(this).data('id') == dataUrl) {
+            if (!$(this).hasClass('active')) {
+                $(this).addClass('active').siblings('.menuTab').removeClass('active');
+                scrollToTab(this);
+                // 显示tab对应的内容区
+                window.parent.$('.mainContent .RuoYi_iframe').each(function () {
+                    if ($(this).data('id') == dataUrl) {
+                        $(this).attr('src', dataUrl);
+                        $(this).show().siblings('.RuoYi_iframe').hide();
+                        return false;
+                    }
+                });
+            }
+            flag = false;
+        }
+    });
+    // 选项卡菜单不存在
+    if (flag) {
+        var str = '<a href="javascript:;" class="active menuTab" data-id="' + dataUrl + '">' + menuName + ' <i class="fa fa-times-circle"></i></a>';
+        window.parent.$('.menuTab').removeClass('active');
+
+        // 添加选项卡对应的iframe
+        var str1 = '<iframe class="RuoYi_iframe" name="iframe' + dataIndex + '" width="100%" height="100%" src="' + dataUrl + '" frameborder="0" data-id="' + dataUrl + '" seamless></iframe>';
+        window.parent.$('.mainContent').find('iframe.RuoYi_iframe').hide().parents('.mainContent').append(str1);
+
+        $.modal.loading("数据加载中，请稍后...");
+
+        window.parent.$('.mainContent iframe:visible').load(function () {
+            $.modal.closeLoading();
+        });
+
+        // 添加选项卡
+        window.parent.$('.menuTabs .page-tabs-content').append(str);
+        scrollToTab(window.parent.$('.menuTab.active'));
+    }
+}
+// 滚动到指定选项卡
+function scrollToTab(element) {
+    var marginLeftVal = calSumWidth($(element).prevAll()),
+    marginRightVal = calSumWidth($(element).nextAll());
+    // 可视区域非tab宽度
+    var tabOuterWidth = calSumWidth(window.parent.$(".content-tabs").children().not(".menuTabs"));
+    //可视区域tab宽度
+    var visibleWidth = window.parent.$(".content-tabs").outerWidth(true) - tabOuterWidth;
+    //实际滚动宽度
+    var scrollVal = 0;
+    if (window.parent.$(".page-tabs-content").outerWidth() < visibleWidth) {
+        scrollVal = 0;
+    } else if (marginRightVal <= (visibleWidth - $(element).outerWidth(true) - $(element).next().outerWidth(true))) {
+        if ((visibleWidth - $(element).next().outerWidth(true)) > marginRightVal) {
+            scrollVal = marginLeftVal;
+            var tabElement = element;
+            while ((scrollVal - $(tabElement).outerWidth()) > (window.parent.$(".page-tabs-content").outerWidth() - visibleWidth)) {
+                scrollVal -= $(tabElement).prev().outerWidth();
+                tabElement = $(tabElement).prev();
+            }
+        }
+    } else if (marginLeftVal > (visibleWidth - $(element).outerWidth(true) - $(element).prev().outerWidth(true))) {
+        scrollVal = marginLeftVal - $(element).prev().outerWidth(true);
+    }
+    window.parent.$('.page-tabs-content').animate({
+        marginLeft: 0 - scrollVal + 'px'
+    }, "fast");
+}
+// 计算元素集合的总宽度
+function calSumWidth(elements) {
+    var width = 0;
+    $(elements).each(function () {
+        width += $(this).outerWidth(true);
+    });
+    return width;
+}
+</script>
+</body>
+</html>

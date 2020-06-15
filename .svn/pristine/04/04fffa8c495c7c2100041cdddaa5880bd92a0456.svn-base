@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="admin/include :: header('新增组织机构')" />
+</head>
+<body class="white-bg">
+	<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+		<form class="form-horizontal m" id="form-org-add">
+			<input type="hidden" id="parentId" name="parentId" th:value="${parentId}">
+			<div class="form-group">
+				<label class="col-sm-2 control-label">组织机构名称：</label>
+				<div class="col-sm-10">
+					<input class="form-control" type="text" name="orgName" id="orgName" placeholder="请填写组织机构名称！" required>
+					<i class="required-icon">*</i>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">机构类型：</label>
+				<div class="col-sm-10">
+					<div class="radio-box" th:each="dict : ${@dict.getType('sys_org_type')}">
+						<input type="radio" th:id="${dict.dictCode}" name="orgType" th:value="${dict.dictValue}" th:checked="${dict.default}">
+						<label th:for="${dict.dictCode}" th:text="${dict.dictLabel}"></label>
+					</div>
+				</div>
+			</div>
+			<div class="form-group" id="manager_area" style="display: none;">
+				<label class="col-sm-2 control-label">管理区域：</label>
+				<div class="col-sm-10">
+					<div id="areas_div" class="tree-select">
+						<div style="line-height: 34px;"><i class="fa fa-spinner fa-spin"></i>正在初始化</div>
+					</div>
+					<i class="required-icon">*</i>
+				</div>
+			</div>
+			<div style="display: none;" id="area_div">
+				<div class="form-group">
+					<label class="col-sm-2 control-label">所属区域：</label>
+					<div class="col-sm-10">
+						<select name="areaId" class="form-control" required>
+							<option value="">--请选择所属区域--</option>
+							<option th:each="area : ${areaList}" th:value="${area.areaId}" th:text="${area.areaName}"></option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label">水厂类型：</label>
+					<div class="col-sm-10">
+						<div class="radio-box" th:each="dict : ${@dict.getType('sys_factory_type')}">
+							<input type="radio" th:id="${dict.dictCode}" name="factoryType" th:value="${dict.dictValue}" th:checked="${dict.default}">
+							<label th:for="${dict.dictCode}" th:text="${dict.dictLabel}"></label>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">排序序号：</label>
+				<div class="col-sm-10">
+					<input class="form-control" type="number" name="listOrder" placeholder="请填写排序序号！" required>
+					<i class="required-icon">*</i>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">组织机构状态：</label>
+				<div class="col-sm-10">
+				    <div class="radio-box" th:each="dict : ${@dict.getType('valid_status')}">
+						<input type="radio" th:id="${dict.dictCode}" name="validStatus" th:value="${dict.dictValue}" th:checked="${dict.default}">
+						<label th:for="${dict.dictCode}" th:text="${dict.dictLabel}"></label>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<th:block th:include="admin/include :: common" />
+	<th:block th:include="admin/include :: form" />
+	<th:block th:include="admin/include :: custom-plugins" />
+	<script th:inline="javascript">
+		var prefix = ctx + "admin/system/org";
+		$(function(){
+            $("input:radio[name='orgType']").on('ifChecked', function(event){
+                var change_value =  $(this).val();
+                if (change_value == '3') {
+                    $("#manager_area").hide();
+                    $("#area_div").show();
+                }else if(change_value=='2'){
+                    $("#area_div").hide();
+                    $("#manager_area").show();
+                    loadArea();
+                }else {
+                    $("#area_div,#manager_area").hide();
+                }
+            });
+		});
+        //验证规则
+        $("#form-org-add").validate({
+            onkeyup: false,
+            rules:{
+                orgId:{
+                    digits:true,//整数
+                    maxlength:36,
+                    remote: {
+                        url: prefix + "/count",
+                        type: "get",
+                        dataType: "json",
+                        data: {
+                            orgId: function() {
+                                return $.common.trim($("#orgId").val());
+                            }
+                        },
+                        dataFilter: function(data, type) {
+                            var json=eval("("+data+")");
+                            var code=json.code==0?1:0;
+                            return $.validate.unique(code);
+                        }
+                    }
+                },
+                orgName:{
+                    remote: {
+                        url: prefix + "/count",
+                        type: "get",
+                        dataType: "json",
+                        data: {
+                            parentId: function() {
+                                return $("input[name='parentId']").val();
+                            },
+                            orgName: function() {
+                                return $.common.trim($("#orgName").val());
+                            }
+                        },
+                        dataFilter: function(data, type) {
+                            var json=eval("("+data+")");
+                            var code=json.code==0?1:0;
+                            return $.validate.unique(code);
+                        }
+                    }
+                },
+                orgCode:{
+                    remote: {
+                        url: prefix + "/count",
+                        type: "get",
+                        dataType: "json",
+                        data: {
+                            orgCode: function() {
+                                return $.common.trim($("#orgCode").val());
+                            }
+                        },
+                        dataFilter: function(data, type) {
+                            var json=eval("("+data+")");
+                            var code=json.code==0?1:0;
+                            return $.validate.unique(code);
+                        }
+                    }
+                },
+                listOrder:{
+                    digits:true//整数
+                }
+            },
+            messages: {
+                orgId: {
+                    remote: "组织机构ID已经存在"
+                },
+                orgName: {
+                    remote: "该组织机构下已经存在该组织机构名称"
+                },
+                orgCode: {
+                    remote: "组织机构代码已经存在"
+                }
+            },
+            focusCleanup: true
+        });
+        function submitHandler() {
+            if ($.validate.form()) {
+                var field=$('#form-org-add').serializeJSON();
+                if(field["orgType"]=="2"){
+                    field["areaId"]=$("#areaIds").val();
+				}
+                $.operate.save(prefix + "/doAdd",field);
+            }
+        }
+        //加载下拉多选区域
+        function  loadArea(){
+            var params={
+                url:ctx + "admin/system/area/treeList",
+                objId:'areas_div',
+                checkBox:true,
+                lastNodeShowCheckBox:true,
+                openLevel:1,
+                valueId:'areaIds',
+                textId:'areaNames',
+                value_filed: 'areaId',
+                text_filed: 'areaName',
+                placeholder:'请选择管理区域',
+                required:'required'
+            };
+            selectTree(params);
+		}
+	</script>
+</body>
+</html>

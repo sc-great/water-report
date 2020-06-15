@@ -1,0 +1,67 @@
+.bg-color1{
+    background-color: #D391F1;
+}
+.bg-color2{
+    background-color: #988DEC;
+}
+.bg-color3{
+    background-color: #5BD3F2;
+}
+.bg-color4{
+    background-color: #59C6E9;
+}
+.bg-color5{
+    background-color: #F8B734;
+}
+.bg-color6{
+    background-color: #F3980F;
+}
+.bg-color7{
+    background-color: #3AC482;
+}
+.bg-color8{
+    background-color: #00A159;
+}
+
+.ibox-title {
+    padding: 10px 7px;
+}
+.block-list {
+    padding: 0 2%;
+}
+.block-list .item{
+    width: 44%;
+    height: 15vh;
+    float: left;
+    color: #fff;
+    border: 1px solid #efefef;
+    box-sizing: border-box;
+    border-radius: 5px;
+    margin: 3%;
+    min-width: 150px;
+}
+/**/
+.item {
+    position: relative;
+}
+.item .item-text {
+    line-height: 15vh;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.item.item-line-2 {
+    padding: 2.5vh;
+}
+.item.item-line-2 .item-text {
+    line-height: 5vh;
+}
+.item .item-text .title, .item .item-text .text, .item .item-text .per {
+    font-size: 14px;
+    padding:2px;
+}
+.item .item-text .text {
+}
+.item .item-text .per {
+}

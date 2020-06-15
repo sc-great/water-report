@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+<th:block th:include="admin/include :: header('修改当月费用填报')" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-consumable-edit" th:object="${consumable}">
+        <input name="id" th:field="*{id}" type="hidden">
+        <div class="form-group">
+            <label class="col-sm-2 control-label label-left">耗材名称：</label>
+            <div class="col-sm-9">
+                <div class="input-group">
+                    <input name="name" th:value="*{name}" hidden="hidden">
+                    <input class="form-control" th:value="*{name}" readonly style="width:517.6px;cursor:pointer;">
+                </div>
+            </div>
+        </div>
+        <div class="form-group">    
+            <label class="col-sm-2 control-label label-left">耗材总量：</label>
+            <div class="col-sm-9">
+                <div class="input-group">
+                    <input name="total" class="form-control" placeholder="请输入耗材总量" th:value="*{total}"
+                    		type="number" min="0" max="10000000" maxLength="8" oninput="autoformart($(this), true)"/>
+                    <span class="input-group-addon" th:text="*{unit}">PCS</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label label-left">最近入库：</label>
+            <div class="col-sm-9">
+                <div class="input-group">
+                    <input name="lastSetNum" class="form-control" placeholder="请输入最近进账" th:value="*{lastSetNum}"
+                    		type="number" min="0" max="10000000" maxLength="8" oninput="autoformart($(this), true)">
+                    <span class="input-group-addon" th:text="*{unit}">PCS</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">    
+            <label class="col-sm-2 control-label label-left">最近领用：</label>
+            <div class="col-sm-9">
+                <div class="input-group">
+                    <input name="lastGetNum" class="form-control" placeholder="请输入本月结余" th:value="*{lastGetNum}"
+                    		type="number" min="0" max="10000000" maxLength="8" oninput="autoformart($(this), true)"/>
+                    <span class="input-group-addon" th:text="*{unit}">PCS</span>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: form" />
+</body>
+<script th:inline="javascript" th:value="*{name}">
+var prefix = ctx + "admin/materialControl/consumable";
+
+$("#form-consumable-edit").validate({
+    focusCleanup: true
+});
+
+function submitHandler() {
+    if ($.validate.form()) {
+        $.operate.save(prefix + "/doEdit", $('#form-consumable-edit').serialize(), null, "put");
+    }
+}
+
+// input限制
+function autoformart(obj, isInt) {
+    var val = obj.val();
+    if (val == null || val == undefined || val == "") {
+        obj.val("");
+        return;
+    }
+    if (isInt && val.indexOf(".") != -1) { // 整数限制
+    	val = val.slice(0, val.length - 2);
+    }
+    var maxLength = obj.attr("maxLength");
+    var max = obj.attr("max");
+    if (val.length > maxLength) {
+        obj.val(val.slice(0, maxLength)); // 限制长度
+        return;
+    }
+    if (parseFloat(val) > parseFloat(max)) {
+        obj.val(val.slice(0, val.length - 1)); // 限制大小
+        return;
+    }
+    obj.val(parseFloat(val));
+}
+</script>
+</html>

@@ -1,0 +1,167 @@
+package com.boot.report.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import com.boot.common.utils.DateUtils;
+import com.boot.report.domain.ReportDateInfo;
+import com.boot.report.mapper.ReportDateInfoMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.boot.report.mapper.TodayElectricityInfoMapper;
+import com.boot.report.domain.TodayElectricityInfo;
+import com.boot.report.service.ITodayElectricityInfoService;
+import com.boot.common.core.text.Convert;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 水厂当日用电信息Service业务层处理
+ *
+ * @author EPL
+ * @date 2020-03-24
+ */
+@Service
+public class TodayElectricityInfoServiceImpl implements ITodayElectricityInfoService {
+	@Autowired
+	private TodayElectricityInfoMapper todayElectricityInfoMapper;
+	@Autowired
+	private ReportDateInfoMapper reportDateInfoMapper;
+
+	/**
+	 * 新增水厂当日用电信息
+	 *
+	 * @param todayElectricityInfo 水厂当日用电信息
+	 * @return 结果
+	 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public int add(TodayElectricityInfo todayElectricityInfo) {
+		String curDate = DateUtils.getDate();
+		// 若是二次填报，则把第一次填报的信息改为不可用标识
+		TodayElectricityInfo todayElectricityParam = new TodayElectricityInfo();
+		todayElectricityParam.setFactoryId(todayElectricityInfo.getFactoryId());
+		todayElectricityParam.setFillDate(curDate);
+		todayElectricityParam.setEffectIcon("1");
+		TodayElectricityInfo originTodayElectricityInfo = todayElectricityInfoMapper.getEntity(todayElectricityParam);
+		if (originTodayElectricityInfo != null) {
+			originTodayElectricityInfo.setEffectIcon("2");
+			todayElectricityInfoMapper.update(originTodayElectricityInfo);
+		}
+		// 添加新数据
+		int insertRow = todayElectricityInfoMapper.insert(todayElectricityInfo);
+		if (insertRow > 0) {
+			// 若当前水厂还未录入用药/水量/用电数据，则加入记录
+			ReportDateInfo reportDateInfoParam = new ReportDateInfo();
+			reportDateInfoParam.setReportDate(curDate);
+			reportDateInfoParam.setFactoryId(todayElectricityInfo.getFactoryId());
+			int count = reportDateInfoMapper.getCount(reportDateInfoParam);
+			if (count == 0) {
+				reportDateInfoMapper.insert(reportDateInfoParam);
+			}
+		}
+		return insertRow;
+	}
+
+	/**
+	 * 修改水厂当日用电信息
+	 *
+	 * @param todayElectricityInfo 水厂当日用电信息
+	 * @return 结果
+	 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public int update(TodayElectricityInfo todayElectricityInfo) {
+		return todayElectricityInfoMapper.update(todayElectricityInfo);
+	}
+
+	/**
+	 * 删除水厂当日用电信息对象
+	 *
+	 * @param ids 需要删除的数据ID
+	 * @return 结果
+	 */
+	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public int deleteByIds(String ids) {
+		int result = 0;
+		if (!ids.isEmpty()) {
+			TodayElectricityInfo todayElectricityInfo = new TodayElectricityInfo();
+			todayElectricityInfo.getParams().put("ids", Convert.toStrArray(ids));
+			result = todayElectricityInfoMapper.delete(todayElectricityInfo);
+		}
+		return result;
+	}
+
+	/**
+	 * 查询水厂当日用电信息数量
+	 *
+	 * @param todayElectricityInfo 查询条件
+	 * @return 水厂当日用电信息数量
+	 */
+	@Override
+	public int getCount(TodayElectricityInfo todayElectricityInfo) {
+		return todayElectricityInfoMapper.getCount(todayElectricityInfo);
+	}
+
+	/**
+	 * 获取水厂当日用电信息实体对象
+	 *
+	 * @param id 水厂当日用电信息ID
+	 * @return 水厂当日用电信息
+	 */
+	@Override
+	public TodayElectricityInfo getEntityById(String id) {
+		TodayElectricityInfo todayElectricityInfo = new TodayElectricityInfo();
+		todayElectricityInfo.setId(id);
+		return todayElectricityInfoMapper.getEntity(todayElectricityInfo);
+	}
+	
+	@Override
+	public TodayElectricityInfo getEntity(TodayElectricityInfo todayElectricityInfo) {	
+		return todayElectricityInfoMapper.getEntity(todayElectricityInfo);
+	}
+	/**
+	 * 查询水厂当日用电信息列表
+	 *
+	 * @param todayElectricityInfo 水厂当日用电信息
+	 * @return 水厂当日用电信息
+	 */
+	@Override
+	public List<TodayElectricityInfo> getList(TodayElectricityInfo todayElectricityInfo) {
+		return todayElectricityInfoMapper.getList(todayElectricityInfo);
+	}
+
+	@Override
+	public Map<String, Object> getSum(TodayElectricityInfo todayElectricityInfo) {
+		return todayElectricityInfoMapper.getSum(todayElectricityInfo);
+	}
+
+	@Override
+	public Map<String, Object> getSumByApp(TodayElectricityInfo todayElectricityInfo) {
+		return todayElectricityInfoMapper.getSumByApp(todayElectricityInfo);
+	}
+
+	@Override
+	public TodayElectricityInfo getLatest(TodayElectricityInfo todayElectricityInfo) {
+		return todayElectricityInfoMapper.getLatest(todayElectricityInfo);
+	}
+
+	/**
+	 *  手机端电量详情统计分析页面：所 选择日期的以前累计电量
+	 * @return
+	 */
+	@Override
+	public Map<String, Object> getSumByAppBefore(TodayElectricityInfo todayElectricityInfo) {
+		return todayElectricityInfoMapper.getSumByAppBefore(todayElectricityInfo);
+	}
+
+	@Override
+	public Map<String, Object> getTodayForChart(TodayElectricityInfo todayElectricityInfo) {
+		return todayElectricityInfoMapper.getTodayForChart(todayElectricityInfo);
+	}
+
+	@Override
+	public Map<String, Object> getSumForChart(TodayElectricityInfo todayElectricityInfo) {
+		return todayElectricityInfoMapper.getSumForChart(todayElectricityInfo);
+	}
+}

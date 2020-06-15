@@ -1,0 +1,412 @@
+<!doctype html>
+<html class="no-js" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=ideal viewport, initial-scale=1 user-scalable=0"/>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="0"/>
+    <title>污泥填报</title>
+    <link rel="stylesheet" th:href="${'/webapp/css/font-awesome.css?v='+@toolsUtils.version()}">
+    <link rel="stylesheet" th:href="${'/webapp/css/com.css?v='+@toolsUtils.version()}">
+    <link rel="stylesheet" th:href="${'/webapp/css/style.css?v='+@toolsUtils.version()}">
+    <script th:src="${'/webapp/js/jquery.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/pace.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/plugin/layer_mobile/layer.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/common.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/jdate.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/dateUtil.js?v='+@toolsUtils.version()}"></script>
+</head>
+<style>
+#check_date {
+	margin-right: 1vw;
+}
+.title {
+    display: inline-block;
+    line-height: 5vh;
+}
+</style>
+<style>
+.factoryInfo_formBox div p {
+	position: relative;
+}
+label.error {
+	position: absolute;
+	right: 15vw;
+	color: #ef392b;
+	font-size: 12px;
+	top: 0.5vw;
+}
+input.error {
+	background-color: #fbe2e2;
+    border-color: #c66161;
+    color: #c00;
+}
+</style>
+<style>
+.factoryInfo_header {
+    background: #ededed;
+    line-height: 6vh;
+}
+.factoryInfo_header .title {
+    padding-left: 8px;
+    color: #000;
+    font-weight: bold;
+    font-size: 1.6rem;
+}
+.factoryInfo_header .title i {
+    float: left;
+    line-height: 6vh;
+}
+.factoryInfo_header .title span {
+	display: flex;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.factoryInfo_formBox {
+	font-size: 1.5rem;
+}
+.factoryInfo_formBox div {
+	line-height: 6vh;
+	margin-left: 3vh;
+}
+.factoryInfo_formBox div p {
+	display: inline-block;
+	border: 1px #dcdcdc solid;
+	background: #f9f9f9;
+	width: 65%;
+	line-height: 4vh;
+}
+.factoryInfo_formBox div span {
+	display: inline-block;
+	width: 26%;
+}
+input, select {
+	border: 0;
+	outline: none;
+	background-color: rgba(0, 0, 0, 0);
+}
+.factoryInfo_formBox form {
+	margin-top: 3vh;
+}
+.factoryInfo_formBox div p input, .factoryInfo_formBox div p select {
+	width: 56%;
+	line-height: 4vh;
+	padding-left: 0.5vh;
+	width: 98%;
+}
+.factoryInfo_formBox .youDanWei p input {
+	width: 78%;
+}
+.factoryInfo_formBox div p b {
+	margin: 0 1vh;
+	font-style: normal;
+	float: right;
+	font-weight: normal;
+	position: absolute;
+    top: 0;
+    right: 0;
+}
+.factoryInfo_formBox .button_group {
+	width: 80%;
+	margin: 3vh auto;
+	height: 10vh;
+}
+.factoryInfo_formBox .button_group a {
+	display: inline-block;
+    width: 45%;
+    text-align: center;
+    line-height: 4ch;
+    font-size: 1.6rem;
+    margin-top: 2vh;
+}
+.factoryInfo_formBox .button_group .reset {
+	background: #f4f4f4;
+	float: left;
+}
+.factoryInfo_formBox .button_group .submit {
+	background: #1d7bb8;
+    color: #fff;
+    float: right;
+}
+
+.factoryInfo_buttonBox {
+	line-height: 6vh;
+	height: 6vh;
+}
+.factoryInfo_buttonBox div {
+	float: right;
+	width: 24%;
+	text-align: right;
+	height: 6vh;
+}
+.factoryInfo_buttonBox div img {
+	margin: 1.4vh 0 0 1vh;
+	float: left;
+}
+.factoryInfo_buttonBox div span {
+	float: right;
+	padding-right: 3vw;
+}
+.is-required {
+	background: #fff!important;
+}
+table tbody {
+    border-bottom: 1px solid #c1cbd9!important;
+}
+.background {
+	background: #f0f0f0;
+}
+</style>
+<body>
+<div class="main">
+	<input id="orgName" th:value="${orgName}" hidden="hidden">
+	<div class="nav">
+		<div class="go-back" onclick="goBack();"><i class="fa fa-chevron-left"></i></div>
+		<div class="date"><span id="check_date"></span><i class="fa fa-calendar-check-o"></i></div>
+		<div class="title"></div>
+	</div>
+	<div class="factoryInfo_buttonBox font-size-14" hidden="hidden">
+		<div onclick="openFillPanel()"><img th:src="${'/webapp/image/set.png'}" width="18rem" height="18rem"><span>当日填报</span></div>
+	</div>
+	<div class="factoryInfo_formBox" id="factoryInfo_formBox_set">
+		<form id="sludge-form-add">
+			<div>
+				<span>污泥日产量</span>
+				<p class="is-required">
+					<input name="todayMud" type="number" required oninput="autoCountTotal()">
+					<b class="consumable-unit">吨</b>
+				</p>
+			</div>
+			<div>
+				<span>污泥累计量</span>
+				<p>
+					<input name="totalMud" type="number" readonly>
+					<b class="consumable-unit">吨</b>
+				</p>
+			</div>
+			<div>
+				<span>污泥含水率</span>
+				<p class="is-required">
+					<input name="waterIn" type="number" required oninput="autoCountTotal()">
+					<b class="consumable-unit">%</b>
+				</p>
+			</div>
+			<div>
+				<span>绝干污泥量</span>
+				<p>
+					<input name="dryMud" type="number" readonly>
+					<b class="consumable-unit">吨</b>
+				</p>
+			</div>
+			<div>
+				<span>绝干量累计</span>
+				<p>
+					<input name="dryMudTotal" type="number" readonly>
+					<b class="consumable-unit">吨</b>
+				</p>
+			</div>
+		</form>
+		<div class="button_group">
+			<a class="reset" onclick="sludgeReset()">取消</a>
+			<a class="submit" onclick="sludgeSubmit()">提交</a>
+		</div>
+	</div>
+    <div class="content center font-size-14">
+        <table class="cross-color">
+            <thead class="bg-color1 color-3">
+            <tr class="font-size-12">
+                <th width=25%>填报日期</th>
+                <th>在线数据</th>
+                <th>产量</th>
+            </tr>
+            </thead>
+            <tbody id="date_list"></tbody>
+        </table>
+    </div>
+</div>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: form" />
+</body>
+<script th:inline="javascript">
+var dateTime = getCurDate("yyyy-MM-dd");
+$(function () {
+    $(".nav .title").html($("#orgName").val() + " 污泥详情");
+    navControler(dateTime);
+    loadData(dateTime);
+    loadFillPanel();
+});
+// 导航控件
+function navControler(dateTime) {
+    // 日期格式
+    new Jdate({
+        el: '#check_date',
+        format: 'YYYY-MM-DD',
+        beginYear: 2000,
+        endYear: 2100,
+        value: dateTime,
+        confirm: function (date) {
+            loadData(date);
+        }
+    });
+}
+// 加载下面表格里面的数据
+function loadData(date) {
+    $("#date_list").empty();
+    $.post("/app/sludge/sludgeFactoryData", {
+    	date: date
+    }, function (result) {
+        if (result.code != "0")
+            return;
+        var html = "";
+        $.each(result.data, function (index, item) {
+        	html = '<tr>' +
+            '       	<td class="left background" rowspan="5">' + item.fillDate + '</td>' +
+            '       	<td class="color-2">污泥日产量</td>' +
+            '       	<td class="color-1">' + item.todayMud + '</td>' +
+            '       </tr>';
+            html += '<tr>' +
+            '       	<td class="color-2">污泥累计量</td>' +
+            '       	<td class="color-1">' + item.totalMud + '</td>' +
+            '       </tr>';
+            html += '<tr>' +
+            '       	<td class="color-2">污泥含水率</td>' +
+            '       	<td class="color-1">' + item.waterIn + '</td>' +
+            '       </tr>';
+            html += '<tr>' +
+            '       	<td class="color-2">绝干污泥量</td>' +
+            '       	<td class="color-1">' + item.dryMud + '</td>' +
+            '       </tr>';
+            html += '<tr>' +
+            '       	<td class="color-2">绝干量累计</td>' +
+            '       	<td class="color-1">' + item.dryMudTotal + '</td>' +
+            '       </tr>';
+            $("#date_list").append(html);
+        });
+    })
+}
+
+var todayMud_input = $("#sludge-form-add input[name='todayMud']");
+var totalMud_input = $("#sludge-form-add input[name='totalMud']");
+var waterIn_input = $("#sludge-form-add input[name='waterIn']");
+var dryMud_input = $("#sludge-form-add input[name='dryMud']");
+var dryMudTotal_input = $("#sludge-form-add input[name='dryMudTotal']");
+
+var totalMud = 0;
+var dryMudTotal = 0;
+
+// 加载form里面的数据
+function loadFillPanel() {
+	$.post("/app/sludge/getSludgeLatest", function(data) {
+		if (data.code != 0)
+			return;
+		var sludge = data.data;
+		// 判断是否是当天的数据
+		if (timeStamp2String(new Date()) == sludge.fillDate)
+			todayMud_input.val(sludge.todayMud);
+		else 
+			todayMud_input.attr("placeholder", "上次填报 " + sludge.todayMud + " 吨");
+		
+		totalMud = sludge.totalMud;
+		dryMudTotal = sludge.dryMudTotal;
+		
+		totalMud_input.val(totalMud);
+		waterIn_input.val(sludge.waterIn);
+		dryMud_input.val(sludge.dryMud);
+		dryMudTotal_input.val(dryMudTotal);
+	});
+}
+// 取消按钮的操作--重置数据
+function sludgeReset() {
+	$(".factoryInfo_buttonBox").show(100);
+	$(".factoryInfo_formBox").hide(100);
+}
+// 点击当日填报的操作--重置数据
+function openFillPanel() {
+	$(".factoryInfo_buttonBox").hide(100);
+	$(".factoryInfo_formBox").show(100);
+	loadFillPanel();
+}
+// 自动规范input框的格式
+function autoformart(obj, max) {
+	var val = obj.val();
+	if (val == null || val == undefined || val == "")
+		return;
+	val = val.replace(/\-/g, ""); // 不能为负数
+	val = val.length > max ? val.slice(0, max) : val; // 限制长度
+	obj.val(val);
+	return val;
+}
+// 总量和绝干污泥量的自动计算
+function autoCountTotal() {
+	// 当日污泥量
+	autoformart(todayMud_input, 10);
+	var todayMud_str = todayMud_input.val();
+    if (todayMud_str == undefined || todayMud_str == "")
+        return;
+    var todayMud = parseFloat(todayMud_str);
+    // 污泥含水率
+    var waterIn_str = waterIn_input.val();
+    waterIn_str = waterIn_str.replace(/\-/g, ""); // 不能为负数
+    if (waterIn_str.indexOf(".") == -1) {
+    	waterIn_str = waterIn_str.length > 2 ? waterIn_str.slice(0, 2) : waterIn_str; // 限制长度
+    } else {
+    	waterIn_str = waterIn_str.length > 5 ? waterIn_str.slice(0, 5) : waterIn_str; // 限制长度
+    }
+    waterIn_input.val(waterIn_str);
+    if (waterIn_str == undefined || waterIn_str == "")
+        return;
+    var waterIn = parseFloat(waterIn_str);
+    // 含水率的填入控制
+    
+	// 累计污泥量
+    var totalMud_val = doubleAdd(todayMud, totalMud);
+    totalMud_input.val(totalMud_val);
+    // 绝干污泥量
+    var dryMud_val = Math.round(todayMud * (100 - waterIn)) * 0.01;
+    dryMud_input.val(dryMud_val);
+    dryMudTotal_input.val(doubleAdd(dryMud_val, dryMudTotal));
+}
+
+function sludgeSubmit() {
+	if ($.validate.form()) {
+		$.operate.save("/app/sludge/sludgeAdd", $("#sludge-form-add").serialize());
+	}
+}
+</script>
+<script type="text/javascript">
+// 公共方法
+// 两小数相加解决精度出现的问题
+var doubleAdd = function (num1, num2) { // 要相加的两个数
+    var baseNum,
+    baseNum1,
+    baseNum2;
+    try {
+        baseNum1 = num1.toString().split(".")[1].length;
+    } catch (e) {
+        baseNum1 = 0;
+    }
+    try {
+        baseNum2 = num2.toString().split(".")[1].length;
+    } catch (e) {
+        baseNum2 = 0;
+    }
+    baseNum = Math.pow(10, Math.max(baseNum1, baseNum2));
+    return (Math.round(num1 * baseNum) + Math.round(num2 * baseNum)) / baseNum;
+};
+// 在Jquery里格式化Date日期时间数据
+function timeStamp2String(time) {
+    var datetime = new Date();
+    datetime.setTime(time);
+    var year = datetime.getFullYear();
+    var month = datetime.getMonth() + 1 < 10 ? "0" + (datetime.getMonth() + 1) : datetime.getMonth() + 1;
+    var date = datetime.getDate() < 10 ? "0" + datetime.getDate() : datetime.getDate();
+    var hour = datetime.getHours() < 10 ? "0" + datetime.getHours() : datetime.getHours();
+    var minute = datetime.getMinutes() < 10 ? "0" + datetime.getMinutes() : datetime.getMinutes();
+    var second = datetime.getSeconds() < 10 ? "0" + datetime.getSeconds() : datetime.getSeconds();
+    // return year + "-" + month + "-" + date + " " + hour + ":" + minute + ":" + second;
+    return year + "-" + month + "-" + date;
+}
+</script>
+</html>

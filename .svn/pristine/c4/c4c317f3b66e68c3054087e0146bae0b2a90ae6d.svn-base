@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>中国水环境集团水厂运维数据填报系统</title>
+    <meta name="description" content="中国水环境集团水厂运维数据填报系统">
+    <link href="../static/css/font-awesome.min.css" th:href="${'/css/font-awesome.min.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+    <link href="../static/css/login.min.css" th:href="${'/css/login.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+    <!--<link href="../static/boot/css/admin.css" th:href="${/css/login_reset.css?v='+@toolsUtils.version()}" rel="stylesheet"/>-->
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <style type="text/css">label.error { position:inherit;  }</style>
+    <script>
+        if(window.top!==window.self){window.top.location=window.location}
+    </script>
+</head>
+<body>
+<div class="main">
+    <div class="bg_img">
+        <img th:src="@{/img/login_db1.jpg}"/>
+    </div>
+    <div class="patter">
+
+    </div>
+    <div class="logo">
+        <div class="text">
+            <div class="zh">水厂运维数据填报系统</div>
+            <div class="en">Water plant operation and maintenance data filling system</div>
+        </div>
+    </div>
+    <form id="login-form" class="login-form">
+        <div class="login-img">
+            <img th:src="@{/img/logo.png}" alt="logo">
+        </div>
+        <div class="login-text">
+            <h2>中国水环境集团</h2>
+            <h3>运维数据填报系统</h3>
+        </div>
+        <div class="form-main">
+            <div class="row">
+                <i class="fa fa-user"></i>
+                <input type="text" id="username" name="username" placeholder="请输入用户名" value="">
+            </div>
+            <div class="row">
+                <i class="fa fa-lock"></i>
+                <input type="password" id="password" name="password" class="pwd" placeholder="请输入密码" value="">
+            </div>
+            <div class="row captcha" th:if="${captchaEnabled==true}">
+                <i class="fa fa-puzzle-piece"></i>
+                <input type="text" id="validateCode" name="validateCode" placeholder="验证码" maxlength="4" autocomplete="off">
+                <img th:src="@{/captcha/captchaImage(type=${captchaType})}" class="imgcode" title="点击更换验证码"/>
+            </div>
+            <!--<div class="rememberme">
+                <input type="checkbox" id="rememberme" name="rememberme"> <label for="rememberme">记住我</label>
+            </div>-->
+            <div class="btn_login">
+                <button id="btnSubmit" type="button">登&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;录</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+<script th:inline="javascript">
+    var ctx = [[@{/}]];
+    var captchaType = [[${captchaType}]];
+</script>
+<!-- 全局js -->
+<script src="../static/js/jquery.min.js" th:src="${'/js/jquery.min.js?v='+@toolsUtils.version()}"></script>
+<script src="../static/js/bootstrap.min.js" th:src="${'/js/bootstrap.min.js?v='+@toolsUtils.version()}"></script>
+<!-- 验证插件 -->
+<script src="../static/ajax/libs/validate/jquery.validate.min.js" th:src="${'/ajax/libs/validate/jquery.validate.min.js?v='+@toolsUtils.version()}"></script>
+<script src="../static/ajax/libs/validate/messages_zh.min.js" th:src="${'/ajax/libs/validate/messages_zh.min.js?v='+@toolsUtils.version()}"></script>
+<script src="../static/ajax/libs/layer/layer.min.js" th:src="${'/ajax/libs/layer/layer.min.js?v='+@toolsUtils.version()}"></script>
+<script src="../static/ajax/libs/blockUI/jquery.blockUI.js" th:src="${'/ajax/libs/blockUI/jquery.blockUI.js?v='+@toolsUtils.version()}"></script>
+<script src="../static/boot/js/admin.js" th:src="${'/boot/js/admin.js?v='+@toolsUtils.version()}"></script>
+<script src="../static/boot/login.js" th:src="${'/boot/login.js?v='+@toolsUtils.version()}"></script>
+</body>
+</html>

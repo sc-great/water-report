@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="admin/include :: header('分配菜单权限')" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-role-menus">
+        <input id="roleId" name="roleId" type="hidden" th:value="${roleId}"/>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">菜单权限</label>
+            <div class="col-sm-10">
+                <div id="menuTrees" class="ztree"></div>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: form" />
+<th:block th:include="admin/include :: ztree" />
+<script th:inline="javascript">
+    $(function() {
+        //初始化菜单权限
+        var url = ctx + "admin/system/menu/roleMenuTreeData?roleId=" + $("#roleId").val();
+        var options = {
+            id: "menuTrees",
+            url: url,
+            check: { enable: true },
+            expandLevel: 0
+        };
+        $.tree.init(options);
+    });
+    function submitHandler() {
+        if ($.validate.form()) {
+            edit();
+        }
+    }
+    function edit() {
+        var filed=$("#form-role-menus").serializeJSON();
+        filed["params[menuIds]"]=$.tree.getCheckedNodes();
+        $.ajax({
+            cache : true,
+            type : "POST",
+            url : ctx + "admin/system/role/doMenusScope",
+            data : filed,
+            async : false,
+            error : function(request) {
+                $.modal.alertError("系统错误");
+            },
+            success : function(data) {
+                $.operate.successCallback(data);
+            }
+        });
+    }
+</script>
+</body>
+</html>

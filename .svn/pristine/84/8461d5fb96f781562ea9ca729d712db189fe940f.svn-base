@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="admin/include :: header('新增水厂信息')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-info-edit"  th:object="${sysFactoryInfo}">
+          <input name="factId" th:field="*{factId}" type="hidden">
+            <div class="form-group">    
+                <label class="col-sm-2 control-label is-required">水厂名称：</label>
+                <div class="col-sm-10">
+                    <input name="factName" class="form-control" placeholder="请输入水厂名称" type="text" required maxLength="50" th:value="*{factName}">
+                </div>
+            </div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label label-right is-required">竣工日期：</label>
+				<div class="col-sm-4">
+					<div class="input-group" style="width:100%">
+						<input name="finiDate"  id="finiDate" class="form-control" readonly required
+							type="text" th:value="*{finiDate}">
+					</div>
+				</div>
+				<label class="col-sm-2 control-label label-right is-required">开始运营日期：</label>
+				<div class="col-sm-4">
+					<div class="input-group" style="width:100%">
+						<input name="startDate"  id="startDate" class="form-control" readonly required
+							 type="text" th:value="*{startDate}">
+					</div>
+				</div>
+			</div>	
+            <div class="form-group">    
+                <label class="col-sm-2 control-label label-right is-required">设计处理能力：</label>
+                <div class="col-sm-4">
+                   <div class="input-group" >
+                    <input name="ton" class="form-control" placeholder="请输入设计处理能力" type="text" required   oninput = "value=value.replace(/[^\d]/g,'')"  maxlength="8" th:value="*{ton}"><span class="input-group-addon">（吨/天）</span>
+                    </div>
+                </div>
+                 <label class="col-sm-2 control-label label-right is-required">人员配置：</label>
+                <div class="col-sm-4">
+                   <div class="input-group">
+                    <input name="personNum" class="form-control" placeholder="请输入人员配置" type="text" required oninput = "value=value.replace(/[^\d]/g,'')"  maxlength="6" th:value="*{personNum}"><span class="input-group-addon">（人）</span>
+                   </div>
+                </div>
+            </div>
+       
+            <div class="form-group">    
+                <label class="col-sm-2 control-label label-right">工艺：</label>
+                <div class="col-sm-4">
+                  <div class="input-group" style="width:100%">
+                    <input name="technology" class="form-control" placeholder="请输入工艺" type="text" maxlength="16" th:value="*{technology}">
+                  </div>
+                </div>
+                 <label class="col-sm-2 control-label label-right is-required">现执行单价(元/吨)：</label>
+                <div class="col-sm-4">
+                  <div class="input-group">
+                    <input name="price" class="form-control" placeholder="请输入现执行单价" type="number" min="0"  max="100" maxLength="5" oninput="autoformart($(this))"  required   th:value="*{price}"><span class="input-group-addon">（元/吨）</span>
+                  </div>
+                </div>
+            </div>
+  
+       <div class="form-group faq-answer" >水质预警值上下限配置</div>
+		
+			<div class="form-group">		
+						
+						<label class="col-sm-2 control-label label-right">PH值进水上限：</label>
+						<div class="col-sm-4">
+						  <div class="input-group"  style="width:100%">
+							<input name="phInMaxGood" class="form-control"
+								type="number" min="0"  max="14" maxLength="6" oninput="autoformart($(this))"  onkeyup="num(this)"  onChange="limitNum('phInMaxGood')"  th:value="${#numbers.formatDecimal(sysFactoryInfo.phInMaxGood,0,0)}">
+						  </div>
+						</div>
+						<label class="col-sm-2 control-label label-right">PH值进水下限：</label>
+						<div class="col-sm-4">
+						 <div class="input-group"  style="width:100%">
+							<input name="phInMinGood" class="form-control"
+								type="number" min="0" max="14"  maxLength="6" oninput="autoformart($(this))"  onkeyup="num(this)"  onChange="limitNum('phInMinGood')"  th:value="${#numbers.formatDecimal(sysFactoryInfo.phInMinGood,0,0)}">
+						</div>
+						</div>
+	    	</div>
+				
+					<div class="form-group">
+						
+						<label class="col-sm-2 control-label label-right">PH值出水上限：</label>
+						<div class="col-sm-4">
+						 <div class="input-group"  style="width:100%">
+							<input name="phOutMaxGood" class="form-control"
+								 type="number" min="0" max="14"  maxLength="6" oninput="autoformart($(this))"  onkeyup="num(this)"  onChange="limitNum('phOutMaxGood')" th:value="${#numbers.formatDecimal(sysFactoryInfo.phOutMaxGood,0,0)}">
+						</div>
+						</div>
+						<label class="col-sm-2 control-label label-right">PH值出水下限：</label>
+						<div class="col-sm-4">
+						  <div class="input-group"  style="width:100%">
+							<input name="phOutMinGood" class="form-control"
+								 type="number" min="0" max="14"  maxLength="6" oninput="autoformart($(this))"  onkeyup="num(this)"  onChange="limitNum('phOutMinGood')" th:value="${#numbers.formatDecimal(sysFactoryInfo.phOutMinGood,0,0)}">
+						</div>
+						</div>
+					</div>
+				
+					<div class="form-group">
+						
+						<label class="col-sm-2 control-label label-right">COL2出水上限：</label>
+						<div class="col-sm-4">
+						 <div class="input-group"  style="width:100%">
+							<input name="col2OutMaxGood" class="form-control"
+								 type="number" min="0"  maxLength="6" oninput="autoformart($(this))"  onkeyup="num(this)"  onChange="limitNum('col2OutMaxGood')" th:value="${#numbers.formatDecimal(sysFactoryInfo.col2OutMaxGood,0,0)}">
+						</div>
+						</div>
+						<label class="col-sm-2 control-label label-right">COL2出水下限：</label>
+						<div class="col-sm-4">
+						 <div class="input-group"  style="width:100%">
+							<input name="col2OutMinGood" class="form-control"
+								 type="number" min="0"  maxLength="6" oninput="autoformart($(this))"  onkeyup="num(this)"  onChange="limitNum('col2OutMinGood')" th:value="${#numbers.formatDecimal(sysFactoryInfo.col2OutMinGood,0,0)}">
+						</div>
+						</div>
+					</div>
+				
+					<div class="form-group">
+						
+						<label class="col-sm-2 control-label label-right">出水细菌总数上限：</label>
+						<div class="col-sm-4">
+						 <div class="input-group"  style="width:100%">
+							<input name="germOutMaxGood" class="form-control"
+								type="number" min="0"  maxLength="6" oninput="autoformart($(this))"  onkeyup="num(this)"  onChange="limitNum('germOutMaxGood')" th:value="${#numbers.formatDecimal(sysFactoryInfo.germOutMaxGood,0,0)}">
+						</div>
+						</div>
+						<label class="col-sm-2 control-label label-right">出水细菌总数下限：</label>
+						<div class="col-sm-4">
+						 <div class="input-group"  style="width:100%">
+							<input name="germOutMinGood" class="form-control"
+								 type="number" min="0"  maxLength="6" oninput="autoformart($(this))"  onkeyup="num(this)"   onChange="limitNum('germOutMinGood')"  th:value="${#numbers.formatDecimal(sysFactoryInfo.germOutMinGood,0,0)}">
+						</div>
+						</div>
+					</div>
+		</form>
+		<div class="row">
+		<div class="col-sm-offset-5 col-sm-5">
+			<button type="button" class="btn btn-sm btn-primary" onclick="submitHandler()">
+				<i class="fa fa-check"></i>保 存
+			</button>
+			&nbsp;
+			<button type="button" class="btn btn-sm btn-danger" onclick="closeItem()">
+				<i class="fa fa-reply-all"></i>关 闭
+			</button>
+		</div>
+	</div>
+    </div>
+    <th:block th:include="admin/include :: common" />
+    <th:block th:include="admin/include :: form" />
+
+
+ <script th:inline="javascript">
+ 
+    
+    var prefix = ctx + "admin/system/factory";
+     // 时间控件
+layui.use('laydate', function () {
+    var laydate = layui.laydate;
+    // 执行一个laydate实例
+    laydate.render({
+        elem: '#finiDate', //指定元素
+        showBottom: false,
+        format: 'yyyy-MM-dd',
+        trigger: 'click'
+    });
+     laydate.render({
+        elem: '#startDate', //指定元素
+        showBottom: false,
+        format: 'yyyy-MM-dd',
+        trigger: 'click'
+    });
+});
+function submitHandler() {
+    		if ($.validate.form()) {
+    			var filed = $("#form-info-edit").serializeJSON();
+    			
+    			$.ajax({
+    				cache : true,
+    				type : "POST",
+    				url : ctx + "admin/system/factory/doEdit",
+    				data : filed,
+    				async : false,
+    				error : function(request) {
+    					$.modal.alertError("系统错误");
+    				},
+    				success : function(data) {
+    					
+    					layer.open({
+    						content : "修改成功！",
+    						btn : '知道了'
+    					});
+    
+    				
+    					
+    				}
+    			});
+    		}
+    		}
+// input限制
+function autoformart(obj) {
+	var val = obj.val();
+	if (val == null || val == undefined || val == "") {
+		obj.val("");
+		return;
+	}
+	var maxLength = obj.attr("maxLength");
+	var max = obj.attr("max");
+	if (val.length > maxLength) {
+		obj.val(val.slice(0, maxLength)); // 限制长度
+		return;
+	}
+	if (parseFloat(val) > parseFloat(max)) {
+		obj.val(val.slice(0, val.length - 1)); // 限制大小
+		return;
+	}
+	obj.val(parseFloat(val));
+}
+//2位小数
+function num(obj){
+	obj.value = obj.value.replace(/[^\d.]/g,""); 
+	obj.value = obj.value.replace(/^\./g,""); 
+	obj.value = obj.value.replace(/\.{2,}/g,"."); 
+	obj.value = obj.value.replace(".","$#$").replace(/\./g,"").replace("$#$",".");
+	obj.value = obj.value.replace(/^(\-)*(\d+)\.(\d\d).*$/,'$1$2.$3'); 
+}
+
+	//下限不能超上限，上限不能小于下限
+ 	function limitNum(str) {
+ 	 
+ 		if (str == 'phInMinGood' || str == 'phInMaxGood') {
+ 			var phInMinGood = $("#phInMinGood").val();
+ 			var phInMaxGood = $("#phInMaxGood").val();
+ 			
+ 			if (phInMinGood == null || phInMinGood == undefined || phInMinGood == "") {
+ 				return;
+ 			}
+ 			if (phInMaxGood == null || phInMaxGood == undefined || phInMaxGood == "") {
+ 				return;
+ 			}
+
+ 			if (Number(phInMinGood) > Number(phInMaxGood)) {
+ 				layer.open({
+ 					content : "PH值进水下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#phInMinGood").val(0);
+ 			}
+ 		}
+ 		//phOutMinGood
+ 		if (str == 'phOutMinGood' || str == 'phOutMaxGood') {
+ 			var phOutMinGood = $("#phOutMinGood").val();
+ 			var phOutMaxGood = $("#phOutMaxGood").val();
+ 			
+ 			if (phOutMinGood == null || phOutMinGood == undefined || phOutMinGood == "") {
+ 				return;
+ 			}
+ 			if (phOutMaxGood == null || phOutMaxGood == undefined || phOutMaxGood == "") {
+ 				return;
+ 			}
+
+ 			if (Number(phOutMinGood) > Number(phOutMaxGood)) {
+ 				layer.open({
+ 					content : "PH值出水下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#phOutMinGood").val(0);
+ 			}
+ 		}
+ 		
+ 		//col2OutMinGood
+ 		if (str == 'col2OutMinGood' || str == 'col2OutMaxGood') {
+ 			var col2OutMinGood = $("#col2OutMinGood").val();
+ 			var col2OutMaxGood = $("#col2OutMaxGood").val();
+ 			
+ 			if (col2OutMinGood == null || col2OutMinGood == undefined || col2OutMinGood == "") {
+ 				return;
+ 			}
+ 			if (col2OutMaxGood == null || col2OutMaxGood == undefined || col2OutMaxGood == "") {
+ 				return;
+ 			}
+
+ 			if (Number(col2OutMinGood) > Number(col2OutMaxGood)) {
+ 				layer.open({
+ 					content : "COL2出水下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#col2OutMinGood").val(0);
+ 			}
+ 		}
+ 		
+ 		
+ 		//germOutMinGood
+ 		if (str == 'germOutMinGood' || str == 'germOutMaxGood') {
+ 			var germOutMinGood = $("#germOutMinGood").val();
+ 			var germOutMaxGood = $("#germOutMaxGood").val();
+ 			
+ 			if (germOutMinGood == null || germOutMinGood == undefined || germOutMinGood == "") {
+ 				return;
+ 			}
+ 			if (germOutMaxGood == null || germOutMaxGood == undefined || germOutMaxGood == "") {
+ 				return;
+ 			}
+
+ 			if (Number(germOutMinGood) > Number(germOutMaxGood)) {
+ 				layer.open({
+ 					content : "出水细菌总数下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#germOutMinGood").val(0);
+ 			}
+ 		}
+ 		
+ 		
+   }
+  </script>
+  </body>
+</html>

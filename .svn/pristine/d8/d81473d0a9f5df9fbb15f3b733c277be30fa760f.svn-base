@@ -1,0 +1,189 @@
+package com.boot.report.domain;
+
+import com.boot.common.core.domain.BaseEntity;
+
+/**
+ * 水厂人力资源健康情况信息对象 HrHealthInfo
+ * 
+ * @author EPL
+ * @date 2020-03-24
+ */
+public class HrHealthInfo extends BaseEntity{
+    private static final long serialVersionUID = 1L;
+
+    /** 编号 */
+    private String id;
+
+    /** 在职人数 */
+    private Long allUserCount;
+
+    /** 现场人数 */
+    private Long siteUserCount;
+
+    /** 远程人数 */
+    private Long onlineUserCount;
+
+    /** 异常人数 */
+    private Long exceptionUserCount;
+
+    /** 健康状况 */
+    private String healthInfo;
+
+    /** 配戴防护用品情况 */
+    private String wearInfo;
+
+    /** 口罩存量 */
+    private Long maskCount;
+
+    /** 消毒物品存量 */
+    private Double disinfectCount;
+
+    /** 填报日期 */
+    private String fillDate;
+
+    /** 填报时间 */
+    private String fillTime;
+
+    /** 所属水厂 */
+    private String factoryId;
+
+    /** 所属区域 */
+    private String areaId;
+
+    /** 填报人编号 */
+    private String fillUserId;
+
+    /** 填报人 */
+    private String fillUserName;
+
+    /** 有效标识(1-有效 2-无效 ) */
+    private String effectIcon;
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setFillDate(String fillDate) {
+        this.fillDate = fillDate;
+    }
+
+    public String getFillDate() {
+        return fillDate;
+    }
+
+    public void setFillTime(String fillTime) {
+        this.fillTime = fillTime;
+    }
+
+    public String getFillTime() {
+        return fillTime;
+    }
+
+    public void setAllUserCount(Long allUserCount) {
+        this.allUserCount = allUserCount;
+    }
+
+    public Long getAllUserCount() {
+        return allUserCount;
+    }
+
+    public void setSiteUserCount(Long siteUserCount) {
+        this.siteUserCount = siteUserCount;
+    }
+
+    public Long getSiteUserCount() {
+        return siteUserCount;
+    }
+
+    public void setOnlineUserCount(Long onlineUserCount) {
+        this.onlineUserCount = onlineUserCount;
+    }
+
+    public Long getOnlineUserCount() {
+        return onlineUserCount;
+    }
+
+    public void setExceptionUserCount(Long exceptionUserCount) {
+        this.exceptionUserCount = exceptionUserCount;
+    }
+
+    public Long getExceptionUserCount() {
+        return exceptionUserCount;
+    }
+
+    public void setHealthInfo(String healthInfo) {
+        this.healthInfo = healthInfo;
+    }
+
+    public String getHealthInfo() {
+        return healthInfo;
+    }
+
+    public void setWearInfo(String wearInfo) {
+        this.wearInfo = wearInfo;
+    }
+
+    public String getWearInfo() {
+        return wearInfo;
+    }
+
+    public void setMaskCount(Long maskCount) {
+        this.maskCount = maskCount;
+    }
+
+    public Long getMaskCount() {
+        return maskCount;
+    }
+
+    public void setDisinfectCount(Double disinfectCount) {
+        this.disinfectCount = disinfectCount;
+    }
+
+    public Double getDisinfectCount() {
+        return disinfectCount;
+    }
+
+    public void setFactoryId(String factoryId) {
+        this.factoryId = factoryId;
+    }
+
+    public String getFactoryId() {
+        return factoryId;
+    }
+
+    public void setAreaId(String areaId) {
+        this.areaId = areaId;
+    }
+
+    public String getAreaId() {
+        return areaId;
+    }
+
+    public void setFillUserId(String fillUserId) {
+        this.fillUserId = fillUserId;
+    }
+
+    public String getFillUserId() {
+        return fillUserId;
+    }
+
+    public void setFillUserName(String fillUserName) {
+        this.fillUserName = fillUserName;
+    }
+
+    public String getFillUserName() {
+        return fillUserName;
+    }
+
+    public void setEffectIcon(String effectIcon) {
+        this.effectIcon = effectIcon;
+    }
+
+    public String getEffectIcon() {
+        return effectIcon;
+    }
+}

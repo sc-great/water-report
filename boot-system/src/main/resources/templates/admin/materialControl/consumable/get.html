@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+<th:block th:include="admin/include :: header('领用耗材')" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content main_rigth">
+    <form class="form-horizontal m" id="form-consumable-get" th:object="${consumable}">
+        <input name="id" th:field="*{id}" type="hidden">
+        <div class="form-group">
+            <label class="col-sm-2 control-label label-left">物品名称：</label>
+            <div class="col-sm-9">
+                <div class="input-group">
+                    <input name="name" th:value="*{name}" hidden="hidden">
+                    <input class="form-control" th:value="*{name}" readonly style="width:517.6px;cursor:pointer;">
+                </div>
+            </div>
+        </div>
+        <div class="form-group">    
+            <label class="col-sm-2 control-label label-left">耗材总量：</label>
+            <div class="col-sm-9">
+                <div class="input-group">
+                    <input name="total" class="form-control" th:data-val="*{total}" th:value="*{total}" 
+                    		type="number" readonly="readonly">
+                    <span class="input-group-addon" th:text="*{unit}">PCS</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">    
+            <label class="col-sm-2 control-label label-left is-required">领用数量：</label>
+            <div class="col-sm-9">
+                <div class="input-group">
+                    <input name="lastGetNum" class="form-control" required
+                    		type="number" min="0" max="10000000" maxLength="8" oninput="autoformart($(this), true);autoCountTotal()">
+                    <span class="input-group-addon" th:text="*{unit}">PCS</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">    
+            <label class="col-sm-2 control-label label-left is-required">领用人员：</label>
+            <div class="col-sm-9">
+                <div class="input-group">
+                    <input name="lastGetUserName" class="form-control" type="text" maxlength="20" required style="width:517.6px;"
+                    		oninput="userNameLimit($(this))">
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: form" />
+</body>
+<script th:inline="javascript">
+var form_consumable_get_prefix = ctx + "admin/materialControl/consumable";
+var total_obj = $("#form-consumable-get input[name='total']");
+var lastGetNum_obj = $("#form-consumable-get input[name='lastGetNum']");
+var total = total_obj.attr("data-val");
+
+$("#form-consumable-get").validate({
+    focusCleanup: true
+});
+
+function submitHandler() {
+	var lastGetNum_str = lastGetNum_obj.val();
+	if (lastGetNum_str == undefined || lastGetNum_str == null || lastGetNum_str == "")
+		return;
+	if (total == null || total == undefined || total == "")
+		total = 0;
+	var total_num = Number(total);
+	var lastGetNum = Number(lastGetNum_str);
+	if (lastGetNum <= 0) {
+		$.modal.alertWarning("对不起，请正确输入您需要领用的数量！");
+		return;
+	}
+	if (lastGetNum > total_num) {
+		$.modal.alertWarning("对不起，现有数量不足以领用！");
+		return;
+	}
+    if ($.validate.form()) {
+        $.operate.save(form_consumable_get_prefix + "/doGet", $('#form-consumable-get').serialize());
+    }
+}
+
+function autoCountTotal() {
+	if (total == null || total == undefined || total == "")
+		total = 0;
+	var get = lastGetNum_obj.val();
+	if (get == null || get == undefined || get == "")
+		return;
+	
+	var shengxia = Number(total) - Number(get);
+	
+	if (shengxia < 0)
+		total_obj.val(0);
+	else
+		total_obj.val(shengxia);
+}
+
+// input限制
+function autoformart(obj, isInt) {
+    var val = obj.val();
+    if (val == null || val == undefined || val == "") {
+        obj.val("");
+        return;
+    }
+    if (isInt && val.indexOf(".") != -1) { // 整数限制
+    	val = val.slice(0, val.length - 2);
+    }
+    var maxLength = obj.attr("maxLength");
+    var max = obj.attr("max");
+    if (val.length > maxLength) {
+        obj.val(val.slice(0, maxLength)); // 限制长度
+        return;
+    }
+    if (parseFloat(val) > parseFloat(max)) {
+        obj.val(val.slice(0, val.length - 1)); // 限制大小
+        return;
+    }
+    obj.val(parseFloat(val));
+}
+
+// 限制输入特殊字符
+function userNameLimit(t) {
+    t.value = t.value.replace(/[ `~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、]/g, '')
+}
+
+</script>
+</html>

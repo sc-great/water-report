@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+<th:block th:include="admin/include :: header('水厂历史数据统计')" />
+</head>
+<style>
+.select-list li p {
+	margin-right: 0;
+}
+.btn-export {
+	background-color: #337ab7;
+    border-color: #337ab7;
+}
+.btn-export:hover {
+	background-color: #3c8cd0;
+    border-color: #3c8cd0;
+}
+.tree .node .node-text label {
+    width: 85%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#orgNames {
+	width: 250px;
+}
+</style>
+<body class="gray-bg">
+<div class="container-div">
+	<div class="row">
+		<div class="col-sm-12 search-collapse">
+			<form id="formId">
+				<div class="select-list">
+					<ul>
+						<li>
+							<p>开始：</p>
+							<input type="text" id="dateSta" name="dateSta" data-type="date" data-format="yyyy-MM-dd" />
+						</li>
+						<li>
+							<p>结束：</p>
+							<input type="text" id="dateEnd" name="dateEnd" data-type="date" data-format="yyyy-MM-dd" />
+						</li>
+						<li id="shuiChangYongHuBuXuYao">
+							<p>水厂：</p>
+							<input id="orgType" name="orgType" hidden="hidden" />
+							<input id="orgId" name="orgId" hidden="hidden" />
+							<div class="col-sm-10" style="width: auto;">
+								<div id="orgs_div" class="tree-select">
+									<div style="line-height: 34px;">
+										<i class="fa fa-spinner fa-spin"></i>正在初始化
+									</div>
+								</div>
+							</div>
+						</li>
+						<li>
+							<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()">
+								<i class="fa fa-search"></i>&nbsp;查询
+							</a>
+							<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()">
+								<i class="fa fa-refresh"></i>&nbsp;重置
+							</a>
+							<a class="btn btn-warning btn-export btn-rounded btn-sm" onclick="exportData()" 
+									shiro:hasPermission="report:his:export">
+								<i class="fa fa-download"></i>&nbsp;导出
+							</a>
+						</li>
+					</ul>
+				</div>
+			</form>
+		</div>
+		<div class="col-sm-12 select-table table-striped table-bordered table-groupheader" id="table-box">
+			<table id="bootstrap-table" data-mobile-responsive="true"></table>
+		</div>
+	</div>
+</div>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: table" />
+<th:block th:include="admin/include :: custom-plugins" />
+<script type="text/javascript">
+// 得到当前时间
+var dateNow = getCurDate("yyyy-MM-dd");
+// laydate 时间控件绑定
+layui.use("laydate", function () {
+    var laydate = layui.laydate;
+    var startDate = laydate.render({
+            elem: "#dateSta",
+            max: $("#dateEnd").val(),
+            theme: "molv",
+            trigger: "click",
+            done: function (value, date) {
+                // 结束时间大于开始时间
+                if (value !== "") {
+                    endDate.config.min.year = date.year;
+                    endDate.config.min.month = date.month - 1;
+                    endDate.config.min.date = date.date;
+                } else {
+                    endDate.config.min.year = "";
+                    endDate.config.min.month = "";
+                    endDate.config.min.date = "";
+                }
+            }
+        });
+    var endDate = laydate.render({
+            elem: "#dateEnd",
+            min: $("#dateSta").val(),
+            max: dateNow,
+            theme: "molv",
+            trigger: "click",
+            done: function (value, date) {
+                // 开始时间小于结束时间
+                if (value !== "") {
+                    startDate.config.max.year = date.year;
+                    startDate.config.max.month = date.month - 1;
+                    startDate.config.max.date = date.date;
+                } else {
+                    startDate.config.max.year = "";
+                    startDate.config.max.month = "";
+                    startDate.config.max.date = "";
+                }
+            }
+        });
+});
+</script>
+<script th:inline="javascript">
+var orgId = [[${orgId}]];
+var type = [[${type}]];
+var orgName = [[${orgName}]];
+
+$(function () {
+	if (type == "3") { // 水厂用户就别选了，只能导自己水厂的数据
+		$("#orgId").val(orgId);
+		$("#orgType").val(type);
+		
+		if ([[${factoryType}]] == "1") { // 污水厂
+			dailyTableWS();console.log(1);
+		}
+		if ([[${factoryType}]] == "2") { // 供水厂
+			dailyTableGS();console.log(2);
+		}
+		
+		$("#shuiChangYongHuBuXuYao").hide();
+		return;
+	}
+	if (orgId == "1") {
+		loadOrgTree(0);
+	} else {
+		loadOrgTree("MARK" + orgId);
+	}
+});
+
+var factoryType = "";
+function loadOrgTree(pId) {
+    var params = {
+        url: ctx + "admin/system/org/treeListArea",
+        data: {
+            parentId: pId,
+            validStatus: 1
+        },
+        objId: 'orgs_div',
+        checkBox: false,
+        lastNodeShowCheckBox: true,
+        openLevel: 1,
+        valueId: 'orgIds',
+        textId: 'orgNames',
+        value_filed: 'orgId',
+        text_filed: 'orgName',
+        placeholder: '请选择所属机构',
+        required: 'required',
+        callback: function (values) {
+            if ($.common.isNotEmpty(values)) {
+                $.ajax({
+                    type: "get",
+                    url: ctx + "admin/system/org/get/" + values,
+                    dataType: 'json',
+                    data: {},
+                    success: function (r) {
+                        if (r.code == 0) {
+                        	$("#orgType").val("");
+                            $("#orgId").val("");
+                        	var selOrg = r.data;
+                            // 若机构类型不是‘水厂（3）’，则不能导出日报表
+                            if (selOrg.orgType == '3') {
+                            	$("#orgType").val(selOrg.orgType);
+                                $("#orgId").val(selOrg.orgId);
+                                
+                                if (factoryType == selOrg.factoryType)
+                                	return;
+                                factoryType = selOrg.factoryType;
+                                $("#table-box").html('<table id="bootstrap-table" data-mobile-responsive="true"></table>');
+                                if (factoryType == "1") { // 污水厂
+                                	dailyTableWS();
+                                }
+                                if (factoryType == "2") { // 供水厂
+                                	dailyTableGS();
+                                }
+                            } else {
+                            	$.modal.msgWarning("日报表只能导出为水厂，请选择具体的水厂！");
+                            }
+                        } else {
+                            $.modal.msgWarning(r.msg);
+                        }
+                    }
+                });
+            }
+        }
+    };
+    selectTree(params);
+}
+</script>
+<script th:inline="javascript">
+// 导出功能--------------------------------------------------------------------------------------------------------------
+function exportData() {
+	var dateSta = $("#dateSta").val();
+	var dateEnd = $("#dateEnd").val();
+	var orgType = $("#orgType").val();
+	var orgId = $("#orgId").val();
+	
+	if (dateSta == null || dateSta == undefined || dateSta == "") {
+		$.modal.alertWarning("请选择开始时间！");
+		return;
+	}
+	
+	if (dateEnd == null || dateEnd == undefined || dateEnd == "") {
+		$.modal.alertWarning("请选择结束时间！");
+		return;
+	}
+
+	if (orgId == null || orgId == undefined || orgId == "") {
+		$.modal.alertWarning("请选择水厂！");
+		return;
+	}
+	
+	$.modal.loading("正在导出数据，请稍后...");
+    $.post("/admin/his/exportDailyReport", {
+    	"dateSta": dateSta,
+    	"dateEnd": dateEnd,
+    	"orgType": orgType,
+    	"orgId": orgId
+    }, function (result) {
+        if (result.code == web_status.SUCCESS) {
+            window.location.href = ctx + "common/download?fileName=" + encodeURI(result.msg) + "&delete=" + true;
+        } else if (result.code == web_status.WARNING) {
+            $.modal.alertWarning(result.msg);
+        } else {
+            $.modal.alertError(result.msg);
+        }
+        $.modal.closeLoading();
+    });
+}
+</script>
+<script type="text/javascript">
+function dailyTableWS() {
+    var options = {
+        url: "/admin/his/searchDailyReport",
+        modalName: "当日用药信息",
+        rememberSelected: true,
+        uniqueId: "id",
+        pagination: false, // 不分页
+        columns: [
+            [{
+                    field: 'reportDate',
+                    title: '序号',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 3,
+                    formatter: function (value, row, index) {
+                        return index + 1;
+                    }
+                }, {
+                    field: 'date',
+                    title: '日期',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 3
+                }, {
+                    field: 'overNorm',
+                    title: '超标',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 3
+                }, {
+                    field: 'todayOut',
+                    title: '处理水量（万吨/日）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 3
+                }, {
+                    field: 'todayMud',
+                    title: '污泥量（吨）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 3
+                }, {
+                    field: 'dryMud',
+                    title: '绝干污泥量（吨）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 3
+                }, {
+                    field: 'today',
+                    title: '工时情况',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'today',
+                    title: '能耗数据',
+                    align: 'center',
+                    colspan: 4
+                }, {
+                    field: 'today',
+                    title: '药耗数据',
+                    align: 'center',
+                    colspan: 21
+                }, {
+                    field: 'today',
+                    title: '进水化验数据',
+                    align: 'center',
+                    colspan: 8
+                }, {
+                    field: 'today',
+                    title: '出水化验数据',
+                    align: 'center',
+                    colspan: 9
+                }, {
+                    field: 'today',
+                    title: '化验室生化池数据',
+                    align: 'center',
+                    colspan: 5
+                }, {
+                    field: 'today',
+                    title: '进出口在线数据（中控数值）（日平均值）',
+                    align: 'center',
+                    colspan: 10
+                }
+            ],
+            [{
+                    field: 'personNum',
+                    title: '水厂工作总人次',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'dsrg',
+                    title: '吨水人工（小时/吨）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'todayElec',
+                    title: '污水处理电量',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'pumpElec',
+                    title: '泵站/其它电量',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'totalElec',
+                    title: '总计电量',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'dynamic',
+                    title: '能耗（度/吨）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'composite',
+                    title: '综合药耗（KG/吨）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'should',
+                    title: 'PAM（阳）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'reality',
+                    title: 'PAM（阴）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'HKRate',
+                    title: 'PAC',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'totalElec',
+                    title: '石灰',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'totalElecTon',
+                    title: '复核除磷剂',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'pjdsdh',
+                    title: '盐酸（HCL）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'totalMud',
+                    title: '氯酸钠（NaCL）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'totalDryMud',
+                    title: '次氯酸钠（NaCLO）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'totalDryMud',
+                    title: '葡萄糖（C6H12O6）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'Sa',
+                    title: '乙酸钠（C2H3O2Na）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'codIn',
+                    title: 'COD（mg/L）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'bod5In',
+                    title: 'BOD5（mg/L）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'adanIn',
+                    title: 'NH3-N（mg/L）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'zdanIn',
+                    title: 'T-N（mg/L）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'zlinIn',
+                    title: 'T-P（mg/L）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'xfuIn',
+                    title: 'SS（mg/L）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'phIn',
+                    title: 'PH值',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'tempIn',
+                    title: '温度（℃）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'codOut',
+                    title: 'COD（mg/L）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'bod5Out',
+                    title: 'BOD5（mg/L）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'adanOut',
+                    title: 'NH3-N（mg/L）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'zdanOut',
+                    title: 'T-N（mg/L）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'zlinOut',
+                    title: 'T-P（mg/L）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'xfuOut',
+                    title: 'SS（mg/L）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'phOut',
+                    title: 'PH值',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'tempOut',
+                    title: '温度（℃）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'fengJun',
+                    title: '粪大肠菌群数（个/L）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'mlss',
+                    title: 'MLSS（mg/L）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'mlvss',
+                    title: 'MLVSS（mg/L）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'testDo',
+                    title: 'DO（mg/L）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'sv30',
+                    title: 'SV30（%）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'waterSludge',
+                    title: '污泥含水率（%）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'Sa',
+                    title: '进水',
+                    align: 'center',
+                    colspan: 5
+                }, {
+                    field: 'Sa',
+                    title: '出水',
+                    align: 'center',
+                    colspan: 5
+                }
+            ],
+            [{
+                    field: 'todayPAMYang',
+                    title: '用量（kg）',
+                    align: 'center'
+                }, {
+                    field: 'tonPAMYang',
+                    title: '单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                	field: 'todayPAMYin',
+                    title: '用量（kg）',
+                    align: 'center'
+                }, {
+                	field: 'tonPAMYin',
+                    title: '单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                	field: 'todayPAC',
+                    title: '用量（kg）',
+                    align: 'center'
+                }, {
+                	field: 'tonPAC',
+                    title: '单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                	field: 'todayLime',
+                    title: '用量（kg）',
+                    align: 'center'
+                }, {
+                	field: 'tonLime',
+                    title: '单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                	field: 'todayPhosphorus',
+                    title: '用量（kg）',
+                    align: 'center'
+                }, {
+                	field: 'tonPhosphorus',
+                    title: '单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                	field: 'todayHCL',
+                    title: '用量（kg）',
+                    align: 'center'
+                }, {
+                	field: 'tonHCL',
+                    title: '单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                	field: 'todaySC',
+                    title: '用量（kg）',
+                    align: 'center'
+                }, {
+                	field: 'tonSC',
+                    title: '单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                	field: 'todayNaCLO',
+                    title: '用量（kg）',
+                    align: 'center'
+                }, {
+                	field: 'tonNaCLO',
+                    title: '单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                	field: 'todayGlucose',
+                    title: '用量（kg）',
+                    align: 'center'
+                }, {
+                	field: 'tonGlucose',
+                    title: '单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                	field: 'todaySA',
+                    title: '用量（kg）',
+                    align: 'center'
+                }, {
+                	field: 'tonSA',
+                    title: '单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                	field: 'CODIn',
+                    title: 'COD（mg/L）',
+                    align: 'center'
+                }, {
+                	field: 'NH3NIn',
+                    title: 'NH3-N（mg/L）',
+                    align: 'center'
+                }, {
+                	field: 'TPIn',
+                    title: 'TP（mg/L）',
+                    align: 'center'
+                }, {
+                	field: 'TNIn',
+                    title: 'TN（mg/L）',
+                    align: 'center'
+                }, {
+                	field: 'SSIn',
+                    title: 'SS（mg/L）',
+                    align: 'center'
+                }, {
+                	field: 'CODOut',
+                    title: 'COD（mg/L）',
+                    align: 'center'
+                }, {
+                	field: 'NH3NOut',
+                    title: 'NH3-N（mg/L）',
+                    align: 'center'
+                }, {
+                	field: 'TPOut',
+                    title: 'TP（mg/L）',
+                    align: 'center'
+                }, {
+                	field: 'TNOut',
+                    title: 'TN（mg/L）',
+                    align: 'center'
+                }, {
+                	field: 'SSOut',
+                    title: 'SS（mg/L）',
+                    align: 'center'
+                }
+            ]
+        ]
+    };
+    $.table.init(options);
+}
+function dailyTableGS() {
+    var options = {
+        url: "/admin/his/searchDailyReport",
+        modalName: "当日用药信息",
+        rememberSelected: true,
+        uniqueId: "id",
+        pagination: false, // 不分页
+        columns: [
+            [{
+	                field: 'date',
+	                title: '序号',
+	                align: 'center',
+	                valign: 'middle',
+	                rowspan: 3,
+	                formatter: function (value, row, index) {
+	                    return index + 1;
+	                }
+	            }, {
+	                field: 'date',
+	                title: '日期',
+	                align: 'center',
+	                valign: 'middle',
+	                rowspan: 3
+	            }, {
+	                field: 'overNorm',
+	                title: '超标',
+	                align: 'center',
+	                valign: 'middle',
+	                rowspan: 3
+	            }, {
+	                field: 'todayOut',
+	                title: '产水量（万吨/日）',
+	                align: 'center',
+	                valign: 'middle',
+	                rowspan: 3
+	            }, {
+	                field: 'today',
+	                title: '工时情况',
+	                align: 'center',
+	                valign: 'middle',
+	                colspan: 2
+	            }, {
+	                field: 'today',
+	                title: '能耗数据',
+	                align: 'center',
+	                valign: 'middle',
+	                colspan: 4
+	            }, {
+	                field: 'today',
+	                title: '药耗数据',
+	                align: 'center',
+	                colspan: 21
+	            }, {
+	                field: 'today',
+	                title: '化验数据',
+	                align: 'center',
+	                colspan: 8
+	            }, {
+	                field: 'today',
+	                title: '进出口在线数据（中控数值）（日平均值）',
+	                align: 'center',
+	                colspan: 6
+                }
+            ],
+            [{
+	                field: 'personNum',
+	                title: '水厂工作总人次',
+	                align: 'center',
+	                valign: 'middle',
+	                rowspan: 2
+	            }, {
+	                field: 'dsrg',
+	                title: '吨水人工（小时/吨）',
+	                align: 'center',
+	                valign: 'middle',
+	                rowspan: 2
+	            }, {
+	                field: 'todayElec',
+	                title: '水厂电量',
+	                align: 'center',
+	                valign: 'middle',
+	                rowspan: 2
+	            }, {
+	                field: 'pumpElec',
+	                title: '泵站/其它电量',
+	                align: 'center',
+	                valign: 'middle',
+	                rowspan: 2
+	            }, {
+	                field: 'totalElec',
+	                title: '总计电量',
+	                align: 'center',
+	                valign: 'middle',
+	                rowspan: 2
+	            }, {
+	                field: 'dynamic',
+	                title: '能耗（度/吨）',
+	                align: 'center',
+	                valign: 'middle',
+	                rowspan: 2
+	            }, {
+                    field: 'composite',
+                    title: '综合药耗（KG/吨）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'should',
+                    title: 'PAM（阳）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'reality',
+                    title: 'PAM（阴）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'HKRate',
+                    title: 'PAC',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'totalElec',
+                    title: '石灰',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'totalElecTon',
+                    title: '复核除磷剂',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'pjdsdh',
+                    title: '盐酸（HCL）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'totalMud',
+                    title: '氯酸钠（NaCL）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'totalDryMud',
+                    title: '次氯酸钠（NaCLO）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'totalDryMud',
+                    title: '葡萄糖（C6H12O6）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'Sa',
+                    title: '乙酸钠（C2H3O2Na）',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'eyeOut',
+                    title: '肉眼可见物',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'colourOut',
+                    title: '色度',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'cwOut',
+                    title: '嗅和味',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'twoOut',
+                    title: '出水CL02',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'ntuOut',
+                    title: '浊度',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'tempOut',
+                    title: '温度（℃）',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'zdjOut',
+                    title: '总大肠菌群',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'xjzsOut',
+                    title: '细菌总数',
+                    align: 'center',
+                    valign: 'middle',
+                    rowspan: 2
+                }, {
+                    field: 'Sa',
+                    title: '进水',
+                    align: 'center',
+                    colspan: 2
+                }, {
+                    field: 'Sa',
+                    title: '出水',
+                    align: 'center',
+                    colspan: 4
+                }
+            ],
+            [{
+                    field: 'todayPAMYang',
+                    title: '用量（kg）',
+                    align: 'center'
+                }, {
+                    field: 'tonPAMYang',
+                    title: '单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                    field: 'todayPAMYin',
+                    title: '用量（kg）',
+                    align: 'center'
+                }, {
+                    field: 'tonPAMYin',
+                    title: '单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                    field: 'todayPAC',
+                    title: '用量（kg）',
+                    align: 'center'
+                }, {
+                    field: 'tonPAC',
+                    title: '单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                    field: 'todayLime',
+                    title: '用量（kg）',
+                    align: 'center'
+                }, {
+                    field: 'tonLime',
+                    title: '单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                    field: 'todayPhosphorus',
+                    title: '用量（kg）',
+                    align: 'center'
+                }, {
+                    field: 'tonPhosphorus',
+                    title: '单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                    field: 'todayHCL',
+                    title: '用量（kg）',
+                    align: 'center'
+                }, {
+                    field: 'tonHCL',
+                    title: '单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                    field: 'todaySC',
+                    title: '用量（kg）',
+                    align: 'center'
+                }, {
+                    field: 'tonSC',
+                    title: '单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                    field: 'todayNaCLO',
+                    title: '用量（kg）',
+                    align: 'center'
+                }, {
+                    field: 'tonNaCLO',
+                    title: '单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                    field: 'todayGlucose',
+                    title: '用量（kg）',
+                    align: 'center'
+                }, {
+                    field: 'tonGlucose',
+                    title: '单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                    field: 'todaySA',
+                    title: '用量（kg）',
+                    align: 'center'
+                }, {
+                    field: 'tonSA',
+                    title: '单耗（KG/吨）',
+                    align: 'center'
+                }, {
+                    field: 'PHIn',
+                    title: 'PH值',
+                    align: 'center'
+                }, {
+                    field: 'NTUIn',
+                    title: '浊度',
+                    align: 'center'
+                }, {
+                    field: 'PHOut',
+                    title: 'PH值',
+                    align: 'center'
+                }, {
+                    field: 'NTUOut',
+                    title: '浊度',
+                    align: 'center'
+                }, {
+                    field: 'COL2Out',
+                    title: '后置加氯/出水CL02',
+                    align: 'center'
+                }, {
+                    field: 'germOut',
+                    title: '细菌总数',
+                    align: 'center'
+                }
+            ]
+        ]
+    };
+    $.table.init(options);
+}
+</script>
+</body>
+</html>

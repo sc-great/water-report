@@ -1,0 +1,84 @@
+package com.boot.system.service.impl;
+
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.boot.system.mapper.SysFilesMapper;
+import com.boot.system.domain.SysFiles;
+import com.boot.system.service.ISysFilesService;
+import com.boot.common.core.text.Convert;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 上传文件信息Service业务层处理
+ * 
+ * @author boot
+ * @date 2019-10-12
+ */
+@Service
+public class SysFilesServiceImpl implements ISysFilesService {
+    @Autowired
+    private SysFilesMapper sysFilesMapper;
+
+    /**
+     * 查询上传文件信息
+     * 
+     * @param id 上传文件信息ID
+     * @return 上传文件信息
+     */
+    @Override
+    public SysFiles selectSysFilesById(String id) {
+        return sysFilesMapper.selectSysFilesById(id);
+    }
+    @Override
+    public List<SysFiles> selectSysFilesByIds(String ids) {
+        return sysFilesMapper.selectSysFilesByIds(Convert.toStrArray(ids));
+    }
+    /**
+     * 查询上传文件信息列表
+     * 
+     * @param sysFiles 上传文件信息
+     * @return 上传文件信息
+     */
+    @Override
+    public List<SysFiles> selectSysFilesList(SysFiles sysFiles) {
+        return sysFilesMapper.selectSysFilesList(sysFiles);
+    }
+
+    /**
+     * 新增上传文件信息
+     * 
+     * @param sysFiles 上传文件信息
+     * @return 结果
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int insertSysFiles(SysFiles sysFiles) {
+                                                                                                return sysFilesMapper.insertSysFiles(sysFiles);
+    }
+
+    /**
+     * 修改上传文件信息
+     * 
+     * @param sysFiles 上传文件信息
+     * @return 结果
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int updateSysFiles(SysFiles sysFiles) {
+                                                                                                return sysFilesMapper.updateSysFiles(sysFiles);
+    }
+
+    /**
+     * 删除上传文件信息对象
+     * 
+     * @param ids 需要删除的数据ID
+     * @return 结果
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int deleteSysFilesByIds(String ids) {
+        return sysFilesMapper.deleteSysFilesByIds(Convert.toStrArray(ids));
+    }
+
+}

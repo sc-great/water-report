@@ -1,0 +1,247 @@
+<!doctype html>
+<html class="no-js" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>中国水环境集团</title>
+<th:block th:include="app/pages/homeHeader.html" />
+</head>
+<style>
+input {
+	border: 0;
+	outline: none;
+	background-color: rgba(0, 0, 0, 0);
+}
+input {
+	border: 1px #dcdcdc solid;
+	background: #f9f9f9;
+}
+.home_main_form {
+	width: 96%;
+	margin: 2vh auto;
+}
+.home_main_form .from_box {
+	width: 100%;
+	border: 1px #1590ee solid;
+	font-size: 1.5rem;
+	background: #fff;
+	margin: 1vh 0;
+}
+.home_main_form .other {
+	border-color: #ff7e00;
+}
+.home_main_form .from_box .ibox-title {
+	width: 100%;
+	height: 5vh;
+	display: table;
+	text-decoration: none;
+	margin: 1.5vh 0;
+}
+.home_main_form .from_box .ibox-title .icon, .home_main_form .from_box .ibox-title .icon_w
+	{
+	height: 100%;
+	width: 10vw;
+	display: table-cell;
+	text-align: center;
+	vertical-align: middle;
+}
+.home_main_form .from_box .ibox-title .icon img {
+	height: auto;
+	width: 5vw;
+}
+.home_main_form .from_box .ibox-title .icon_w img {
+	height: auto;
+	width: 3.5vw;
+}
+.home_main_form .from_box .ibox-title .text {
+	display: table-cell;
+	vertical-align: middle;
+	font-size: 1.4rem;
+	font-weight: bold;
+}
+.from_box p {
+	line-height: 5vh;
+	margin-left: 3vh;
+	position: relative;
+}
+.from_box p span {
+	display: inline-block;
+	width: 26%;
+}
+.from_box p input {
+	width: 50%;
+	line-height: 3.5vh;
+	padding-left: 0.5vh;
+}
+.from_box p b {
+	font-weight: normal;
+	margin-left: 1vh;
+}
+.from_box .button_group {
+	width: 80%;
+	margin: 3vh auto;
+}
+.from_box .button_group a {
+	display: inline-block;
+	width: 45%;
+	text-align: center;
+	line-height: 3.5ch;
+}
+.from_box .button_group .reset {
+	background: #f4f4f4;
+}
+.from_box .button_group .submit {
+	background: #1d7bb8;
+	color: #fff;
+	float: right;
+}
+</style>
+<body>
+
+	<div class="home_main_form">
+		<div class="from_box">
+			<div class="ibox-title">
+				<div class="icon">
+					<img th:src="@{/webapp/image/icon-ws.png}">
+				</div>
+				<div class="text" id="title_div" >财务信息填报</div>
+			</div>
+			<form id="costInfo-form">
+				<input id="costInfo_params" name="params[icon]" value="" type="hidden">
+				<p><span>当年目标</span><input name="thisYear" type="text" required  maxlength="6"   placeholder="数字且最多两位小数"   onkeyup="num(this)" ><b>万元</b></p>
+				<p><span>去年目标</span><input name="lastYear" type="text" required  maxlength="6"   placeholder="数字且最多两位小数"   onkeyup="num(this)" ><b>万元</b></p>
+				<p><span>本月到账</span><input name="currentEnter" type="text" required oninput="autoCurrentTotal()"  maxlength="5"   placeholder="数字且最多两位小数"   onkeyup="num(this)" ><b>万元</b></p>
+				<p><span>本月累计</span><input name="currentTotal" type="number" required readOnly ><b>万元</b></p>
+			</form>
+			<div class="button_group">
+				<a class="reset" onClick="costInfoReset()">重置</a>
+				<a class="submit" onClick="costInfoSubmit()">提交</a>
+			</div>
+		</div>
+		<div class="content center font-size-14">
+			<table class="cross-color" style="border: 1px solid #c1cbd9">
+				<thead class="bg-color1 color-3">
+					<tr>
+						<th>月份</th>
+						<th>累计金额（万元）</th>
+					</tr>
+				</thead>
+				<tbody class="cross-color" id="water_works"></tbody>
+			</table>
+		</div>
+	</div>
+ <input type="hidden" th:value="${factoryName}" id="factoryName"/>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: form" />
+<style>
+label.error {
+	position: absolute;
+	right: 22vw;
+	color: #ef392b;
+	font-size: 12px;
+}
+input.error {
+	background-color: #fbe2e2;
+    border-color: #c66161;
+    color: #c00;
+}
+</style>
+<script type="text/javascript">
+$("#title_div").html($("#factoryName").val()+"财务信息填报");
+
+var thisYear_obj = $("#costInfo-form input[name='thisYear']");
+var lastYear_obj = $("#costInfo-form input[name='lastYear']");
+var currentEnter_obj = $("#costInfo-form input[name='currentEnter']");
+var currentTotal_obj = $("#costInfo-form input[name='currentTotal']");
+var currentTotal = 0;
+$(function() {
+    $("#water_works").empty();
+    $.post('/app/homeFinanceData', function (result) {
+        if (result.code == "0") {
+            var waterWorks = result.data;
+            $.each(waterWorks, function (index, item) {
+            	if (waterWorks.length > 0 && index == 0) {
+            		var icon = item.params.iconMonth;
+            		if (icon == 1 || icon == "1") { // 不是本月的记录
+            			if (item.params.iconYear == 1 || item.params.iconYear == "1") { // 不是本年的记录
+            				lastYear_obj.val(item.thisYear);
+            			}
+						if (item.params.iconYear == 2 || item.params.iconYear == "2") { // 是本年的记录
+							thisYear_obj.val(item.thisYear);
+	                		lastYear_obj.val(item.lastYear);
+            			}
+            		}
+            		if (icon == 2 || icon == "2") { // 是本月的记录
+            			
+            			currentTotal = item.currentTotal;
+                		
+                		thisYear_obj.val(item.thisYear);
+                		lastYear_obj.val(item.lastYear);
+                		currentEnter_obj.attr("placeholder", "上笔到账金额：" + item.currentEnter);
+            		}
+            		$("#costInfo_params").val(icon);
+                	currentTotal_obj.val(currentTotal);
+            	}
+                var html = '<tr>\n' +
+                    '       	<td>' + item.fillDate + '</td>\n' +
+                    '       	<td>\n' +
+                    '       		<span class="color-2">' + (item.currentTotal != null ? item.currentTotal : "") + '</span>\n' +
+                    '       	</td>\n' +
+                    '       </tr>\n';
+                $("#water_works").append(html);
+            });
+        }
+    });
+})
+
+// 重置
+function costInfoReset() {
+	//currentEnter_obj.val("");
+	//currentTotal_obj.val(currentTotal);
+	$('#costInfo-form')[0].reset() 
+}
+
+// 当月累计自动计算
+function autoCurrentTotal() {
+	var currentEnter = 0;
+	try {
+		currentEnter = parseFloat(currentEnter_obj.val());
+	} catch (e) {
+			
+	}
+	currentTotal_obj.val(doubleAdd(currentEnter, currentTotal));
+}
+
+// 两小数相加解决精度出现的问题
+var doubleAdd = function (num1, num2) { // 要相加的两个数
+    var baseNum,
+    baseNum1,
+    baseNum2;
+    try {
+        baseNum1 = num1.toString().split(".")[1].length;
+    } catch (e) {
+        baseNum1 = 0;
+    }
+    try {
+        baseNum2 = num2.toString().split(".")[1].length;
+    } catch (e) {
+        baseNum2 = 0;
+    }
+    baseNum = Math.pow(10, Math.max(baseNum1, baseNum2));
+    return (Math.round(num1 * baseNum) + Math.round(num2 * baseNum)) / baseNum;
+};
+
+function costInfoSubmit() {
+	if ($.validate.form()) {
+		$.operate.save("costInfoAdd", $("#costInfo-form").serialize());
+	}
+}
+
+function num(obj){
+	obj.value = obj.value.replace(/[^\d.]/g,""); 
+	obj.value = obj.value.replace(/^\./g,""); 
+	obj.value = obj.value.replace(/\.{2,}/g,"."); 
+	obj.value = obj.value.replace(".","$#$").replace(/\./g,"").replace("$#$",".");
+	obj.value = obj.value.replace(/^(\-)*(\d+)\.(\d\d).*$/,'$1$2.$3'); 
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,551 @@
+<!doctype html>
+<html class="no-js" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport"
+	content="width=ideal viewport, initial-scale=1 user-scalable=0" />
+<meta http-equiv="Cache-Control"
+	content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<title>工厂信息</title>
+<link rel="stylesheet"
+	th:href="${'/webapp/css/font-awesome.css?v='+@toolsUtils.version()}">
+<link rel="stylesheet"
+	th:href="${'/webapp/css/com.css?v='+@toolsUtils.version()}">
+<link rel="stylesheet"
+	th:href="${'/webapp/css/style.css?v='+@toolsUtils.version()}">
+    <script th:src="${'/webapp/js/jquery.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/jquery.cookie.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/common.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/plugin/layer_mobile/layer.js?v='+@toolsUtils.version()}"></script>
+    <!--json 序列化-->
+    <script th:src="${'/js/jquery.serializejson.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/ajax/libs/layui/layui.js?v='+@toolsUtils.version()}"></script>
+<style>
+.factoryInfo_header {
+    background: #ededed;
+    line-height: 6vh;
+}
+.factoryInfo_header .title {
+    padding-left: 8px;
+    color: #000;
+    font-weight: bold;
+    font-size: 1.6rem;
+}
+.factoryInfo_header .title i {
+    float: left;
+    line-height: 6vh;
+}
+.factoryInfo_header .title span {
+	display: flex;
+    justify-content: center;
+    font-weight: bold;
+}
+.factoryInfo_formBox {
+	font-size: 1.5rem;
+}
+.factoryInfo_formBox div {
+	line-height: 6vh;
+	margin-left: 3vh;
+}
+.factoryInfo_formBox div p {
+	display: inline-block;
+	border: 1px #dcdcdc solid;
+	background: #f9f9f9;
+	width: 65%;
+	line-height: 4vh;
+}
+.factoryInfo_formBox div span {
+	display: inline-block;
+	width: 26%;
+}
+input {
+	border: 0;
+	outline: none;
+	background-color: rgba(0, 0, 0, 0);
+}
+.factoryInfo_formBox form {
+	margin-top: 3vh;
+}
+.factoryInfo_formBox div p input {
+	width: 56%;
+	line-height: 4vh;
+	padding-left: 0.5vh;
+	width: 98%;
+}
+.factoryInfo_formBox .youDanWei p input {
+	width: 78%;
+}
+.factoryInfo_formBox div p i {
+	margin: 0 1vh;
+	font-style: normal;
+	float: right;
+}
+.factoryInfo_formBox .button_group {
+	width: 80%;
+	margin: 3vh auto;
+}
+.factoryInfo_formBox .button_group a {
+	display: inline-block;
+    width: 45%;
+    text-align: center;
+    line-height: 4ch;
+    font-size: 1.6rem;
+    margin-top: 2vh;
+}
+.factoryInfo_formBox .button_group .reset {
+	background: #f4f4f4;
+	float: left;
+}
+.factoryInfo_formBox .button_group .submit {
+	background: #1d7bb8;
+    color: #fff;
+    float: right;
+}
+
+.form-control, .single-line {
+    background: #FFFFFF none;
+    border: 1px solid #e5e6e7;
+    border-radius: 1px;
+    color: inherit;
+    display: block;
+    padding: 6px 12px;
+    -webkit-transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+    transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+    width: 100%;
+    font-size: 14px;
+}
+
+</style>
+</head>
+<body>
+	<div class="factoryInfo_header">
+		<div class="title" onclick="goBack();" >
+			<i class="fa fa-chevron-left"></i><span>水厂信息</span>
+		</div>
+	</div>
+	<form  id="factory_form" class="form_main"  th:object="${sysFactoryInfo}">
+	<div class="factoryInfo_formBox">
+	
+		<input name="factId" th:field="*{factId}" type="hidden">
+			<div><span>水厂名称</span><p><input  type="text" name="factName" id="factName" maxlength="20"  th:value="*{factName}"></p></div>
+			<div><span>竣工日期</span><p><input type="text" name="finiDate" id="finiDate" maxlength="10"   th:value="*{finiDate}"></p></div>
+			<div><span>开始运营日期</span><p><input type="text" name="startDate" id="startDate" maxlength="10" th:value="*{startDate}"></p></div>
+			<div ><span>设计处理能力</span><p><input type="text" name="ton" id="ton"  oninput = "value=value.replace(/[^\d]/g,'')"  maxlength="12" th:value="*{ton}"><i>吨/天</i></p></div>
+			<div ><span>人员配置</span><p><input type="text" name="personNum" id="personNum"  oninput = "value=value.replace(/[^\d]/g,'')"  maxlength="6" th:value="*{personNum}"><i>人</i></p></div>
+			<div><span>工艺</span><p><input type="text" name="technology" id="technology" maxlength="20" th:value="*{technology}"></p></div>
+			
+			<div class="youDanWei"><span>现执行单价</span><p><input  name="price" id="price"   type="number" min="0"  max="100" maxLength="5" oninput="autoformart($(this))"  th:value="*{price}"><i>元/吨</i></p></div>
+  
+	<div ><span style="width:60%;font-weight:bold;" >水质预警值上下限配置</span></div>
+			<div><span>COD进水上限</span><p><input  name="codInMaxBad" id="codInMaxBad"  type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('codInMaxBad')"  th:value="*{codInMaxBad}"></p></div>		
+			<div><span>COD进水下限</span><p><input  name="codInMinBad" id="codInMinBad"  type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('codInMinBad')"  th:value="*{codInMinBad}"></p></div>
+		
+			<div><span>COD出水上限</span><p><input  name="codOutMaxBad" id="codOutMaxBad"  type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('codOutMaxBad')"  th:value="*{codOutMaxBad}"></p></div>
+			<div><span>COD出水下限</span><p><input  name="codOutMinBad" id="codOutMinBad"  type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('codOutMinBad')"  th:value="*{codOutMinBad}"></p></div>
+			
+			<div><span style="font-size: 1.2rem;">NH3-N进水上限</span><p><input  name="nh3NInMaxBad" id="nh3NInMaxBad"  type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('nh3NInMaxBad')"  th:value="*{nh3NInMaxBad}"></p></div>
+			<div><span style="font-size: 1.2rem;">NH3-N进水下限</span><p><input  name="nh3NInMinBad" id="nh3NInMinBad"  type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('nh3NInMinBad')"  th:value="*{nh3NInMinBad}"></p></div>
+			
+			<div><span style="font-size: 1.2rem;">NH3-N出水上限</span><p><input  name="nh3NOutMaxBad" id="nh3NOutMaxBad"  type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('nh3NOutMaxBad')"  th:value="*{nh3NOutMaxBad}"></p></div>
+			<div><span style="font-size: 1.2rem;">NH3-N出水下限</span><p><input  name="nh3NOutMinBad" id="nh3NOutMinBad"  type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('nh3NOutMinBad')"  th:value="*{nh3NOutMinBad}"></p></div>
+	
+			<div><span>SS进水上限</span><p><input  name="ssInMaxBad" id="ssInMaxBad"  type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('ssInMaxBad')"  th:value="*{ssInMaxBad}"></p></div>
+			<div><span>SS进水下限</span><p><input  name="ssInMinBad" id="ssInMinBad"  type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('ssInMinBad')"  th:value="*{ssInMinBad}"></p></div>
+
+			<div><span>SS出水上限</span><p><input  name="ssOutMaxBad" id="ssOutMaxBad"  type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('ssOutMaxBad')"  th:value="*{ssOutMaxBad}"></p></div>
+			<div><span>SS出水下限</span><p><input  name="ssOutMinBad" id="ssOutMinBad"  type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('ssOutMinBad')"  th:value="*{ssOutMinBad}"></p></div>
+
+			<div><span style="font-size: 1.2rem;">PH值进水上限</span><p><input  name="phInMaxBad" id="phInMaxBad"  type="number" min="0"  max="14" maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('phInMaxBad')"  th:value="*{phInMaxBad}"></p></div>
+			<div><span style="font-size: 1.2rem;">PH值进水下限</span><p><input  name="phInMinBad" id="phInMinBad"  type="number" min="0" max="14"  maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('phInMinBad')"  th:value="*{phInMinBad}"></p></div>
+
+			<div><span style="font-size: 1.2rem;">PH值出水上限</span><p><input  name="phOutMaxBad" id="phOutMaxBad"  type="number" min="0" max="14" maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('phOutMaxBad')"  th:value="*{phOutMaxBad}"></p></div>
+			<div><span style="font-size: 1.2rem;">PH值出水下限</span><p><input  name="phOutMinBad" id="phOutMinBad"  type="number" min="0" max="14"  maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('phOutMinBad')"  th:value="*{phOutMinBad}"></p></div>
+
+ 			<div><span>TP进水上限</span><p><input  name="tpInMaxBad" id="tpInMaxBad"  type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('tpInMaxBad')"  th:value="*{tpInMaxBad}"></p></div>
+  			<div><span>TP进水下限</span><p><input  name="tpInMinBad" id="tpInMinBad"  type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('tpInMinBad')"  th:value="*{tpInMinBad}"></p></div>
+            
+   			<div><span>TP出水上限</span><p><input  name="tpOutMaxBad" id="tpOutMaxBad"  type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('tpOutMaxBad')"  th:value="*{tpOutMaxBad}"></p></div>
+ 			<div><span>TP出水下限</span><p><input  name="tpOutMinBad" id="tpOutMinBad"  type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('tpOutMinBad')"  th:value="*{tpOutMinBad}"></p></div>
+ 
+   			<div><span>TN进水上限</span><p><input  name="tnInMaxBad" id="tnInMaxBad"  type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('tnInMaxBad')"  th:value="*{tnInMaxBad}"></p></div>
+   			<div><span>TN进水下限</span><p><input  name="tnInMinBad" id="tnInMinBad"  type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('tnInMinBad')"  th:value="*{tnInMinBad}"></p></div>
+
+   			<div><span>TN出水上限</span><p><input  name="tnOutMaxBad" id="tnOutMaxBad"  type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('tnOutMaxBad')"  th:value="*{tnOutMaxBad}"></p></div>
+  			<div><span>TN出水下限</span><p><input  name="tnOutMinBad" id="tnOutMinBad"  type="number" min="0"  maxLength="6" oninput="autoformart($(this));num(this)" onChange="limitNum('tnOutMinBad')"  th:value="*{tnOutMinBad}"></p></div>
+			
+		    <div class="button_group">
+           	<a class="reset" onclick="goBack_onload();" >返回</a>
+           	<a class="submit"  id="submit">提交</a>
+            </div>       
+	</div>
+	 </form>
+</body>
+<!-- scripts -->
+
+<script th:inline="javascript">
+
+//时间控件
+layui.use('laydate', function () {
+    var laydate = layui.laydate;
+    //执行一个laydate实例
+    laydate.render({
+        elem: '#finiDate', //指定元素
+        showBottom: false,
+        format: 'yyyy-MM-dd',
+        trigger: 'click'
+    });
+    laydate.render({
+        elem: '#startDate', //指定元素
+        showBottom: false,
+        format: 'yyyy-MM-dd',
+        trigger: 'click'
+    });
+});
+
+
+    $(function () {
+        $("#submit").click(function () {
+        
+            var field = $('#factory_form').serializeJSON();
+           
+            if (field["factName"] == "") {
+                layer.open({
+                    content: '请填写水厂名称！',
+                    btn: '知道了'
+                });
+                $("#factName").focus();
+                return false;
+            }
+            if (field["startDate"] == "") {
+                layer.open({
+                    content: '请填写开始运营日期！',
+                    btn: '知道了'
+                });
+                $("#startDate").focus();
+                return false;
+            }
+            if (field["ton"] == "") {
+                layer.open({
+                    content: '请填写设计处理能力！',
+                    btn: '知道了'
+                });
+                $("#ton").focus();
+                return false;
+            }
+              if (field["personNum"] == "") {
+                layer.open({
+                    content: '请填写人员配置！',
+                    btn: '知道了'
+                });
+                $("#personNum").focus();
+                return false;
+            }
+             
+          
+             if (field["price"] == "") {
+                layer.open({
+                    content: '请填写现执行单价！',
+                    btn: '知道了'
+                });
+                $("#price").focus();
+                return false;
+            }
+                 
+            
+            req("/app/doEdit",field, function (result) {
+          
+                if (result.code == 0) {
+                       layer.open({
+                          content: "修改成功!",
+                          btn: '知道了'
+                         });
+                         setTimeout( function(){
+                             window.top.location.href = "/app/homeAdmin";
+                         }, 3 * 300 )
+                } else {
+                    layer.open({
+                        content: result.msg,
+                        btn: '知道了'
+                    });
+                    
+                }
+               
+                
+            }, "post");
+        });
+    });
+</script>
+<script>
+	//获取节点
+    let inp = document.getElementById('price');
+    //给节点添加键盘抬起事件
+    inp.onkeyup = function restrictNumber() {
+        let inpu = document.getElementById('price');
+        inpu.value = inpu.value.replace(/[^\d.]/g, "");  
+        inpu.value = inpu.value.replace(/\.{2,}/g, "."); 
+        inpu.value = inpu.value.replace(".", "$#*").replace(/\./g,'').replace('$#*','.');
+        inpu.value = inpu.value.replace(/^(\d+)\.(\d\d).*$/, '$1.$2');
+        if (inpu.value.indexOf(".") < 0 && inpu.value != "") { 
+            inpu.value = parseFloat(inpu.value);
+        }
+    }
+    function goBack_onload(){
+      window.top.location.href = "/app/homeAdmin";
+    }
+  // input限制
+function autoformart(obj) {
+	var val = obj.val();
+	if (val == null || val == undefined || val == "") {
+		obj.val("");
+		return;
+	}
+	var maxLength = obj.attr("maxLength");
+	var max = obj.attr("max");
+	if (val.length > maxLength) {
+		obj.val(val.slice(0, maxLength)); // 限制长度
+		return;
+	}
+	if (parseFloat(val) > parseFloat(max)) {
+		obj.val(val.slice(0, val.length - 1)); // 限制大小
+		return;
+	}
+	obj.val(parseFloat(val));
+}
+
+//2位小数
+function num(obj){
+	obj.value = obj.value.replace(/[^\d.]/g,""); 
+	obj.value = obj.value.replace(/^\./g,""); 
+	obj.value = obj.value.replace(/\.{2,}/g,"."); 
+	obj.value = obj.value.replace(".","$#$").replace(/\./g,"").replace("$#$",".");
+	obj.value = obj.value.replace(/^(\-)*(\d+)\.(\d\d).*$/,'$1$2.$3'); 
+}
+
+ 	//下限不能超上限，上限不能小于下限
+ 	function limitNum(str) {
+ 	 
+ 		if (str == 'codInMinBad' || str == 'codInMaxBad') {
+ 			var codInMinBad = $("#codInMinBad").val();
+ 			var codInMaxBad = $("#codInMaxBad").val();
+ 			
+ 			if (codInMinBad == null || codInMinBad == undefined || codInMinBad == "") {
+ 				return;
+ 			}
+ 			if (codInMaxBad == null || codInMaxBad == undefined || codInMaxBad == "") {
+ 				return;
+ 			}
+
+ 			if (codInMinBad > codInMaxBad) {
+ 				layer.open({
+ 					content : "cod进水下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#codInMinBad").val(0);
+ 			}
+ 		}
+ 		if (str == 'codOutMinBad' || str == 'codOutMaxBad') {
+ 			var codOutMinBad = $("#codOutMinBad").val();
+ 			var codOutMaxBad = $("#codOutMaxBad").val();
+ 			if (codOutMinBad == null || codOutMinBad == undefined || codOutMinBad == "") {
+ 				return;
+ 			}
+ 			if (codOutMaxBad == null || codOutMaxBad == undefined || codOutMaxBad == "") {
+ 				return;
+ 			}
+ 			if (codOutMinBad > codOutMaxBad) {
+ 				layer.open({
+ 					content : "cod出水下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#codOutMinBad").val(0);
+ 			}
+ 		}
+ 
+ 		if (str == 'nh3NInMinBad' || str == 'nh3NInMaxBad') {
+ 			var nh3NInMinBad = $("#nh3NInMinBad").val();
+ 			var nh3NInMaxBad = $("#nh3NInMaxBad").val();
+ 			if (nh3NInMinBad == null || nh3NInMinBad == undefined || nh3NInMinBad == "") {
+ 				return;
+ 			}
+ 			if (nh3NInMaxBad == null || nh3NInMaxBad == undefined || nh3NInMaxBad == "") {
+ 				return;
+ 			}
+ 			if (nh3NInMinBad > nh3NInMaxBad) {
+ 				layer.open({
+ 					content : "NH3-N进水下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#nh3NInMinBad").val(0);
+ 			}
+ 		}
+ 		//nh3NOutMinBad
+ 		if (str == 'nh3NOutMinBad' || str == 'nh3NOutMaxBad') {
+ 			var nh3NOutMinBad = $("#nh3NOutMinBad").val();
+ 			var nh3NOutMaxBad = $("#nh3NOutMaxBad").val();
+ 			if (nh3NOutMinBad == null || nh3NOutMinBad == undefined || nh3NOutMinBad == "") {
+ 				return;
+ 			}
+ 			if (nh3NOutMaxBad == null || nh3NOutMaxBad == undefined || nh3NOutMaxBad == "") {
+ 				return;
+ 			}
+ 			if (nh3NOutMinBad > nh3NOutMaxBad) {
+ 				layer.open({
+ 					content : "NH3-N出水下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#nh3NOutMinBad").val(0);
+ 			}
+ 		}
+ 		//ssInMinBad
+ 		if (str == 'ssInMinBad' || str == 'ssInMaxBad') {
+ 			var ssInMinBad = $("#ssInMinBad").val();
+ 			var ssInMaxBad = $("#ssInMaxBad").val();
+ 			if (ssInMinBad == null || ssInMinBad == undefined || ssInMinBad == "") {
+ 				return;
+ 			}
+ 			if (ssInMaxBad == null || ssInMaxBad == undefined || ssInMaxBad == "") {
+ 				return;
+ 			}
+ 			if (ssInMinBad > ssInMaxBad) {
+ 				layer.open({
+ 					content : "SS进水下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#ssInMinBad").val(0);
+ 			}
+ 		}
+ 		//ssOutMinBad
+ 		if (str == 'ssOutMinBad' || str == 'ssOutMaxBad') {
+ 			var ssOutMinBad = $("#ssOutMinBad").val();
+ 			var ssOutMaxBad = $("#ssOutMaxBad").val();
+ 			if (ssOutMinBad == null || ssOutMinBad == undefined || ssOutMinBad == "") {
+ 				return;
+ 			}
+ 			if (ssOutMaxBad == null || ssOutMaxBad == undefined || ssOutMaxBad == "") {
+ 				return;
+ 			}
+ 			if (ssOutMinBad > ssOutMaxBad) {
+ 				layer.open({
+ 					content : "SS出水下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#ssOutMinBad").val(0);
+ 			}
+ 		}
+ 		//phInMinBad
+ 		if (str == 'phInMinBad' || str == 'phInMaxBad') {
+ 			var phInMinBad = $("#phInMinBad").val();
+ 			var phInMaxBad = $("#phInMaxBad").val();
+ 			if (phInMinBad == null || phInMinBad == undefined || phInMinBad == "") {
+ 				return;
+ 			}
+ 			if (phInMaxBad == null || phInMaxBad == undefined || phInMaxBad == "") {
+ 				return;
+ 			}
+ 			if (phInMinBad > phInMaxBad) {
+ 				layer.open({
+ 					content : "PH进水下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#phInMinBad").val(0);
+ 			}
+ 		}
+ 
+ 		//phOutMinBad
+ 		if (str == 'phOutMinBad' || str == 'phOutMaxBad') {
+ 			var phOutMinBad = $("#phOutMinBad").val();
+ 			var phOutMaxBad = $("#phOutMaxBad").val();
+ 			if (phOutMinBad == null || phOutMinBad == undefined || phOutMinBad == "") {
+ 				return;
+ 			}
+ 			if (phOutMaxBad == null || phOutMaxBad == undefined || phOutMaxBad == "") {
+ 				return;
+ 			}
+ 			if (phOutMinBad > phOutMaxBad) {
+ 				layer.open({
+ 					content : "PH出水下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#phOutMinBad").val(0);
+ 			}
+ 		}
+ 		//tpInMinBad
+ 		if (str == 'tpInMinBad' || str == 'tpInMaxBad') {
+ 			var tpInMinBad = $("#tpInMinBad").val();
+ 			var tpInMaxBad = $("#tpInMaxBad").val();
+ 			if (tpInMinBad == null || tpInMinBad == undefined || tpInMinBad == "") {
+ 				return;
+ 			}
+ 			if (tpInMaxBad == null || tpInMaxBad == undefined || tpInMaxBad == "") {
+ 				return;
+ 			}
+ 			if (tpInMinBad > tpInMaxBad) {
+ 				layer.open({
+ 					content : "TP进水下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#tpInMinBad").val(0);
+ 			}
+ 		}
+ 		//tpOutMinBad
+ 		if (str == 'tpOutMinBad' || str == 'tpOutMaxBad') {
+ 			var tpOutMinBad = $("#tpOutMinBad").val();
+ 			var tpOutMaxBad = $("#tpOutMaxBad").val();
+ 			if (tpOutMinBad == null || tpOutMinBad == undefined || tpOutMinBad == "") {
+ 				return;
+ 			}
+ 			if (tpOutMaxBad == null || tpOutMaxBad == undefined || tpOutMaxBad == "") {
+ 				return;
+ 			}
+ 			if (tpOutMinBad > tpOutMaxBad) {
+ 				layer.open({
+ 					content : "TP出水下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#tpOutMinBad").val(0);
+ 			}
+ 		}
+ 
+ 		//tnInMinBad 		
+ 		if (str == 'tnInMinBad' || str == 'tnInMaxBad') {
+ 			var tnInMinBad = $("#tnInMinBad").val();
+ 			var tnInMaxBad = $("#tnInMaxBad").val();
+ 			if (tnInMinBad == null || tnInMinBad == undefined || tnInMinBad == "") {
+ 				return;
+ 			}
+ 			if (tnInMaxBad == null || tnInMaxBad == undefined || tnInMaxBad == "") {
+ 				return;
+ 			}
+ 			if (tnInMinBad > tnInMaxBad) {
+ 				layer.open({
+ 					content : "TN进水下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#tnInMinBad").val(0);
+ 			}
+ 		}
+ 		//tnOutMinBad
+ 		if (str == 'tnOutMinBad' || str == 'tnOutMaxBad') {
+ 			var tnOutMinBad = $("#tnOutMinBad").val();
+ 			var tnOutMaxBad = $("#tnOutMaxBad").val();
+ 			if (tnOutMinBad == null || tnOutMinBad == undefined || tnOutMinBad == "") {
+ 				return;
+ 			}
+ 			if (tnOutMaxBad == null || tnOutMaxBad == undefined || tnOutMaxBad == "") {
+ 				return;
+ 			}
+ 			if (tnOutMinBad > tnOutMaxBad) {
+ 				layer.open({
+ 					content : "TN出水下限不能超过上限！",
+ 					btn : '知道了'
+ 				});
+ 				$("#tnOutMinBad").val(0);
+ 			}
+ 		}
+ 
+ 	}
+</script>
+
+</html>

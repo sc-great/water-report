@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+<th:block th:include="admin/include :: header('新增水厂电耗信息')" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content main_rigth">
+    <form class="form-horizontal m" id="form-todayElectricityInfo-add">
+        <input id="todayElectricityInfo_params" name="params[icon]" th:value="${icon}" type="hidden">
+        <div class="form-group">
+            <label class="col-sm-2 control-label is-required label-left">当日水厂电耗：</label>
+            <div class="col-sm-10">
+                <div class="input-group">
+                    <input name="todayElectricity" id="todayElectricity" class="form-control" placeholder="请输入当日水厂电耗" required
+                    		type="number" min="0" max="100000" maxLength="6" oninput="autoformart($(this));todayElectricityInfo_autoCalculate1()"/>
+                    <span class="input-group-addon">KWH</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">    
+            <label class="col-sm-2 control-label label-left">累计水厂电耗：</label>
+            <div class="col-sm-10">
+                <div class="input-group">
+                    <input name="totalElectricity" id="totalElectricity" class="form-control" placeholder="请输入累计水厂电耗" 
+                    		type="number" readonly/>
+                    <span class="input-group-addon">KWH</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">    
+            <label class="col-sm-2 control-label label-left">泵站当日电耗：</label>
+            <div class="col-sm-10">
+                <div class="input-group">
+                    <input name="pumpTodayEletricity" id="pumpTodayEletricity" class="form-control" placeholder="请输入泵站当日电耗" 
+                    		type="number" min="0" max="100000" maxLength="6" oninput="autoformart($(this));todayElectricityInfo_autoCalculate2()"/>
+                    <span class="input-group-addon">KWH</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">    
+            <label class="col-sm-2 control-label label-left">泵站累计电耗：</label>
+            <div class="col-sm-10">
+                <div class="input-group">
+                    <input name="pumpTotalEletricity" id="pumpTotalEletricity" class="form-control" placeholder="请输入泵站累计电耗" 
+                    		type="number" readonly/>
+                    <span class="input-group-addon">KWH</span>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: form" />
+</body>
+<script type="text/javascript">
+var form_todayElectricityInfo_add_prefix = ctx + "admin/report/todayElectricityInfo";
+
+$("#form-todayElectricityInfo-add").validate({
+    focusCleanup: true
+});
+
+function submitHandler() {
+    if ($.validate.form()) {
+        $.operate.save(form_todayElectricityInfo_add_prefix + "/doAdd", $('#form-todayElectricityInfo-add').serialize());
+    }
+}
+
+function index_todayElectricityInfo_submitHandler() {
+    if ($.validate.formRequired("form-todayElectricityInfo-add")) {
+        $.operate.saveModal(form_todayElectricityInfo_add_prefix + "/doAdd", $('#form-todayElectricityInfo-add').serialize());
+    }
+}
+
+var totala = 0; //水厂原有当天日期以前的累计量
+var totalb = 0; // 泵站原有当天日期以前的累计量
+
+$.post(form_todayElectricityInfo_add_prefix + "/getLatest", function (data) {
+    if (data.data != null && data.data != undefined) {
+        $(".input-group input[name=\"totalElectricity\"]").val(data.data.totalElectricity);
+        $(".input-group input[name=\"pumpTotalEletricity\"]").val(data.data.pumpTotalEletricity);
+        totala = data.data.totalElectricity;
+        totalb = data.data.pumpTotalEletricity;
+    }
+});
+
+// 自动计算
+function todayElectricityInfo_autoCalculate1() {
+    var a = document.getElementById("todayElectricity").value;
+    var c = Number(a) + Number(totala);
+    document.getElementById("totalElectricity").value = c.toFixed(2);
+}
+function todayElectricityInfo_autoCalculate2() {
+    var a = document.getElementById("pumpTodayEletricity").value;
+    var c = Number(a) + Number(totalb);
+    document.getElementById("pumpTotalEletricity").value = c.toFixed(2);
+}
+
+$.post(form_todayElectricityInfo_add_prefix + "/checkIsOver?operateIcon=add", function (data) {
+    if (data.code == web_status.SUCCESS) {
+        $("#todayElectricityInfo_params").val("1");
+    } else if (data.code == web_status.FAIL) {
+        $("#todayElectricityInfo_params").val("2");
+        $(".input-group input[name=\"todayElectricity\"]").val(data.data.todayElectricity);
+        $(".input-group input[name=\"totalElectricity\"]").val(data.data.totalElectricity);
+        $(".input-group input[name=\"pumpTodayEletricity\"]").val(data.data.pumpTodayEletricity);
+        $(".input-group input[name=\"pumpTotalEletricity\"]").val(data.data.pumpTotalEletricity);
+    }
+});
+
+// input限制
+function autoformart(obj) {
+	var val = obj.val();
+	if (val == null || val == undefined || val == "") {
+		obj.val("");
+		return;
+	}
+	var maxLength = obj.attr("maxLength");
+	var max = obj.attr("max");
+	if (val.length > maxLength) {
+		obj.val(val.slice(0, maxLength)); // 限制长度
+		return;
+	}
+	if (parseFloat(val) > parseFloat(max)) {
+		obj.val(val.slice(0, val.length - 1)); // 限制大小
+		return;
+	}
+	obj.val(parseFloat(val));
+}
+</script>
+</html>

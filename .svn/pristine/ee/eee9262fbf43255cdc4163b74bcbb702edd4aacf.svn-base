@@ -1,0 +1,550 @@
+<!doctype html>
+<html class="no-js" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="viewport" content="width=ideal viewport, initial-scale=1 user-scalable=0"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+<title>中国水环境集团</title>
+<link rel="stylesheet" th:href="${'/webapp/css/font-awesome.css?v='+@toolsUtils.version()}"/>
+<link rel="stylesheet" th:href="${'/webapp/css/com.css?v='+@toolsUtils.version()}"/>
+<link rel="stylesheet" th:href="${'/webapp/css/style.css?v='+@toolsUtils.version()}"/>
+<script th:src="${'/webapp/js/jquery.min.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/webapp/js/pace.min.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/webapp/js/jquery.cookie.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/webapp/js/plugin/layer_mobile/layer.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/webapp/js/plugin/sparkline/jquery.sparkline.min.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/webapp/js/common.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/webapp/js/jquery.event.drag-1.5.min.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/webapp/js/jquery.touchSlider.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/webapp/js/jQuery.textSlider.js?v='+@toolsUtils.version()}"></script>
+<style type="text/css">
+* {
+	font-family: "微软雅黑";
+}
+.main {
+    background: #F9F9F7 url('/webapp/image/home_bg.png') no-repeat center top;
+    background-size: 100% auto;
+}
+.ibox {
+	border: 1px #1590ee solid;
+}
+.ibox .ibox-title {
+	margin-top: 1.5vh;
+}
+.ibox .ibox-title .tips {
+	text-align: right;
+	padding-right: 3%;
+}
+.table_edicine div {
+	padding: 0!important;
+}
+.table_edicine .meiyihang_title {
+	background: #4d9dd0;
+	height: 5vh;
+	line-height: 5vh;
+}
+.table_edicine .meiyihang_content div div {
+	height: 5vh;
+	line-height: 5vh;
+}
+.table_edicine .meiyihang_content .youbeijing {
+	background: #f1f8fe
+}
+.danhang div div {
+	padding: 0!important;
+	line-height: 4vh;
+}
+</style>
+<style>
+input {
+	border: 0;
+	outline: none;
+	background-color: rgba(0, 0, 0, 0);
+}
+input {
+	border: 1px #dcdcdc solid;
+	background: #f9f9f9;
+}
+.home_main_form {
+	width: 96%;
+	margin: 2vh auto;
+}
+.home_main_form .from_box {
+	width: 100%;
+	border: 1px #1590ee solid;
+	font-size: 1.5rem;
+	background: #fff;
+	margin: 1vh 0;
+}
+.home_main_form .other {
+	border-color: #ff7e00;
+}
+.home_main_form .from_box .ibox-title {
+	width: 100%;
+	height: 5vh;
+	display: table;
+	text-decoration: none;
+	margin: 1.5vh 0;
+}
+.home_main_form .from_box .ibox-title .icon,.home_main_form .from_box .ibox-title .icon_w {
+	height: 100%;
+	width: 10vw;
+	display: table-cell;
+	text-align: center;
+	vertical-align: middle;
+}
+.home_main_form .from_box .ibox-title .icon img {
+	height: auto;
+	width: 5vw;
+}
+.home_main_form .from_box .ibox-title .icon_w img {
+	height: auto;
+	width: 3.5vw;
+}
+.home_main_form .from_box .ibox-title .text {
+	display: table-cell;
+	vertical-align: middle;
+	font-size: 1.4rem;
+	font-weight: bold;
+}
+.from_box p {
+	line-height: 5vh;
+	margin-left: 3vh;
+}
+.from_box p span {
+	display: inline-block;
+  	width: 26%;
+}
+.from_box p input {
+	width: 50%;
+	line-height: 3.5vh;
+	padding-left: 0.5vh;
+}
+.from_box p b {
+	font-weight: normal;
+  	margin-left: 1vh;
+}
+.from_box .button_group {
+	width: 80%;
+  	margin: 3vh auto;
+}
+.from_box .button_group a {
+	display: inline-block;
+    width: 45%;
+    text-align: center;
+    line-height: 3.5ch;
+}
+.from_box .button_group .reset {
+	background: #f4f4f4;
+}
+.from_box .button_group .submit {
+	background: #1d7bb8;
+    color: #fff;
+    float: right;
+}
+</style>
+</head>
+<body>
+<div class="main">
+    <div class="home_top" style="height:36%;">
+        <div class="menu_table">
+            <div class="menu_row">
+                <a class="menu_cell" th:href="${'/app/waterQualityArea'}">
+                    <div class="img-table">
+                        <div class="img-cel">
+                            <img th:src="@{/webapp/image/sz.png}">
+                        </div>
+                    </div>
+                    <div class="menu_name">水质统计</div>
+                </a>
+                <a class="menu_cell" th:href="${'/app/waterYieldArea'}">
+                    <div class="img-table">
+                        <div class="img-cel">
+                            <img th:src="@{/webapp/image/sl.png}">
+                        </div>
+                    </div>
+                    <div class="menu_name">水量统计</div>
+                </a>
+                <a class="menu_cell" th:href="${'/app/electricQuantityArea'}">
+                    <div class="img-table">
+                        <div class="img-cel img_w">
+                            <img th:src="@{/webapp/image/dh.png}">
+                        </div>
+                    </div>
+                    <div class="menu_name">电耗统计</div>
+                </a>
+                <a class="menu_cell" th:href="${'/app/medicationArea'}">
+                    <div class="img-table">
+                        <div class="img-cel">
+                            <img th:src="@{/webapp/image/yh.png}">
+                        </div>
+                    </div>
+                    <div class="menu_name">药耗统计</div>
+                </a>
+            </div>
+            <div class="menu_row">
+            	<a class="menu_cell" th:href="${'/app/sludgeArea'}">
+                    <div class="img-table">
+                        <div class="img-cel img_w">
+                            <img th:src="@{/webapp/image/wn.png}">
+                        </div>
+                    </div>
+                    <div class="menu_name">污泥统计</div>
+                </a>
+                <a class="menu_cell" th:href="${'/app/testWaterArea'}">
+                    <div class="img-table">
+                        <div class="img-cel">
+                            <img th:src="@{/webapp/image/hy.png}">
+                        </div>
+                    </div>
+                    <div class="menu_name">化验数据</div>
+                </a>
+                
+                <a class="menu_cell" th:href="${'/app/beOnDutyArea'}">
+                    <div class="img-table">
+                        <div class="img-cel">
+                            <img th:src="@{/webapp/image/zb.png}">
+                        </div>
+                    </div>
+                    <div class="menu_name">值班统计</div>
+                </a>
+                <a class="menu_cell" th:href="${'/app/comprehensiveArea'}">
+                    <div class="img-table">
+                        <div class="img-cel">
+                            <img th:src="@{/webapp/image/zhtj.png}">
+                        </div>
+                    </div>
+                    <div class="menu_name">综合统计</div>
+                </a>
+            </div>
+            <div class="menu_row">
+            	<a class="menu_cell" href="#">
+                    <div class="img-table">
+                        <div class="img-cel">
+                            <img th:src="@{/webapp/image/sf.png}">
+                        </div>
+                    </div>
+                    <div class="menu_name">收费情况</div>
+                </a>
+                <a class="menu_cell" href="#">
+                    <div class="img-table">
+                        <div class="img-cel">
+                            <img th:src="@{/webapp/image/qzjc.png}">
+                        </div>
+                    </div>
+                    <div class="menu_name">强制检测</div>
+                </a>
+                <a class="menu_cell" th:href="${'/app/consumable'}">
+                    <div class="img-table">
+                        <div class="img-cel">
+                            <img th:src="@{/webapp/image/bpbj.png}">
+                        </div>
+                    </div>
+                    <div class="menu_name">备品备件</div>
+                </a>
+                <a class="menu_cell" th:href="${'/app/factoryInfo'}">
+                    <div class="img-table">
+                        <div class="img-cel">
+                            <img th:src="@{/webapp/image/scxx.png}">
+                        </div>
+                    </div>
+                    <div class="menu_name">水厂信息</div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="home_main">
+    	<div class="ibox" style="border-color:#1590ee;">
+            <a class="ibox-title" th:href="${'/app/beOnDutyArea'}">
+                <div class="icon">
+                    <img th:src="@{/webapp/image/icon-yynl.png}">
+                </div>
+                <div class="text">运营能力</div>
+            </a>
+            <div class="ibox-content danhang" style="margin-top:0;">
+                <div class="row" style="margin-top:1vh;">
+                    <div class="cel cel-2 font-size-15" style="text-align:left;margin-left:10%;width:30%;">设计处理能力</div>
+                    <div class="cel cel-3 font-size-16 bold" style="width:30%;"><span class="color-1">10000 吨/天</span></div>
+                </div>
+                <div class="row" style="margin-bottom:2vh;">
+                    <div class="cel cel-2 font-size-15" style="text-align:left;margin-left:10%;width:30%;">到标率</div>
+                    <div class="cel cel-3 font-size-16 bold" style="width:30%;"><span class="color-1">100%</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="ibox" style="border-color:#ff7e00;">
+            <a class="ibox-title" th:href="${'/app/beOnDutyArea'}">
+                <div class="icon">
+                    <img th:src="@{/webapp/image/icon-zb.png}">
+                </div>
+                <div class="text">当日值班统计</div>
+            </a>
+            <div class="ibox-content" style="margin-top:0;">
+                <div class="row">
+                    <div class="cel cel-2 font-size-15" style="text-align:left;margin-left:10%;width:10%;">到岗</div>
+                    <div class="cel cel-3 font-size-16 bold" style="width:30%;">
+                        <span class="color-1" th:text="${(workerCount!=null?workerCount:'0')+'/'+(workerTotal!=null?workerTotal:'0')}"></span>
+                        <span class="color-2 font-size-15" th:text="${((workerCount!=null && workerTotal!=null && workerTotal>0)?#numbers.formatDecimal((workerCount*100.0/workerTotal),0,1):'0')+'%'}" style="font-weight:400;"></span></div>
+                    <div class="cel cel-2 font-size-15" style="text-align:left;margin-left:5%;width:20%;">现场/远程</div>
+                    <div class="cel cel-3 font-size-16 bold" style="width:25%;"><span class="color-1" th:text="${(sceneWorkerCount!=null?sceneWorkerCount:'0')+'/'+(onlineWorkerCount!=null?onlineWorkerCount:'0')}"></span></div>
+                </div>
+            </div>
+        </div>
+        <div class="ibox" style="border-color:#1590ee;">
+            <a class="ibox-title" th:href="${'/app/beOnDutyArea'}">
+                <div class="icon">
+                    <img th:src="@{/webapp/image/icon-sfjz.png}">
+                </div>
+                <div class="text">收费进展</div>
+            </a>
+            <div class="ibox-content" style="margin-top:0;">
+                <div class="row">
+                    <div class="cel cel-2 font-size-15" style="text-align:left;margin-left:10%;width:20%;">收费进展</div>
+                    <div class="cel cel-3 font-size-16 bold" style="width:30%;"><span class="color-1">100%</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="ibox" style="border-color:#ff7e00;">
+            <a class="ibox-title" th:href="${'/app/waterYieldArea'}">
+                <div class="icon">
+                    <img th:src="@{/webapp/image/icon-sl.png}">
+                </div>
+                <div class="text">水量统计</div>
+                <div class="tips">
+                    <div class="legend"><span class="bg-color2"></span>进水</div>
+                    <div class="legend"><span class="bg-color1"></span>出水</div>
+                </div>
+            </a>
+            <div class="ibox-content">
+                <div class="row">
+                    <div class="cel cel-3 font-size-15" style="line-height:6vh;text-align:left;margin-left:10%;width:20%;">当日水量</div>
+                    <div class="cel cel-2 font-size-16 bold" style="line-height:3vh;width:20%;">
+                        <div class="color-2" style="margin-bottom:5px;" th:text="${(sumWaterYield?.totalTodayIn!=null?sumWaterYield?.totalTodayIn:'0')+''}"></div> 
+                        <div class="color-1" th:text="${(sumWaterYield?.totalTodayOut!=null?sumWaterYield?.totalTodayOut:'0')+''}"></div>
+                    </div>
+                    <div class="cel cel-2 font-size-15" style="line-height:6vh;margin-left:5%;width:20%;">累计水量</div>
+                    <div class="cel cel-3 font-size-16 bold" style="line-height:3vh;width:25%;">
+                    	<div class="color-2" style="margin-bottom:5px;" th:text="${(sumWaterYield?.totalIn!=null?sumWaterYield?.totalIn:'0')+''}"></div>
+                        <div class="color-1" th:text="${(sumWaterYield?.totalOut!=null?sumWaterYield?.totalOut:'0')+''}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ibox" style="border-color:#1590ee;">
+            <a class="ibox-title" th:href="${'/app/electricQuantityArea'}">
+                <div class="icon icon_w">
+                    <img th:src="@{/webapp/image/icon-dh.png}">
+                </div>
+                <div class="text">电耗统计</div>
+                <div class="tips">
+                    <div class="legend"><span class="bg-color2"></span>当日</div>
+                    <div class="legend"><span class="bg-color1"></span>累计</div>
+                </div>
+            </a>
+            <div class="ibox-content">
+                <div class="row">
+                    <div class="cel cel-2 font-size-15" style="line-height:6vh;text-align:left;margin-left:10%;width:20%;">水厂电耗</div>
+                    <div class="cel cel-3 font-size-16 bold" style="line-height:3vh;width:20%;">
+                        <div class="color-2" style="margin-bottom:5px;" th:text="${sumElectricity?.totalTodayElectricity}"></div>
+                        <div class="color-1" th:text="${sumElectricity?.totalTotalElectricity}"></div>
+                    </div>
+                    <div class="cel cel-2 font-size-15" style="line-height:6vh;margin-left:5%;width:20%;">泵站电耗</div>
+                    <div class="cel cel-3 font-size-16 bold" style="line-height:3vh;width:25%;">
+                        <div class="color-2" style="margin-bottom:5px;" th:text="${sumElectricity?.totalPumpTodayEletricity}"></div>
+                        <div class="color-1" th:text="${sumElectricity?.totalPumpTotalEletricity}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ibox" style="border-color:#ff7e00;">
+            <a class="ibox-title" th:href="${'/app/medicationArea'}">
+                <div class="icon icon_w">
+                    <img th:src="@{/webapp/image/icon-yh.png}">
+                </div>
+                <div class="text">药量统计(KG)</div>
+                <div class="tips">
+                    <div class="legend"><span class="bg-color2"></span>当日</div>
+                    <div class="legend"><span class="bg-color1"></span>累计</div>
+                </div>
+            </a>
+            <div class="ibox-content center table_edicine">
+                <div class="row border-bottom font-size-15 meiyihang_title">
+                    <div class="cel cel-2">PAC</div>
+                    <div class="cel cel-3">PAM阴离子</div>
+                    <div class="cel cel-3">PAM阳离子</div>
+                    <div class="cel cel-2">葡萄糖</div>
+                </div>
+                <div class="row meiyihang_content">
+                    <div class="cel cel-2 font-size-16 bold">
+                        <div class="color-2" th:text="${sumMedicine?.sumTodayPAC}"></div>
+                        <div class="color-1" th:text="${sumMedicine?.sumTotalPAC}"></div>
+                    </div>
+                    <div class="cel cel-3 font-size-16 bold youbeijing">
+                        <div class="color-2" th:text="${sumMedicine?.sumTodayPAMYin}"></div>
+                        <div class="color-1" th:text="${sumMedicine?.sumTotalPAMYin}"></div>
+                    </div>
+                    <div class="cel cel-3 font-size-16 bold">
+                        <div class="color-2" th:text="${sumMedicine?.sumTodayPAMYang}"></div>
+                        <div class="color-1" th:text="${sumMedicine?.sumTotalPAMYang}"></div>
+                    </div>
+                    <div class="cel cel-2 font-size-16 bold youbeijing">
+                        <div class="color-2" th:text="${sumMedicine?.sumTodayGlucose}"></div>
+                        <div class="color-1" th:text="${sumMedicine?.sumTotalGlucose}"></div>
+                    </div>
+                </div>
+                <div class="row border-bottom font-size-15 meiyihang_title">
+                    <div class="cel cel-2">NaCLO</div>
+                    <div class="cel cel-3">复核除磷剂</div>
+                    <div class="cel cel-3">石灰</div>
+                    <div class="cel cel-2">葡萄糖</div>
+                </div>
+                <div class="row meiyihang_content">
+                    <div class="cel cel-2 font-size-16 bold">
+                        <div class="color-2" th:text="${sumMedicine?.sumTodayNaCLO}"></div>
+                        <div class="color-1" th:text="${sumMedicine?.sumTotalNaCLO}"></div>
+                    </div>
+                    <div class="cel cel-3 font-size-16 bold youbeijing">
+                        <div class="color-2" th:text="${sumMedicine?.sumTodayPhosphorus}"></div>
+                        <div class="color-1" th:text="${sumMedicine?.sumTotalPhosphorus}"></div>
+                    </div>
+                     <div class="cel cel-3 font-size-16 bold">
+                        <div class="color-2" th:text="${sumMedicine?.sumTodayLime}"></div>
+                        <div class="color-1" th:text="${sumMedicine?.sumTodayLime}"></div>
+                    </div>
+                    <div class="cel cel-2 font-size-16 bold youbeijing">
+                        <div class="color-2" th:text="${sumMedicine?.sumTodayGlucose}"></div>
+                        <div class="color-1" th:text="${sumMedicine?.sumTotalGlucose}"></div>
+                    </div>
+                      
+                </div>
+               <div class="row border-bottom font-size-15 meiyihang_title">
+                    <div class="cel cel-2">氯酸钠</div>
+                    <div class="cel cel-3">乙酸钠</div>
+                </div>
+                <div class="row meiyihang_content">
+                    <div class="cel cel-2 font-size-16 bold">
+                        <div class="color-2" th:text="${sumMedicine?.sumTodaySC}"></div>
+                        <div class="color-1" th:text="${sumMedicine?.sumTotalSC}"></div>
+                    </div>
+                    <div class="cel cel-3 font-size-16 bold youbeijing">
+                        <div class="color-2" th:text="${sumMedicine?.sumTodaySA}"></div>
+                        <div class="color-1" th:text="${sumMedicine?.sumTotalSA}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="home_main_form">
+    	<div class="from_box">
+    		<div class="ibox-title">
+	    		<div class="icon"><img th:src="@{/webapp/image/icon-ws.png}"></div>
+	            <div class="text">污水厂水质信息填报</div>
+	        </div>
+	        <form>
+	        	<p><span>COD进水</span><input><b>Mg/L</b></p>
+		        <p><span>COD出水</span><input><b>Mg/L</b></p>
+		        <p><span>NH3-N进水</span><input><b>Mg/L</b></p>
+		        <p><span>NH3-N出水</span><input><b>Mg/L</b></p>
+		        <p><span>SS进水</span><input><b>Mg/L</b></p>
+		        <p><span>SS出水</span><input><b>Mg/L</b></p>
+		        <p><span>PH值进水</span><input><b></b></p>
+		        <p><span>PH值出水</span><input><b></b></p>
+		        <p><span>TN进水</span><input><b>Mg/L</b></p>
+		        <p><span>TN出水</span><input><b>Mg/L</b></p>
+		        <p><span>MLSS</span><input><b>Mg/L</b></p>
+		        <p><span>SV30</span><input><b>%</b></p>
+	        </form>
+			<div class="button_group">
+            	<a class="reset">重置</a>
+            	<a class="submit">提交</a>
+            </div>
+    	</div>
+    	<div class="from_box other">
+    		<div class="ibox-title">
+	    		<div class="icon"><img th:src="@{/webapp/image/icon-gs.png}"></div>
+	            <div class="text">供水厂水质信息填报</div>
+	        </div>
+	        <form>
+	        	<p><span>PH值进水</span><input><b></b></p>
+	        	<p><span>PH值出水</span><input><b></b></p>
+	        	<p><span>浊度进水</span><input><b>NTU</b></p>
+	        	<p><span>浊度出水</span><input><b>NTU</b></p>
+		        <p><span>COL2进水</span><input><b>Mg/L</b></p>
+		        <p><span>COL2出水</span><input><b>Mg/L</b></p>
+		        <p><span>出水细菌总数</span><input><b>CFU/ml</b></p>
+	        </form>
+	        <div class="button_group">
+            	<a class="reset">重置</a>
+            	<a class="submit">提交</a>
+            </div>
+    	</div>
+    	<div class="from_box">
+    		<div class="ibox-title">
+	    		<div class="icon_w"><img th:src="@{/webapp/image/icon-yl.png}"></div>
+	            <div class="text">水厂药量统计信息填报</div>
+	        </div>
+	        <form>
+	        	<p><span>PAC</span><input><b>KG</b></p>
+	        	<p><span>PAC阴离子</span><input><b>KG</b></p>
+	        	<p><span>PAC阳离子</span><input><b>KG</b></p>
+	        	<p><span>石灰</span><input><b>KG</b></p>
+		        <p><span>复核除磷剂</span><input><b>KG</b></p>
+		        <p><span>氯化氢</span><input><b>KG</b></p>
+		        <p><span>氯化钠</span><input><b>KG</b></p>
+		        <p><span>NaClo</span><input><b>KG</b></p>
+		        <p><span>葡萄糖</span><input><b>KG</b></p>
+		        <p><span>乙酸钠</span><input><b>KG</b></p>
+	        </form>
+	        <div class="button_group">
+            	<a class="reset">重置</a>
+            	<a class="submit">提交</a>
+            </div>
+    	</div>
+    	<div class="from_box other">
+    		<div class="ibox-title">
+	    		<div class="icon_w"><img th:src="@{/webapp/image/icon-sl.png}"></div>
+	            <div class="text">水厂水量信息填报</div>
+	        </div>
+	        <form>
+	        	<p><span>进水水量</span><input><b>吨</b></p>
+		        <p><span>出水水量</span><input><b>吨</b></p>
+	        </form>
+	        <div class="button_group">
+            	<a class="reset">重置</a>
+            	<a class="submit">提交</a>
+            </div>
+    	</div>
+    	<div class="from_box">
+    		<div class="ibox-title">
+	    		<div class="icon"><img th:src="@{/webapp/image/icon-dhs.png}"></div>
+	            <div class="text">水厂电耗信息填报</div>
+	        </div>
+	        <form>
+	        	<p><span>水厂电耗</span><input><b>KWH</b></p>
+		        <p><span>泵站电耗</span><input><b>KWH</b></p>
+	        </form>
+	        <div class="button_group">
+            	<a class="reset">重置</a>
+            	<a class="submit">提交</a>
+            </div>
+    	</div>
+    	<div class="from_box other">
+    		<div class="ibox-title">
+	    		<div class="icon"><img th:src="@{/webapp/image/icon-wn.png}"></div>
+	            <div class="text">水厂污泥数据填报</div>
+	        </div>
+	        <form>
+	        	<p><span>污泥日产量</span><input><b>吨</b></p>
+		        <p><span>污泥含水率</span><input><b>%</b></p>
+	        </form>
+	        <div class="button_group">
+            	<a class="reset">重置</a>
+            	<a class="submit">提交</a>
+            </div>
+    	</div>
+    </div>
+</div>
+</body>
+</html>

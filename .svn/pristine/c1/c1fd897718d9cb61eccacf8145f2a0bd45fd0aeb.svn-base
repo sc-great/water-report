@@ -1,0 +1,97 @@
+package com.boot.framework.shiro.service;
+
+import java.util.concurrent.atomic.AtomicInteger;
+import javax.annotation.PostConstruct;
+import org.apache.shiro.cache.Cache;
+import org.apache.shiro.cache.CacheManager;
+import org.apache.shiro.crypto.hash.Md5Hash;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import com.boot.common.constant.Constants;
+import com.boot.common.constant.ShiroConstants;
+import com.boot.common.exception.user.UserPasswordNotMatchException;
+import com.boot.common.exception.user.UserPasswordRetryLimitExceedException;
+import com.boot.common.utils.MessageUtils;
+import com.boot.framework.manager.AsyncManager;
+import com.boot.framework.manager.factory.AsyncFactory;
+import com.boot.system.domain.SysUser;
+
+/**
+ * 登录密码方法
+ * 
+ * @author epl
+ */
+@Component
+public class SysPasswordService
+{
+    @Autowired
+    private CacheManager cacheManager;
+
+    private Cache<String, AtomicInteger> loginRecordCache;
+
+    @Value(value = "${user.password.maxRetryCount}")
+    private String maxRetryCount;
+
+    @PostConstruct
+    public void init()
+    {
+        loginRecordCache = cacheManager.getCache(ShiroConstants.LOGINRECORDCACHE);
+    }
+
+    /**
+     *
+     * 验证登录帐号和登录密码
+     * */
+    public void validate(SysUser user, String password)
+    {
+        String loginName = user.getLoginName();
+
+        AtomicInteger retryCount = loginRecordCache.get(loginName);
+
+        if (retryCount == null)
+        {
+            retryCount = new AtomicInteger(0);
+            loginRecordCache.put(loginName, retryCount);
+        }
+        //用户名和密码错误登录次数限制
+        if (retryCount.incrementAndGet() > Integer.valueOf(maxRetryCount).intValue())
+        {
+            AsyncManager.me().execute(AsyncFactory.recordLogininfor(loginName, Constants.LOGIN_FAIL, MessageUtils.message("user.password.retry.limit.exceed", maxRetryCount)));
+            throw new UserPasswordRetryLimitExceedException(Integer.valueOf(maxRetryCount).intValue());
+        }
+        //用户名和密码已经重试次数
+        if (!matches(user, password))
+        {
+            AsyncManager.me().execute(AsyncFactory.recordLogininfor(loginName, Constants.LOGIN_FAIL, MessageUtils.message("user.password.retry.limit.count", retryCount)));
+            loginRecordCache.put(loginName, retryCount);
+            throw new UserPasswordNotMatchException();
+        }
+        else
+        {
+            clearLoginRecordCache(loginName);
+        }
+    }
+
+    /**
+     * 用户名和密码验证
+     * */
+    public boolean matches(SysUser user, String newPassword)
+    {
+        return user.getPassword().equals(encryptPassword(user.getLoginName(), newPassword, user.getSalt()));
+    }
+
+    public void clearLoginRecordCache(String username)
+    {
+        loginRecordCache.remove(username);
+    }
+
+    /**
+     * 用户密码加密
+     * */
+    public String encryptPassword(String username, String password, String salt)
+    {
+        return new Md5Hash(username + password + salt).toHex().toString();
+    }
+
+}

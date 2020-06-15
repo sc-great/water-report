@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+<th:block th:include="admin/include :: header('添加耗材')" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content main_rigth">
+    <form class="form-horizontal m" id="form-consumable-add">
+        <input id="consumable_params" name="params[icon]" th:value="${icon}" type="hidden">
+        <div class="form-group">
+            <label class="col-sm-2 control-label label-left is-required">物品名称：</label>
+            <div class="col-sm-9">
+                <div class="input-group">
+                    <select name="typeId" id="consumableNameSelect" class="form-control" required style="width:517.6px;cursor:pointer;" onChange="autoLoadTotal()"></select>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label label-left is-required">现有库存：</label>
+            <div class="col-sm-9">
+                <div class="input-group">
+                    <input id="consumableTotal" class="form-control" type="number" readonly/>
+                    <span class="input-group-addon consumable-unit">PCS</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">    
+            <label class="col-sm-2 control-label label-left is-required">入库数量：</label>
+            <div class="col-sm-9">
+                <div class="input-group">
+                    <input name="lastSetNum" id="lastSetNumInput" class="form-control" placeholder="请输入进账数量" required
+                    		type="number" min="0" max="10000000" maxLength="8" oninput="autoformart($(this), true);autoCountTotal()"/>
+                    <span class="input-group-addon consumable-unit">PCS</span>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: form" />
+</body>
+<script th:inline="javascript">
+var form_consumable_add_prefix = ctx + "admin/materialControl/consumable";
+
+$("#form-consumable-add").validate({
+    focusCleanup: true
+});
+
+function submitHandler() {
+    if ($.validate.form()) {
+    	var form_val = $("#lastSetNumInput").val();
+    	if (form_val == "" || form_val == "0") {
+			$.modal.alertWarning("对不起，请输入有效数量！");
+			return;
+		}
+        $.operate.save(form_consumable_add_prefix + "/doAdd", $('#form-consumable-add').serialize());
+    }
+}
+
+// 加载耗材的下拉列表
+$.post(form_consumable_add_prefix + "/loadOption", function(data) {
+	if (data.code != 0)
+		return;
+	$("#consumableNameSelect").html("");
+	var option = "";
+	for (var i = 0; i < data.data.length; i ++) {
+		var name = data.data[i].name;
+		var model = data.data[i].model;
+		name +=  (model != null && model != undefined && model != "" ? ("（" + model + "）") : "");
+		option = "<option value=\"" + data.data[i].id + "\" data-unit=\"" + data.data[i].unit + "\">" + name + "</option>";
+		$("#consumableNameSelect").append(option);
+	}
+	// 总量的自动计算
+	autoLoadTotal();
+});
+
+// 总量的自动计算
+function autoLoadTotal() {
+	$("#consumableTotal").val("0");
+	$("#lastSetNumInput").val("");
+	var type_id = $("#consumableNameSelect").val();
+	if (type_id == null || type_id == undefined || type_id == "")
+		return;
+	$.post(form_consumable_add_prefix + "/getConsumableByTypeId?typeId=" + type_id, function(data) {
+		if (data.code != 0)
+			return;
+		if (data.data == null || data.data == undefined)
+			return;
+		total = data.data.total
+		$("#consumableTotal").val(total);
+		
+		var unit = data.data.type.unit;
+		if (unit == null || unit == undefined || undefined == "") 
+			return;
+		$(".consumable-unit").html(unit);
+	});
+}
+
+var total = 0;
+
+function autoCountTotal() {
+	var set = $("#lastSetNumInput").val();
+	if (set == null || set == undefined || set == "")
+		set = "0";
+	$("#consumableTotal").val(total + Number(set));
+}
+
+// input限制
+function autoformart(obj, isInt) {
+    var val = obj.val();
+    if (val == null || val == undefined || val == "") {
+        obj.val("");
+        return;
+    }
+    if (isInt && val.indexOf(".") != -1) { // 整数限制
+    	val = val.slice(0, val.length - 2);
+    }
+    var maxLength = obj.attr("maxLength");
+    var max = obj.attr("max");
+    if (val.length > maxLength) {
+        obj.val(val.slice(0, maxLength)); // 限制长度
+        return;
+    }
+    if (parseFloat(val) > parseFloat(max)) {
+        obj.val(val.slice(0, val.length - 1)); // 限制大小
+        return;
+    }
+    obj.val(parseFloat(val));
+}
+</script>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+<th:block th:include="admin/include :: header('修改当月费用填报')" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+	<form class="form-horizontal m" id="form-costInfo-edit" th:object="${costInfo}">
+		<input name="id" th:field="*{id}" type="hidden">
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left is-required">当年目标：</label>
+			<div class="col-sm-9">
+				<div class="input-group">
+					<input name="thisYear" class="form-control" placeholder="请输入当年目标" type="text" required 
+							th:value="*{thisYear}" maxlength="6" onkeyup="num(this)">
+					<span class="input-group-addon">万元</span>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left is-required">去年目标：</label>
+			<div class="col-sm-9">
+				<div class="input-group">
+					<input name="lastYear" class="form-control" type="text" required th:value="*{lastYear}" maxlength="6" 
+							onkeyup="num(this)" />
+					<span class="input-group-addon">万元</span>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left is-required">本月到账：</label>
+			<div class="col-sm-9">
+				<div class="input-group">
+					<input name="currentEnter" class="form-control" placeholder="请输入本月到账" type="text" required
+							th:value="*{currentEnter}" maxlength="5" onkeyup="num(this)">
+					<span class="input-group-addon">万元</span>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">本月累计：</label>
+			<div class="col-sm-9">
+				<div class="input-group">
+					<input name="currentTotal" class="form-control" value="0" type="number" required
+							 th:value="*{currentTotal}" maxlength="5" onkeyup="num(this)">
+					<span class="input-group-addon">万元</span>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: form" />
+</body>
+<script th:inline="javascript">
+var prefix = ctx + "admin/materialControl/costInfo";
+
+var thisYear = $(".input-group input[name='thisYear']");
+var lastYear = $(".input-group input[name='lastYear']");
+var currentEnter = $(".input-group input[name='currentEnter']");
+var currentTotal = $(".input-group input[name='currentTotal']");
+
+$(function() {
+	var thisYear_val = 0;
+	try {
+		thisYear_val  = parseFloat(thisYear.val());
+	} catch (err) {
+		
+	}
+	thisYear.val(thisYear_val);
+	
+	var lastYear_val = 0;
+	try {
+		lastYear_val  = parseFloat(lastYear.val());
+	} catch (err) {
+		
+	}
+	lastYear.val(lastYear_val);
+	
+	var currentEnter_val = 0;
+	try {
+		currentEnter_val  = parseFloat(currentEnter.val());
+	} catch (err) {
+		
+	}
+	currentEnter.val(currentEnter_val);
+	
+	var currentTotal_val = 0;
+	try {
+		currentTotal_val  = parseFloat(currentTotal.val());
+	} catch (err) {
+		
+	}
+	currentTotal.val(currentTotal_val);
+})
+
+$("#form-costInfo-edit").validate({
+    focusCleanup: true
+});
+
+function submitHandler() {
+    if ($.validate.form()) {
+        $.operate.save(prefix + "/doEdit", $('#form-costInfo-edit').serialize(), null, "put");
+    }
+}
+function num(obj) {
+	obj.value = obj.value.replace(/[^\d.]/g,""); 
+	obj.value = obj.value.replace(/^\./g,""); 
+	obj.value = obj.value.replace(/\.{2,}/g,"."); 
+	obj.value = obj.value.replace(".","$#$").replace(/\./g,"").replace("$#$",".");
+	obj.value = obj.value.replace(/^(\-)*(\d+)\.(\d\d).*$/,'$1$2.$3'); 
+}	
+</script>
+</html>

@@ -1,0 +1,61 @@
+package ${packageName}.mapper;
+
+import ${packageName}.domain.${ClassName};
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Component;
+
+/**
+ * ${functionName}Mapper接口
+ * 
+ * @author ${author}
+ * @date ${datetime}
+ */
+@Component
+@Mapper
+public interface ${ClassName}Mapper {
+    /**
+     * 新增${functionName}
+     *
+     * @param ${className} ${functionName}
+     * @return 结果
+     */
+    public int insert(${ClassName} ${className});
+    /**
+     * 修改${functionName}
+     *
+     * @param ${className} ${functionName}
+     * @return 结果
+     */
+    public int update(${ClassName} ${className});
+    /**
+     * 批量删除${functionName}
+     *
+     * @param ${className} 删除条件
+     * @return 结果
+     */
+    public int delete(${ClassName} ${className});
+    /**
+     * 获取${functionName}数量
+     *
+     * @param ${className} 查询条件
+     * @return 结果
+     */
+    public int getCount(${ClassName} ${className});
+    /**
+     * 获取${functionName}对象
+     * 
+     * @param ${className} 查询条件
+     * @return ${functionName}
+     */
+    public ${ClassName} getEntity(${ClassName} ${className});
+    /**
+     * 查询${functionName}列表
+     * 
+     * @param ${className} 查询条件
+     * @return ${functionName}集合
+     */
+    public List<${ClassName}> getList(${ClassName} ${className});
+}

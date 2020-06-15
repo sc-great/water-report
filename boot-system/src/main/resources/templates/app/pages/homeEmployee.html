@@ -1,0 +1,1215 @@
+<!doctype html>
+<html class="no-js" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>中国水环境集团</title>
+<th:block th:include="app/pages/homeHeader.html" />
+</head>
+     <script th:src="${'/webapp/js/jquery.min.js?v='+@toolsUtils.version()}"></script>
+        
+    <link rel="stylesheet" th:href="${'/webapp/css/com.css?v='+@toolsUtils.version()}"/>
+    <link rel="stylesheet" th:href="${'/webapp/css/login.css?v='+@toolsUtils.version()}"/>
+    <link rel="stylesheet" th:href="${'/webapp/css/reset.css?v='+@toolsUtils.version()}"/>
+    <script th:src="${'/webapp/js/jquery.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/jquery.cookie.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/common.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/plugin/layer_mobile/layer.js?v='+@toolsUtils.version()}"></script>
+    <!--json 序列化-->
+    <script th:src="${'/js/jquery.serializejson.js?v='+@toolsUtils.version()}"></script>
+     <script th:src="${'/ajax/libs/layui/layui.js?v='+@toolsUtils.version()}"></script>
+<style>
+input {
+	border: 0;
+	outline: none;
+	background-color: rgba(0, 0, 0, 0);
+}
+input {
+	border: 1px #dcdcdc solid;
+	background: #f9f9f9;
+}
+.home_main_form {
+	width: 96%;
+	margin: 2vh auto;
+}
+.home_main_form .from_box {
+	width: 100%;
+	border: 1px #1590ee solid;
+	font-size: 1.5rem;
+	background: #fff;
+	margin: 1vh 0;
+}
+.home_main_form .other {
+	border-color: #ff7e00;
+}
+.home_main_form .from_box .ibox-title {
+	width: 100%;
+	height: 5vh;
+	display: table;
+	text-decoration: none;
+	margin: 1.5vh 0;
+}
+.home_main_form .from_box .ibox-title .icon, .home_main_form .from_box .ibox-title .icon_w
+	{
+	height: 100%;
+	width: 10vw;
+	display: table-cell;
+	text-align: center;
+	vertical-align: middle;
+}
+.home_main_form .from_box .ibox-title .icon img {
+	height: auto;
+	width: 5vw;
+}
+.home_main_form .from_box .ibox-title .icon_w img {
+	height: auto;
+	width: 3.5vw;
+}
+.home_main_form .from_box .ibox-title .text {
+	display: table-cell;
+	vertical-align: middle;
+	font-size: 1.4rem;
+	font-weight: bold;
+}
+.from_box p {
+	line-height: 5vh;
+	margin-left: 3vh;
+	position: relative;
+}
+.from_box p span {
+	display: inline-block;
+	width: 26%;
+}
+.from_box p input {
+	width: 50%;
+	line-height: 3.5vh;
+	padding-left: 0.5vh;
+}
+.from_box p b {
+	font-weight: normal;
+	margin-left: 1vh;
+}
+.from_box .button_group {
+	width: 80%;
+	margin: 3vh auto;
+}
+.from_box .button_group a {
+	display: inline-block;
+	width: 45%;
+	text-align: center;
+	line-height: 3.5ch;
+}
+.from_box .button_group .reset {
+	background: #f4f4f4;
+}
+.from_box .button_group .submit {
+	background: #1d7bb8;
+	color: #fff;
+	float: right;
+}
+</style>
+<body>
+<div class="main">
+	<div class="home_top" style="height: 32%;">
+		<div class="menu_table">
+			<div class="menu_row">
+				<a class="menu_cell" th:href="${'/app/waterQualityArea'}">
+					<div class="img-table">
+						<div class="img-cel">
+							<img th:src="@{/webapp/image/sz.png}">
+						</div>
+					</div>
+					<div class="menu_name">水质统计</div>
+				</a>
+				<a class="menu_cell" th:href="${'/app/waterYieldArea'}">
+					<div class="img-table">
+						<div class="img-cel">
+							<img th:src="@{/webapp/image/sl.png}">
+						</div>
+					</div>
+					<div class="menu_name">水量统计</div>
+				</a>
+				<a class="menu_cell" th:href="${'/app/electricQuantityArea'}">
+					<div class="img-table">
+						<div class="img-cel img_w">
+							<img th:src="@{/webapp/image/dh.png}">
+						</div>
+					</div>
+					<div class="menu_name">电耗统计</div>
+				</a>
+			</div>
+			<div class="menu_row">
+				<a class="menu_cell" th:href="${'/app/medicationArea'}">
+					<div class="img-table">
+						<div class="img-cel">
+							<img th:src="@{/webapp/image/yh.png}">
+						</div>
+					</div>
+					<div class="menu_name">药耗统计</div>
+				</a>
+				<a class="menu_cell" th:href="${'/app/sludgeArea'}">
+					<div class="img-table">
+						<div class="img-cel img_w">
+							<img th:src="@{/webapp/image/wn.png}">
+						</div>
+					</div>
+					<div class="menu_name">污泥统计</div>
+				</a>
+				<a class="menu_cell" th:href="${'/app/testWaterArea'}">
+					<div class="img-table">
+						<div class="img-cel">
+							<img th:src="@{/webapp/image/hy.png}">
+						</div>
+					</div>
+					<div class="menu_name">化验数据</div>
+				</a>
+			</div>
+			<div class="menu_row">
+				<a class="menu_cell" th:href="${'/app/mandatoryCheckAreaFactory'}">
+					<div class="img-table">
+						<div class="img-cel">
+							<img th:src="@{/webapp/image/qzjc.png}">
+						</div>
+					</div>
+					<div class="menu_name">强制检测</div>
+				</a>
+				<a class="menu_cell" th:href="${'/app/consumableFill'}">
+					<div class="img-table">
+						<div class="img-cel">
+							<img th:src="@{/webapp/image/bpbj.png}">
+						</div>
+					</div>
+					<div class="menu_name">备品备件</div>
+				</a>
+				<a class="menu_cell" th:onclick="companys([[${currEableFlag}]]);">
+					<div class="img-table">
+						<div class="img-cel">
+							<img th:src="@{/webapp/image/scxx.png}">
+						</div>
+					</div>
+					<div class="menu_name">水厂信息</div>
+				</a>
+			</div>
+		</div>
+	</div>
+	<div class="home_main_form">
+		<div class="from_box" id="badWaterQualityInfo_div" hidden="hidden">
+			<form id="form-badWaterQualityInfo">
+				<div class="ibox-title">
+					<div class="icon">
+						<img th:src="@{/webapp/image/icon-ws.png}">
+					</div>
+					<div class="text">污水厂水质信息填报</div>
+				</div>
+				<p><span>COD进水</span><input type="text" name="codIn" maxlength="5" placeholder="数字且最多两位小数" onkeyup="num(this)"><b>mg/L</b></p>
+				<p><span>COD出水</span><input type="text" name="codOut" maxlength="5" placeholder="数字且最多两位小数" onkeyup="num(this)"><b>mg/L</b></p>
+				<p><span>NH3-N进水</span><input type="text" name="nh3NIn" maxlength="5" placeholder="数字且最多两位小数" onkeyup="num(this)"><b>mg/L</b></p>
+				<p><span>NH3-N出水</span><input type="text" name="nh3NOut" maxlength="5" placeholder="数字且最多两位小数" onkeyup="num(this)"><b>mg/L</b></p>
+				<p><span>SS进水</span><input type="text" name="ssIn" maxlength="5" placeholder="数字且最多两位小数" onkeyup="num(this)"><b>mg/L</b></p>
+				<p><span>SS出水</span><input type="text" name="ssOut" maxlength="5" placeholder="数字且最多两位小数" onkeyup="num(this)"><b>mg/L</b></p>
+				<p><span>PH值进水</span><input type="text" name="phIn" maxlength="3" placeholder="数字且最多两位小数" onkeyup="num(this)"><b></b></p>
+				<p><span>PH值出水</span><input type="text" name="phOut" maxlength="3" placeholder="数字且最多两位小数" onkeyup="num(this)"><b></b></p>
+				<p><span>TP进水</span><input type="text" name="tpIn" maxlength="5" placeholder="数字且最多两位小数" onkeyup="num(this)"><b>mg/L</b></p>
+				<p><span>TP出水</span><input type="text" name="tpOut" maxlength="5" placeholder="数字且最多两位小数" onkeyup="num(this)"><b>mg/L</b></p>
+				<p><span>TN进水</span><input type="text" name="tnIn" maxlength="5" placeholder="数字且最多两位小数" onkeyup="num(this)"><b>mg/L</b></p>
+				<p><span>TN出水</span><input type="text" name="tnOut" maxlength="5" placeholder="数字且最多两位小数" onkeyup="num(this)"><b>mg/L</b></p>
+				<p><span>MLSS</span><input type="text" name="mlssIn" maxlength="5" placeholder="数字且最多两位小数" onkeyup="num(this)"><b>mg/L</b></p>
+				<p><span>SV30</span><input type="number" name="sv30In" id="bad_water_sv30In" min="0" max="100"  maxlength="5"  oninput="autoformart($(this), true)" ><b>%</b></p>
+				<div class="button_group">
+					<a class="reset" id="reset_badWaterQualityInfo">重置</a>
+					<a class="submit" id="form-badWaterQualityInfo_add">提交</a>
+				</div>
+			</form>
+		</div>
+		<div class="from_box other" id="goodWaterInfo_div" hidden="hidden">
+			<form id="form_goodWaterInfo">
+				<div class="ibox-title">
+					<div class="icon">
+						<img th:src="@{/webapp/image/icon-gs.png}">
+					</div>
+					<div class="text">供水厂水质信息填报</div>
+				</div>
+				<p><span>PH值进水</span><input type="text" name="phIn" id="phIn" maxlength="3" placeholder="数字且最多两位小数" onkeyup="num(this)"></p>
+				<p><span>PH值出水</span><input type="text" name="phOut" id="phOut" maxlength="3" placeholder="数字且最多两位小数" onkeyup="num(this)"></p>
+				<p><span>浊度进水</span><input type="text" name="ntuIn" id="ntuIn" maxlength="5" placeholder="数字且最多两位小数" onkeyup="num(this)"><b>NTU</b></p>
+				<p><span>浊度出水</span><input type="text" name="ntuOut" id="ntuOut" maxlength="5" placeholder="数字且最多两位小数" onkeyup="num(this)"><b>NTU</b></p>
+				<p><span>COL2出水</span><input type="text" name="col2Out" id="col2Out" maxlength="5" placeholder="数字且最多两位小数" onkeyup="num(this)"><b>mg/L</b></p>
+				<p><span style="font-size: 1.2rem;">出水细菌总数</span><input type="text" name="germOut" id="germOut" maxlength="5" placeholder="数字且最多两位小数" onkeyup="num(this)"><b>CFU/ml</b></p>
+				<div class="button_group">
+					<a class="reset" id="reset_goodWaterInfo">重置</a> <a class="submit" id="submit_goodWaterInfo">提交</a>
+				</div>
+			</form>
+		</div>
+		<div class="from_box other">
+			<form id="form_waterYield">
+				<div class="ibox-title">
+					<div class="icon_w">
+						<img th:src="@{/webapp/image/icon-sl.png}">
+					</div>
+					<div class="text">水厂水量信息填报</div>
+				</div>
+				<p><span>当日进水量</span><input type="text" name="todayIn" id="todayIn" maxlength="6" placeholder="数字且最多两位小数" onkeyup="num(this)"><b>吨</b></p>
+				<p><span>当日出水量</span><input type="text" name="todayOut" id="todayOut" maxlength="6" placeholder="数字且最多两位小数" onkeyup="num(this)"><b>吨</b></p>
+				<div class="button_group">
+					<a class="reset" id="reset_waterYield">重置</a> <a class="submit" id="submit_waterYield">提交</a>
+				</div>
+			</form>
+		</div>
+		<div class="from_box">
+			<form id="form_electricity">
+				<div class="ibox-title">
+					<div class="icon">
+						<img th:src="@{/webapp/image/icon-dhs.png}">
+					</div>
+					<div class="text">水厂电耗信息填报</div>
+				</div>
+				<p><span>水厂电耗</span><input type="text" name="todayElectricity" id="todayElectricity" maxlength="6" placeholder="数字且最多两位小数" onkeyup="num(this)"><b>KWH</b></p>
+				<p><span>泵站电耗</span><input type="text" name="pumpTodayEletricity" id="pumpTodayEletricity" maxlength="6" placeholder="数字且最多两位小数" onkeyup="num(this)"><b>KWH</b></p>
+				<div class="button_group">
+					<a class="reset" id="reset_electricity">重置</a>
+					<a class="submit" id="submit_electricity">提交</a>
+				</div>
+			</form>
+		</div>
+		<div class="from_box">
+			<form id="form_medicine">
+				<div class="ibox-title">
+					<div class="icon_w">
+						<img th:src="@{/webapp/image/icon-yl.png}">
+					</div>
+					<div class="text">水厂药量统计信息填报</div>
+				</div>
+				<p><span>PAC</span><input type="text" name="todayPac" placeholder="数字且最多两位小数" maxlength="6" onkeyup="num(this)"><b>KG</b></p>
+				<p><span>PAM阴离子</span><input type="text" name="todayPamYin" placeholder="数字且最多两位小数" maxlength="6" onkeyup="num(this)"><b>KG</b></p>
+				<p><span>PAM阳离子</span><input type="text" name="todayPamYang" placeholder="数字且最多两位小数" maxlength="6" onkeyup="num(this)"><b>KG</b></p>
+				<p><span>石灰</span><input type="text" name="todayLime" placeholder="数字且最多两位小数" maxlength="6" onkeyup="num(this)"><b>KG</b></p>
+				<p><span>复核除磷剂</span><input type="text" name="todayPhosphorus" placeholder="数字且最多两位小数" maxlength="6" onkeyup="num(this)"><b>KG</b></p>
+				<p><span>氯化氢</span><input type="text" name="todayHCL" placeholder="数字且最多两位小数" maxlength="6" onkeyup="num(this)"><b>KG</b></p>
+				<p><span>氯酸钠</span><input type="text" name="todaySc" placeholder="数字且最多两位小数" maxlength="6" onkeyup="num(this)"><b>KG</b></p>
+				<p><span>NaClo</span><input type="text" name="todayNaclo" placeholder="数字且最多两位小数" maxlength="6" onkeyup="num(this)"><b>KG</b></p>
+				<p><span>葡萄糖</span><input type="text" name="todayGlucose" placeholder="数字且最多两位小数" maxlength="6" onkeyup="num(this)"><b>KG</b></p>
+				<p><span>乙酸钠</span><input type="text" name="todaySa" placeholder="数字且最多两位小数" maxlength="6" onkeyup="num(this)"><b>KG</b></p>
+				<div class="button_group">
+					<a class="reset" id="reset_medicine">重置</a>
+					<a class="submit" id="submit_medicine">提交</a>
+				</div>
+			</form>
+		</div>
+		<div class="from_box other" id="mud_div" hidden="hidden">
+			<form id="form_mudInfo">
+				<div class="ibox-title">
+					<div class="icon_w">
+						<img th:src="@{/webapp/image/icon-sl.png}">
+					</div>
+					<div class="text">当日污泥量信息填报</div>
+				</div>
+				<p><span>污泥日产量</span><input type="text" name="todayMud" id="todayMud" maxlength="6" placeholder="数字且最多两位小数" onkeyup="num(this)"><b>吨</b></p>
+				<p><span>污泥含水率</span><input type="number" name="waterIn" id="waterIn"  min="0" max="100"  maxlength="5"  oninput="autoformart($(this))" ><b>%</b></p>
+				<div class="button_group">
+					<a class="reset" id="reset_mudInfo">重置</a>
+					<a class="submit" id="submit_mudInfo">提交</a>
+				</div>
+			</form>
+		</div>
+
+    	<div class="from_box"  id="testBadWaterInfo_div" hidden="hidden">
+        <form  id="form_testBadWaterInfo" >
+    		<div class="ibox-title">
+	    		<div class="icon"><img th:src="@{/webapp/image/icon-ws.png}"></div>
+	            <div class="text">污水厂化验数据填报</div>
+	        </div>	       
+	        	<p><span>pH值进水</span><input type="text"  name="phIn"  maxlength="3" placeholder="数字且最多一位小数"  onkeyup="this.value= this.value.match(/\d+(\.\d{0,1})?/) ? this.value.match(/\d+(\.\d{0,1})?/)[0] : ''" ><b>mg/L</b></p>
+		        <p><span>pH值出水</span><input type="text"  name="phOut" maxlength="3" placeholder="数字且最多一位小数"  onkeyup="this.value= this.value.match(/\d+(\.\d{0,1})?/) ? this.value.match(/\d+(\.\d{0,1})?/)[0] : ''" ><b>mg/L</b></p>
+		        <p><span>氨氮进水</span><input type="text"  name="adanIn" maxlength="6" placeholder="数字且最多三位小数"  onkeyup="this.value= this.value.match(/\d+(\.\d{0,3})?/) ? this.value.match(/\d+(\.\d{0,3})?/)[0] : ''" ><b>mg/L</b></p>
+		        <p><span>氨氮出水</span><input  type="text"  name="adanOut" maxlength="6" placeholder="数字且最多三位小数"  onkeyup="this.value= this.value.match(/\d+(\.\d{0,3})?/) ? this.value.match(/\d+(\.\d{0,3})?/)[0] : ''" ><b>mg/L</b></p>
+		        <p><span>总氮进水</span><input  type="text"  name="zdanIn" maxlength="6" placeholder="数字且最多三位小数"  onkeyup="this.value= this.value.match(/\d+(\.\d{0,3})?/) ? this.value.match(/\d+(\.\d{0,3})?/)[0] : ''" ><b>mg/L</b></p>
+		        <p><span>总氮出水</span><input  type="text"  name="zdanOut" maxlength="6" placeholder="数字且最多三位小数"  onkeyup="this.value= this.value.match(/\d+(\.\d{0,3})?/) ? this.value.match(/\d+(\.\d{0,3})?/)[0] : ''" ><b>mg/L</b></p>
+		        <p><span>总磷进水</span><input  type="text"  name="zlinIn" maxlength="6" placeholder="数字且最多三位小数"  onkeyup="this.value= this.value.match(/\d+(\.\d{0,3})?/) ? this.value.match(/\d+(\.\d{0,3})?/)[0] : ''" ><b>mg/L</b></p>
+		        <p><span>总磷出水</span><input  type="text"  name="zlinOut" maxlength="6" placeholder="数字且最多三位小数"  onkeyup="this.value= this.value.match(/\d+(\.\d{0,3})?/) ? this.value.match(/\d+(\.\d{0,3})?/)[0] : ''" ><b>mg/L</b></p>
+		        
+		        <p><span>COD进水</span><input  type="text"  name="codIn" maxlength="6" placeholder="整数"   onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" ><b>mg/L</b></p>
+		        <p><span>COD出水</span><input  type="text"  name="codOut" maxlength="6" placeholder="整数"  onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" ><b>mg/L</b></p>
+		        
+		        <p ><span>BOD5进水</span><input  type="text"  name="bod5In" maxlength="6" placeholder="数字且最多一位小数"  onkeyup="this.value= this.value.match(/\d+(\.\d{0,1})?/) ? this.value.match(/\d+(\.\d{0,1})?/)[0] : ''"  ><b>mg/L</b></p>
+		        <p ><span>BOD5出水</span><input  type="text"  name="bod5Out" maxlength="6" placeholder="数字且最多一位小数"  onkeyup="this.value= this.value.match(/\d+(\.\d{0,1})?/) ? this.value.match(/\d+(\.\d{0,1})?/)[0] : ''"  ><b>mg/L</b></p>
+		        
+		        <p><span style="font-size: 1.4rem;">总悬浮物进水</span><input  type="text"  name="xfuIn" maxlength="6" placeholder="整数"   onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" ><b>mg/L</b></p>
+		        <p><span style="font-size: 1.4rem;">总悬浮物出水</span><input  type="text"  name="xfuOut" maxlength="6" placeholder="整数"   onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" ><b>mg/L</b></p>
+		       
+		        <p><span>温度进水</span><input  type="text"  name="tempIn" maxlength="5" placeholder="数字且最多两位小数"  onkeyup="num(this)" ><b>度</b></p>
+		        <p><span>温度出水</span><input  type="text"  name="tempOut" maxlength="5" placeholder="数字且最多两位小数"  onkeyup="num(this)" ><b>度</b></p>
+		       
+		        <p><span>粪大肠菌</span><input  type="text"  name="fengJun"  maxlength="5" placeholder="整数"   onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" ><b>mg/L</b></p>
+		        <p><span>SV30</span><input  type="number"  name="sv30" id="sv30_test_bad" min="0" max="100"  maxlength="5"  oninput="autoformart($(this), true);autoSVI()" ><b>%</b></p>
+		      
+		        <p><span>MLSS</span><input  type="number"  name="mlss" id="mlss_test_bad"  min="1"  max="10000" maxlength="5"   oninput="autoformart($(this));autoSVI()"  ><b>mg/L</b></p>
+		        <p><span>SVI</span><input  type="text"  name="svt" id="svt_test_bad" maxlength="6"  readonly   ><b>mg/L</b></p>
+		       
+		        <p><span>MLVSS</span><input  type="text"  name="mlvss" maxlength="5" placeholder="整数"   onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"  ><b>mg/L</b></p>
+		        <p><span>DO</span><input  type="text"  name="testDo" maxlength="6" placeholder="数字且最多一位小数"   onkeyup="this.value= this.value.match(/\d+(\.\d{0,1})?/) ? this.value.match(/\d+(\.\d{0,1})?/)[0] : ''" ><b>mg/L</b></p>
+		        <p><span>污泥含水率</span><input  type="number"  name="waterSludge" min="0" max="100"  maxlength="5"  oninput="autoformart($(this))" ><b>%</b></p>
+	       
+			<div class="button_group">
+            	<a class="reset" id="reset_testBadWaterInfo">重置</a>
+            	<a class="submit" id="submit_testBadWaterInfo">提交</a>
+            </div>
+          </form>
+    	</div>
+    	<div class="from_box other"  id="testTapWaterInfo_div" hidden="hidden" >
+        <form  id="form_testTapWaterInfo" >
+    		<div class="ibox-title">
+	    		<div class="icon"><img th:src="@{/webapp/image/icon-ws.png}"></div>
+	            <div class="text">供水厂化验数据填报</div>
+	        </div>	       
+	        	<p><span>浊度进水</span><input type="text"  name="ntuIn"  maxlength="4" placeholder="数字且最多两位小数"  onkeyup="num(this)" ><b></b></p>
+		        <p><span>浊度出水</span><input type="text"  name="ntuOut" maxlength="4" placeholder="数字且最多两位小数"  onkeyup="num(this)" ><b></b></p>
+		       
+		        <p><span>色度进水</span><input type="text"  name="colourIn" maxlength="4" placeholder="数字且最多两位小数"  onkeyup="num(this)" ><b>度</b></p>
+		        <p><span>色度出水</span><input  type="text"  name="colourOut" maxlength="4" placeholder="数字且最多两位小数"  onkeyup="num(this)" ><b>度</b></p>
+		        
+		        <p><span>臭和味进水</span><input  type="text"  name="cwIn" maxlength="6"  ><b></b></p>
+		        <p><span>臭和味出水</span><input  type="text"  name="cwOut" maxlength="6" ><b></b></p>
+		       
+		        <p><span style="font-size: 1.1rem;">肉眼可见物进水</span><input  type="text"  name="eyeIn" maxlength="6" ><b></b></p>
+		        <p><span style="font-size: 1.1rem;">肉眼可见物出水</span><input  type="text"  name="eyeOut" maxlength="6"><b></b></p>
+		        
+		        <p><span>耗氧量进水</span><input  type="text"  name="hyIn"  maxlength="4" placeholder="数字且最多两位小数"  onkeyup="num(this)" ><b>mg/L</b></p>
+		        <p><span>耗氧量出水</span><input  type="text"  name="hyOut" maxlength="4" placeholder="数字且最多两位小数"  onkeyup="num(this)" ><b>mg/L</b></p>
+		        
+		        <p ><span>氨氮进水</span><input  type="text"  name="adanIn" maxlength="4" placeholder="数字且最多两位小数"  onkeyup="num(this)"   ><b>mg/L</b></p>
+		        
+		        <p><span style="font-size: 1.2rem;">细菌总数进水</span><input  type="text"  name="xjzsIn"  maxlength="4" placeholder="数字且最多两位小数"  onkeyup="num(this)"  ><b>CFU/ml</b></p>
+		        <p><span style="font-size: 1.2rem;">细菌总数出水</span><input  type="text"  name="xjzsOut" maxlength="4" placeholder="数字且最多两位小数"  onkeyup="num(this)"  ><b>CFU/ml</b></p>
+		       
+		        <p><span style="font-size: 1.1rem;">总大肠菌群进水</span><input  type="text"  name="zdjIn"  maxlength="4" placeholder="数字且最多两位小数"  onkeyup="num(this)" ><b>CFU/ml</b></p>
+		        <p><span style="font-size: 1.1rem;">总大肠菌群出水</span><input  type="text"  name="zdjOut"  maxlength="4" placeholder="数字且最多两位小数"  onkeyup="num(this)" ><b>CFU/ml</b></p>
+		       
+		        <p><span style="font-size: 1.1rem;" >耐热大肠菌进水</span><input  type="text"  name="nrjIn"   maxlength="4" placeholder="数字且最多两位小数"  onkeyup="num(this)" ><b>CFU/ml</b></p>
+		        <p><span style="font-size: 1.1rem;">耐热大肠菌出水</span><input  type="text"  name="nrjOut"  maxlength="4" placeholder="数字且最多两位小数"  onkeyup="num(this)" ><b>CFU/ml</b></p>
+		      
+		        <p><span style="font-size: 1.1rem;">二氧化氯出水</span><input  type="text"  name="twoOut"  maxlength="4" placeholder="数字且最多两位小数"  onkeyup="num(this)"  ><b>mg/L</b></p>
+			       
+		        <p><span>温度进水</span><input  type="text"  name="tempIn"  maxlength="3" placeholder="数字且最多两位小数"  onkeyup="num(this)"  ><b>度</b></p>
+		        <p><span>温度出水</span><input  type="text"  name="tempOut"  maxlength="3" placeholder="数字且最多两位小数"  onkeyup="num(this)" ><b>度</b></p>
+	       
+			<div class="button_group">
+            	<a class="reset" id="reset_testTapWaterInfo">重置</a>
+            	<a class="submit" id="submit_testTapWaterInfo">提交</a>
+            </div>
+          </form>
+    	</div>
+
+    </div>
+		
+	</div>
+
+<input type="hidden" th:value="${orgType}" id="user_orgType" />
+<input type="hidden" th:value="${factoryType}" id="user_factoryType" />
+<script th:inline="javascript">
+$(function () {
+    if ($("#user_orgType").val() != "3") // 不是水厂用户
+        return;
+
+    if ($("#user_factoryType").val() == "1") {
+        $("#badWaterQualityInfo_div").show();
+        $("#testBadWaterInfo_div").show();
+        $("#mud_div").show();
+    }
+    if ($("#user_factoryType").val() == "2") {
+        $("#goodWaterInfo_div").show();
+        $("#testTapWaterInfo_div").show();
+    }
+});
+// 公用
+function num(obj) {
+    obj.value = obj.value.replace(/[^\d.]/g, ""); // 清除"数字"和"."以外的字符
+    obj.value = obj.value.replace(/^\./g, ""); // 验证第一个字符是数字
+    obj.value = obj.value.replace(/\.{2,}/g, "."); // 只保留第一个, 清除多余的
+    obj.value = obj.value.replace(".", "$#$").replace(/\./g, "").replace("$#$", ".");
+    obj.value = obj.value.replace(/^(\-)*(\d+)\.(\d\d).*$/, '$1$2.$3'); // 只能输入两个小数
+}
+function maxVal(obj) {
+    var mval = obj.value;
+    if (mval > 100) {
+        layer.open({
+            content: '不能超过100',
+            btn: '知道了'
+        });
+        document.getElementById("bad_water_sv30In").value = "";
+        return false;
+    }
+}
+// 污水水质填报--start---
+$(function () {
+    $("#form-badWaterQualityInfo_add").click(function () {
+
+        var field = $('#form-badWaterQualityInfo').serializeJSON();
+
+        if (field["codOut"] == "") {
+            layer.open({
+                content: '请填写COD出水！',
+                btn: '知道了'
+            });
+            $('#codOut').focus();
+            return false;
+        }
+        if (field["nh3NOut"] == "") {
+            layer.open({
+                content: '请填写NH3-N出水！',
+                btn: '知道了'
+            });
+            $('#nh3NOut').focus();
+            return false;
+        }
+        if (field["ssOut"] == "") {
+            layer.open({
+                content: '请填写SS出水！',
+                btn: '知道了'
+            });
+            $('#ssOut').focus();
+            return false;
+        }
+        if (field["phOut"] == "") {
+            layer.open({
+                content: '请填写PH值出水！',
+                btn: '知道了'
+            });
+            $('#phOut').focus();
+            return false;
+        }
+        if (field["tpOut"] == "") {
+            layer.open({
+                content: '请填写TP出水！',
+                btn: '知道了'
+            });
+            $('#tpOut').focus();
+            return false;
+        }
+        if (field["tnOut"] == "") {
+            layer.open({
+                content: '请填写TN出水！',
+                btn: '知道了'
+            });
+            $('#tnOut').focus();
+            return false;
+        }
+        if (field["mlssIn"] == "") {
+            layer.open({
+                content: '请填写MLSS！',
+                btn: '知道了'
+            });
+            $('#mlssIn').focus();
+            return false;
+        }
+        req("/app/doAddBadWaterQualityInfo", field, function (result) {
+            if (result.code == 0) {
+                if (result.data.flag == "0") {
+                    layer.open({
+                        content: result.data.mess,
+                        btn: '知道了'
+                    });
+                    //  $('#form-badWaterQualityInfo')[0].reset()
+                } else if (result.data.flag == "1") {
+                    layer.open({
+                        content: result.data.mess,
+                        btn: '知道了'
+                    });
+                    setTimeout(function () {
+                        window.top.location.href = "/app/login";
+                    }, 5 * 600)
+                } else if (result.data.flag == "-1") {
+
+                    if (window.confirm('今日已填报，确定覆盖已填信息？')) {
+                        req("/app/doEditBadWaterQualityInfo", field, function (result) {
+                            if (result.code == 0) {
+                                layer.open({
+                                    content: "保存成功！",
+                                    btn: '知道了'
+                                });
+                            } else {
+                                layer.open({
+                                    content: result.msg,
+                                    btn: '知道了'
+                                });
+                            }
+                        }, "post");
+                    } else {
+                        return false;
+                    }
+                } else {
+                    layer.open({
+                        content: "异常错误，请与 系统管理员联系！",
+                        btn: '知道了'
+                    });
+                }
+            } else {
+                layer.open({
+                    content: result.msg,
+                    btn: '知道了'
+                });
+            }
+        }, "post");
+    });
+    $("#reset_badWaterQualityInfo").click(function () {
+        $('#form-badWaterQualityInfo')[0].reset()
+    });
+});
+// 污水水质填报---end---
+
+// 自来水或供水厂水质填报-----start--------
+$(function () {
+	$("#submit_goodWaterInfo").click(function () {
+
+	    var field = $('#form_goodWaterInfo').serializeJSON();
+
+	    if (field["phOut"] == "") {
+	        layer.open({
+	            content: '请填写PH值出水！',
+	            btn: '知道了'
+	        });
+	        $('#phOut').focus();
+	        return false;
+	    }
+	    if (field["col2Out"] == "") {
+	        layer.open({
+	            content: '请填写COL2出水！',
+	            btn: '知道了'
+	        });
+	        $('#col2Out').focus();
+	        return false;
+	    }
+	    if (field["germOut"] == "") {
+	        layer.open({
+	            content: '请填写出水细菌总数！',
+	            btn: '知道了'
+	        });
+	        $('#germOut').focus();
+	        return false;
+	    }
+	    req("/app/doAddGoodWaterHealthInfo", field, function (result) {
+
+	        if (result.code == 0) {
+	            if (result.data.flag == "0") {
+	                layer.open({
+	                    content: result.data.mess,
+	                    btn: '知道了'
+	                });
+	            } else if (result.data.flag == "1") {
+	                layer.open({
+	                    content: result.data.mess,
+	                    btn: '知道了'
+	                });
+	                setTimeout(function () {
+	                    window.top.location.href = "/app/login";
+	                }, 5 * 600)
+	            } else if (result.data.flag == "-1") {
+	                if (window.confirm('今日已填报，确定覆盖已填信息？')) {
+	                    req("/app/doEditGoodWaterHealthInfo", field, function (result) {
+	                        if (result.code == 0) {
+	                            layer.open({
+	                                content: "保存成功！",
+	                                btn: '知道了'
+	                            });
+	                        } else {
+	                            layer.open({
+	                                content: result.msg,
+	                                btn: '知道了'
+	                            });
+	                        }
+	                    }, "post");
+	                } else {
+	                    return false;
+	                }
+	            } else {
+	                layer.open({
+	                    content: "异常错误，请与 系统管理员联系！",
+	                    btn: '知道了'
+	                });
+	            }
+	        } else {
+	            layer.open({
+	                content: result.msg,
+	                btn: '知道了'
+	            });
+	        }
+	    }, "post");
+	});
+	$("#reset_goodWaterInfo").click(function () {
+	    $('#form_goodWaterInfo')[0].reset()
+	});
+});
+
+// 水量信息填报---start----
+$(function () {
+	$("#submit_waterYield").click(function () {
+	    var field = $('#form_waterYield').serializeJSON();
+	    if (field["todayIn"] == "") {
+	        layer.open({
+	            content: '请填写当日进水量！',
+	            btn: '知道了'
+	        });
+	        $('#todayIn').focus();
+	        return false;
+	    }
+	    if (field["todayOut"] == "") {
+	        layer.open({
+	            content: '请填写当日出水量！',
+	            btn: '知道了'
+	        });
+	        $('#todayOut').focus();
+	        return false;
+	    }
+	    req("/app/doAddTodayWaterYieldInfo", field, function (result) {
+	        if (result.code == 0) {
+	            if (result.data.flag == "0") {
+	                layer.open({
+	                    content: result.data.mess,
+	                    btn: '知道了'
+	                });
+	            } else if (result.data.flag == "1") {
+	                layer.open({
+	                    content: result.data.mess,
+	                    btn: '知道了'
+	                });
+	                setTimeout(function () {
+	                    window.top.location.href = "/app/login";
+	                }, 5 * 600)
+	            } else if (result.data.flag == "-1") {
+	                if (window.confirm('今日已填报，确定覆盖已填信息？')) {
+	                    req("/app/doEditTodayWaterYieldInfo", field, function (result) {
+	                        if (result.code == 0) {
+	                            layer.open({
+	                                content: "保存成功！",
+	                                btn: '知道了'
+	                            });
+	                        } else {
+	                            layer.open({
+	                                content: result.msg,
+	                                btn: '知道了'
+	                            });
+	                        }
+	                    }, "post");
+	                } else {
+	                    return false;
+	                }
+	            } else {
+	                layer.open({
+	                    content: "异常错误，请与 系统管理员联系！",
+	                    btn: '知道了'
+	                });
+	            }
+	        } else {
+	            layer.open({
+	                content: result.msg,
+	                btn: '知道了'
+	            });
+	        }
+	    }, "post");
+	});
+
+	$("#reset_waterYield").click(function () {
+	    $('#form_waterYield')[0].reset()
+	});
+});
+// 水量信息填报-----end-----
+
+// 电量信息填报---start----
+$(function () {
+	$("#submit_electricity").click(function () {
+	    var field = $('#form_electricity').serializeJSON();
+	    if (field["todayElectricity"] == "") {
+	        layer.open({
+	            content: '请填写当日电耗！',
+	            btn: '知道了'
+	        });
+	        $('#todayElectricity').focus();
+	        return false;
+	    }
+	    if (field["pumpTodayEletricity"] == "") {
+	        layer.open({
+	            content: '请填写泵站当日电耗！',
+	            btn: '知道了'
+	        });
+	        $('#pumpTodayEletricity').focus();
+	        return false;
+	    }
+	    req("/app/doAddTodayElectricityInfo", field, function (result) {
+	        if (result.code == 0) {
+	            if (result.data.flag == "0") {
+	                layer.open({
+	                    content: result.data.mess,
+	                    btn: '知道了'
+	                });
+	            } else if (result.data.flag == "1") {
+	                layer.open({
+	                    content: result.data.mess,
+	                    btn: '知道了'
+	                });
+	                setTimeout(function () {
+	                    window.top.location.href = "/app/login";
+	                }, 5 * 600)
+	            } else if (result.data.flag == "-1") {
+	                if (window.confirm('今日已填报，确定覆盖已填信息？')) {
+	                    req("/app/doEditTodayElectricityInfo", field, function (result) {
+	                        if (result.code == 0) {
+	                            layer.open({
+	                                content: "保存成功！",
+	                                btn: '知道了'
+	                            });
+	                        } else {
+	                            layer.open({
+	                                content: result.msg,
+	                                btn: '知道了'
+	                            });
+	                        }
+	                    }, "post");
+	                } else {
+	                    return false;
+	                }
+	            } else {
+	                layer.open({
+	                    content: "异常错误，请与 系统管理员联系！",
+	                    btn: '知道了'
+	                });
+	            }
+	        } else {
+	            layer.open({
+	                content: result.msg,
+	                btn: '知道了'
+	            });
+	        }
+	    }, "post");
+	});
+
+	$("#reset_electricity").click(function () {
+	    $('#form_electricity')[0].reset()
+	});
+});
+// 电量信息填报---end-----
+
+// 药量信息填报---start----
+$(function () {
+    $("#submit_medicine").click(function () {
+        var field = $('#form_medicine').serializeJSON();
+        if (field["todayPac"] == "") {
+            layer.open({
+                content: '请填写当日PAC！',
+                btn: '知道了'
+            });
+            $('#todayPac').focus();
+            return false;
+        }
+        if (field["todayPamYin"] == "") {
+            layer.open({
+                content: '请填写当日PAM阴离子！',
+                btn: '知道了'
+            });
+            $('#todayPamYin').focus();
+            return false;
+        }
+        if (field["todayPamYang"] == "") {
+            layer.open({
+                content: '请填写当日PAM阳离子！',
+                btn: '知道了'
+            });
+            $('#todayPamYang').focus();
+            return false;
+        }
+        if (field["todayPhosphorus"] == "") {
+            layer.open({
+                content: '请填写当日复核除磷剂！',
+                btn: '知道了'
+            });
+            $('#todayPhosphorus').focus();
+            return false;
+        }
+        if (field["todayNaclo"] == "") {
+            layer.open({
+                content: '请填写当日NaCLO！',
+                btn: '知道了'
+            });
+            $('#todayNaclo').focus();
+            return false;
+        }
+        if (field["todayLime"] == "") {
+            layer.open({
+                content: '请填写当日石灰！',
+                btn: '知道了'
+            });
+            $('#todayLime').focus();
+            return false;
+        }
+        if (field["todayGlucose"] == "") {
+            layer.open({
+                content: '请填写当日葡萄糖！',
+                btn: '知道了'
+            });
+            $('#todayGlucose').focus();
+            return false;
+        }
+        if (field["todaySc"] == "") {
+            layer.open({
+                content: '请填写当日氯酸钠！',
+                btn: '知道了'
+            });
+            $('#todaySc').focus();
+            return false;
+        }
+        if (field["todaySa"] == "") {
+            layer.open({
+                content: '请填写当日乙酸钠！',
+                btn: '知道了'
+            });
+            $('#todaySa').focus();
+            return false;
+        }
+        if (field["todayHCL"] == "") {
+            layer.open({
+                content: '请填写当日氯化氢！',
+                btn: '知道了'
+            });
+            $('#todayHCL').focus();
+            return false;
+        }
+        req("/app/doAddTodayMedicineInfo", field, function (result) {
+            if (result.code == 0) {
+                if (result.data.flag == "0") {
+                    layer.open({
+                        content: result.data.mess,
+                        btn: '知道了'
+                    });
+                } else if (result.data.flag == "1") {
+                    layer.open({
+                        content: result.data.mess,
+                        btn: '知道了'
+                    });
+                    setTimeout(function () {
+                        window.top.location.href = "/app/login";
+                    }, 5 * 600)
+                } else if (result.data.flag == "-1") {
+                    if (window.confirm('今日已填报，确定覆盖已填信息？')) {
+                        req("/app/doEditTodayMedicineInfo", field, function (result) {
+                            if (result.code == 0) {
+                                layer.open({
+                                    content: "保存成功！",
+                                    btn: '知道了'
+                                });
+                            } else {
+                                layer.open({
+                                    content: result.msg,
+                                    btn: '知道了'
+                                });
+                            }
+                        }, "post");
+                    } else {
+                        return false;
+                    }
+                } else {
+                    layer.open({
+                        content: "异常错误，请与 系统管理员联系！",
+                        btn: '知道了'
+                    });
+                }
+            } else {
+                layer.open({
+                    content: result.msg,
+                    btn: '知道了'
+                });
+            }
+        }, "post");
+    });
+    $("#reset_medicine").click(function () {
+        $('#form_medicine')[0].reset()
+    });
+});
+// 药量信息填报---end-----
+
+// 污泥量信息填报-----------start-------------------
+$(function () {
+    $("#submit_mudInfo").click(function () {
+        var field = $('#form_mudInfo').serializeJSON();
+        if (field["todayMud"] == "") {
+            layer.open({
+                content: '请填写污泥日产量！',
+                btn: '知道了'
+            });
+            $('#todayMud').focus();
+            return false;
+        }
+        if (field["waterIn"] == "") {
+            layer.open({
+                content: '请填写污泥含水率！',
+                btn: '知道了'
+            });
+            $('#waterIn').focus();
+            return false;
+        }
+        req("/app/sludge/doAddMudInfo", field, function (result) {
+            if (result.code == 0) {
+                if (result.data.flag == "0") {
+                    layer.open({
+                        content: result.data.mess,
+                        btn: '知道了'
+                    });
+                } else if (result.data.flag == "1") {
+                    layer.open({
+                        content: result.data.mess,
+                        btn: '知道了'
+                    });
+                    setTimeout(function () {
+                        window.top.location.href = "/app/login";
+                    }, 5 * 600)
+                } else if (result.data.flag == "-1") {
+                    if (window.confirm('今日已填报，确定覆盖已填信息？')) {
+                        req("/app/sludge/doEditMudInfo", field, function (result) {
+                            if (result.code == 0) {
+                                layer.open({
+                                    content: "保存成功！",
+                                    btn: '知道了'
+                                });
+                            } else {
+                                layer.open({
+                                    content: result.msg,
+                                    btn: '知道了'
+                                });
+                            }
+                        }, "post");
+                    } else {
+                        return false;
+                    }
+                } else {
+                    layer.open({
+                        content: "异常错误，请与 系统管理员联系！",
+                        btn: '知道了'
+                    });
+                }
+            } else {
+                layer.open({
+                    content: result.msg,
+                    btn: '知道了'
+                });
+            }
+        }, "post");
+    });
+    $("#reset_mudInfo").click(function () {
+        $('#form_mudInfo')[0].reset()
+
+    });
+});
+// 污泥量信息填报-----------end-------------------
+
+// 化验数据_污水填报---------------start---------------
+$(function () {
+    $("#submit_testBadWaterInfo").click(function () {
+        var field = $('#form_testBadWaterInfo').serializeJSON();
+        if (field["phIn"] == "") {
+            layer.open({
+                content: '请填写pH值进水！',
+                btn: '知道了'
+            });
+            return false;
+        }
+        if (field["phOut"] == "") {
+            layer.open({
+                content: '请填写pH值出水！',
+                btn: '知道了'
+            });
+            return false;
+        }
+       if (field["sv30"] != ""&&field["sv30"] >100) {
+            layer.open({
+                content: 'SV30不能超过100！',
+                btn: '知道了'
+            });
+            return false;
+        }
+        
+       if (field["waterSludge"] != "") {
+          if(field["waterSludge"]>100){
+            layer.open({
+                content: '污泥含水率不能超过100！',
+                btn: '知道了'
+            });
+            return false;
+          }
+        }
+        req("/app/doAddTestBadWaterInfo", field, function (result) {
+            if (result.code == 0) {
+                if (result.data.flag == "0") {
+                    layer.open({
+                        content: result.data.mess,
+                        btn: '知道了'
+                    });
+                } else if (result.data.flag == "1") {
+                    layer.open({
+                        content: result.data.mess,
+                        btn: '知道了'
+                    });
+                    setTimeout(function () {
+                        window.top.location.href = "/app/login";
+                    }, 5 * 600)
+                } else if (result.data.flag == "-1") {
+                    if (window.confirm('今日已填报，确定覆盖已填信息？')) {
+                        req("/app/doEditTestBadWaterInfo", field, function (result) {
+                            if (result.code == 0) {
+                                layer.open({
+                                    content: "保存成功！",
+                                    btn: '知道了'
+                                });
+                            } else {
+                                layer.open({
+                                    content: result.msg,
+                                    btn: '知道了'
+                                });
+                            }
+                        }, "post");
+                    } else {
+                        return false;
+                    }
+                } else {
+                    layer.open({
+                        content: "异常错误，请与 系统管理员联系！",
+                        btn: '知道了'
+                    });
+                }
+            } else {
+                layer.open({
+                    content: result.msg,
+                    btn: '知道了'
+                });
+            }
+        }, "post");
+    });
+    $("#reset_testBadWaterInfo").click(function () {
+        $('#form_testBadWaterInfo')[0].reset()
+    });
+});
+// 化验数据_污水填报---------------end-----------------
+
+// 化验数据_供水厂填报---------------start---------------
+$(function () {
+    $("#submit_testTapWaterInfo").click(function () {
+        var field = $('#form_testTapWaterInfo').serializeJSON();
+        if (field["ntuIn"] == "") {
+            layer.open({
+                content: '请填写浊度进水！',
+                btn: '知道了'
+            });
+            return false;
+        }
+        if (field["ntuOut"] == "") {
+            layer.open({
+                content: '请填写浊度出水！',
+                btn: '知道了'
+            });
+            return false;
+        }
+        req("/app/doAddTestTapWaterInfo", field, function (result) {
+            if (result.code == 0) {
+                if (result.data.flag == "0") {
+                    layer.open({
+                        content: result.data.mess,
+                        btn: '知道了'
+                    });
+                } else if (result.data.flag == "1") {
+                    layer.open({
+                        content: result.data.mess,
+                        btn: '知道了'
+                    });
+                    setTimeout(function () {
+                        window.top.location.href = "/app/login";
+                    }, 5 * 600)
+                } else if (result.data.flag == "-1") {
+                    if (window.confirm('今日已填报，确定覆盖已填信息？')) {
+                        req("/app/doEditTestTapWaterInfo", field, function (result) {
+                            if (result.code == 0) {
+                                layer.open({
+                                    content: "保存成功！",
+                                    btn: '知道了'
+                                });
+                            } else {
+                                layer.open({
+                                    content: result.msg,
+                                    btn: '知道了'
+                                });
+                            }
+                        }, "post");
+                    } else {
+                        return false;
+                    }
+                } else {
+                    layer.open({
+                        content: "异常错误，请与 系统管理员联系！",
+                        btn: '知道了'
+                    });
+                }
+            } else {
+                layer.open({
+                    content: result.msg,
+                    btn: '知道了'
+                });
+            }
+        }, "post");
+    });
+    $("#reset_testTapWaterInfo").click(function () {
+        $('#form_testTapWaterInfo')[0].reset()
+    });
+});
+// 化验数据_供水厂填报---------------end-----------------
+</script>
+<script>
+function companys(type) {
+    if (type == "1") {
+        window.location.href = '/app/addFactory';
+    } else {
+        window.location.href = '/app/factoryArea';
+    }
+}
+function costInfoDifferentOrg(type) {
+    if (type == "1") {
+        layer.open({
+            content: "对不起，该栏目您没有查看权限！",
+            btn: '知道了'
+        });
+    } else {
+        window.location.href = '/app/costInfo';
+    }
+}
+function autoSVI() {
+    var sv30 = $("#sv30_test_bad").val();
+    var mlss = $("#mlss_test_bad").val();
+    if (sv30 != "" && mlss != "") {
+    	if (parseFloat(mlss) == 0){
+    		$("#svt_test_bad").val("");
+    		return;
+    	 }
+        var z = parseFloat(sv30) / parseFloat(mlss);
+        $("#svt_test_bad").val(Math.round(z * 100) / 100);
+    }else{
+        $("#svt_test_bad").val("");
+    }
+}
+
+// input限制
+function autoformart(obj, isInt) {
+    var val = obj.val();
+    if (val == null || val == undefined || val == "") {
+        obj.val("");
+        return;
+    }
+    if (isInt && val.indexOf(".") != -1) { // 整数限制
+    	val = val.slice(0, val.length - 2);
+    }
+    var maxLength = obj.attr("maxLength");
+    var max = obj.attr("max");
+    if (val.length > maxLength) {
+        obj.val(val.slice(0, maxLength)); // 限制长度
+        return;
+    }
+    if (parseFloat(val) > parseFloat(max)) {
+        obj.val(val.slice(0, val.length - 1)); // 限制大小
+        return;
+    }
+    obj.val(parseFloat(val));
+}
+</script>
+</body>
+</html>

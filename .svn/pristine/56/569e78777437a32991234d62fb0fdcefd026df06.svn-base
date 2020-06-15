@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+<th:block th:include="admin/include :: header('报警信息列表')"/>
+</head>
+<style>
+table {
+    white-space: nowrap;
+}
+.warning {
+	background: yellow;
+}
+</style>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul>
+                    	<li>
+                            <p>开始：</p>
+                            <input type="text" id="dateSta" name="params[dateSta]" data-type="date" data-format="yyyy-MM-dd"/>
+                        </li>
+                        <li>
+                        	<p>结束：</p>
+                            <input type="text" id="dateEnd" name="params[dateEnd]" data-type="date" data-format="yyyy-MM-dd"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-danger multiple disabled" onclick="deleteAllUrl()" shiro:hasPermission="report:alarmInfo:delete">
+                <i class="fa fa-remove"></i> 删除
+            </a>
+            <a class="btn btn-warning" onclick="exportData()" shiro:hasPermission="report:alarmInfo:export">
+                <i class="fa fa-download"></i> 导出
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped table-bordered table-groupheader">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="admin/include :: common"/>
+<th:block th:include="admin/include :: table"/>
+<script type="text/javascript">
+// 得到当前时间
+var dateNow = getCurDate("yyyy-MM-dd");
+// laydate 时间控件绑定
+layui.use("laydate", function () {
+    var laydate = layui.laydate;
+    var startDate = laydate.render({
+        elem: "#dateSta",
+        max: $("#dateEnd").val(),
+        theme: "molv",
+        trigger: "click",
+        done: function (value, date) {
+            // 结束时间大于开始时间
+            if (value !== "") {
+                endDate.config.min.year = date.year;
+                endDate.config.min.month = date.month - 1;
+                endDate.config.min.date = date.date;
+            } else {
+                endDate.config.min.year = "";
+                endDate.config.min.month = "";
+                endDate.config.min.date = "";
+            }
+        }
+    });
+    var endDate = laydate.render({
+        elem: "#dateEnd",
+        min: $("#dateSta").val(),
+        max: dateNow,
+        theme: "molv",
+        trigger: "click",
+        done: function (value, date) {
+            // 开始时间小于结束时间
+            if (value !== "") {
+                startDate.config.max.year = date.year;
+                startDate.config.max.month = date.month - 1;
+                startDate.config.max.date = date.date;
+            } else {
+                startDate.config.max.year = "";
+                startDate.config.max.month = "";
+                startDate.config.max.date = "";
+            }
+        }
+    });
+});
+</script>
+<script th:inline="javascript">
+var prefix = ctx + "admin/report/alarmInfo";
+var removeFlag = [[${@permission.hasPermi('report:badWaterQualityInfo:delete')}]];
+$(function () {
+	var options = {
+	    url: prefix + "/doList",
+	    modalName: "报警信息",
+	    rememberSelected: true,
+	    uniqueId: "id",
+	    columns: [{
+	            field: "state",
+	            checkbox: true
+	        }, {
+	            field: "name",
+	            title: "序号",
+	            align: "center",
+	            formatter: function (value, row, index) {
+	                return index + 1;
+	            }
+	        }, {
+	            field: "fillTime",
+	            title: "报警时间",
+	            align: "center"
+	        }, {
+	            field: "alarmItem",
+	            title: "报警项目",
+	            align: "center",
+	            formatter: function (value, row, index) {
+	            	if (row.alarmType != "3")
+	            		return value;
+	            	if (value.indexOf(",") == -1) {
+	            		if (value.indexOf("=") == -1)
+	            			return value;
+	            		else
+	            			return value.split(",")[0];
+	            	}
+	            	var val = value.split(",");
+	            	var str = "";
+	            	for (var i = 0; i < val.length; i ++) {
+	            		if (val[i].indexOf("=") == -1)
+	            			str += val[i] + "</br>";
+	            		else
+	            			str += val[i].substring(0, val[i].indexOf("=")) + "</br>";
+	            	}
+	            	return str;
+	            }
+	        }, {
+	            field: "value",
+	            title: "报警值",
+	            align: "center",
+	            formatter: function (value, row, index) {
+	            	if (row.alarmType != "3")
+	            		return value;
+	            	if (row.alarmItem.indexOf(",") == -1) {
+	            		if (row.alarmItem.indexOf("=") == -1)
+	            			return "";
+	            		else
+	            			return row.alarmItem.split(",")[1];
+	            	}
+	            	var val = row.alarmItem.split(",");
+	            	var str = "";
+	            	for (var i = 0; i < val.length; i ++) {
+	            		if (val[i].indexOf("=") == -1)
+	            			str += "</br>";
+	            		else
+	            			str += val[i].substring(val[i].indexOf("=") + 1) + "</br>";
+	            	}
+	            	return str;
+	            }
+	        }, {
+	            field: "orgName",
+	            title: "单位名称",
+	            align: "center",
+	            formatter: function (value, row, index) {
+	            	return row.paOrgName + " " + row.areaName + " " + value;
+	            }
+	        }, {
+	            field: "alarmType",
+	            title: "报警状态",
+	            align: "center",
+	            formatter: function (value, row, index) {
+	                var type = row.alarmType;
+	                if (type == "1")
+	                    type = "低库存";
+	                if (type == "2")
+	                    type = "待检测";
+	                if (type == "3")
+	                    type = "不达标";
+	                return type;
+	            }
+	        }, {
+	            title: "操作",
+	            align: "center",
+	            formatter: function (value, row, index) {
+	                var actions = [];
+	                var href = "javascript:void(0)";
+	                var menuName = "";
+	                
+	             	// 备品备件
+	            	if (row.alarmType == "1") {
+	            		href = "/admin/materialControl/consumable";
+	            	}
+	            	// 强制检测
+	            	if (row.alarmType == "2") {
+	            		href = "/admin/materialControl/mandatoryCheckInfo";
+	            	}
+	            	// 水质信息
+	            	if (row.alarmType == "3") {
+	            		// 污水厂
+            			if (row.factoryType == "1") {
+            				href = "/admin/report/badWaterQualityInfo";
+            			}
+            			// 供水厂
+            			if (row.factoryType == "2") {
+            				href = "/admin/report/goodWaterHealthInfo";
+            			}
+	            	}
+	                
+	                actions.push("<a class='btn btn-success btn-xs' onClick='panelToObjPage(\"" + href + "\", \"" + row.objId + "\")' style='background:green;'><i class='fa fa-edit'></i>详情</a>");
+	                actions.push("<a class='btn btn-danger btn-xs " + removeFlag + "' href='javascript:void(0)' onclick=\"deleteUrl('" + row.id + "')\"><i class='fa fa-remove'></i>删除</a>");
+	                return actions.join("");
+	            }
+	        }
+	    ]
+	};
+    $.table.init(options);
+});
+
+// 删除选中的质数据信息
+function deleteAllUrl() {
+	var rows = $.table.selectColumns("id");
+    if (rows.length == 0) {
+        $.modal.alertWarning("请至少选择一条记录");
+        return;
+    }
+    $.modal.confirm("确认要删除选中的" + rows.length + "条数据吗？", function () {
+        var url = prefix + "/doDelete";
+        var data = {
+            "ids": rows.join()
+        };
+        $.operate.submit(url, "post", "json", data);
+    });
+}
+
+// 删除单条质数据信息
+function deleteUrl(id, fillDate) {
+	$.modal.confirm("确定删除该条报警信息吗？", function () {
+        var data = {
+            "ids": id
+        };
+        $.operate.submit(prefix + "/doDelete", "post", "json", data);
+    });
+}
+
+// 导出质数据信息
+function exportData() {
+	$.modal.confirm("确定导出报警信息吗？", function () {
+        // 获取已勾选的数据信息
+        var rows = $.table.selectColumns("id");
+        if (rows.length == 0) {
+            $.modal.confirm("未选中任何数据，是否导出所有数据？", function () {
+                postData({
+                	dateSta: $("#dateSta").val(),
+                	dateEnd: $("#dateEnd").val(),
+                    ids: ""
+                });
+            });
+        } else if (rows.length > 0) {
+            postData({
+            	dateSta: $("#dateSta").val(),
+            	dateEnd: $("#dateEnd").val(),
+                ids: $.common.join(rows, ",")
+            });
+        }
+
+        function postData(data) {
+            $.modal.loading("正在导出数据，请稍后...");
+            $.post(prefix + "/export", data, function (result) {
+                if (result.code == web_status.SUCCESS) {
+                    window.location.href = ctx + "common/download?fileName=" + encodeURI(result.msg) + "&delete=" + true;
+                } else if (result.code == web_status.WARNING) {
+                    $.modal.alertWarning(result.msg)
+                } else {
+                    $.modal.alertError(result.msg);
+                }
+                $.modal.closeLoading();
+            });
+        }
+    });
+}
+</script>
+<script type="text/javascript">
+// 页面跳转
+function panelToObjPage(dataUrl, objId) {
+	
+	var menuItem = window.parent.$(".menuItem[href='" + dataUrl + "']");
+	var menuName = menuItem.html();
+	var dataIndex = menuItem.attr("data-index");
+	
+    // 获取标识数据
+    var flag = true;
+    window.parent.$(".nav ul li, .nav li").removeClass("selected");
+    
+    window.parent.$("#side-menu li").removeClass("active");
+    window.parent.$("#side-menu li ul").removeClass("in");
+    window.parent.$(".menuItem[href='" + dataUrl + "']").parent("li").parent("ul").parent("li").addClass("active");
+    window.parent.$(".menuItem[href='" + dataUrl + "']").parent("li").parent("ul").addClass("in");
+    window.parent.$(".menuItem[href='" + dataUrl + "']").parent("li").addClass("selected");
+
+    // 选项卡菜单已存在
+    window.parent.$('.menuTab').each(function () {
+        if ($(this).data('id') == dataUrl) {
+            if (!$(this).hasClass('active')) {
+                $(this).addClass('active').siblings('.menuTab').removeClass('active');
+                scrollToTab(this);
+                // 显示tab对应的内容区
+                window.parent.$('.mainContent .RuoYi_iframe').each(function () {
+                    if ($(this).data('id') == dataUrl) {
+                        $(this).attr('src', dataUrl);
+                        $(this).show().siblings('.RuoYi_iframe').hide();
+                        return false;
+                    }
+                });
+            }
+            flag = false;
+        }
+    });
+    // 选项卡菜单不存在
+    if (flag) {
+        var str = '<a href="javascript:;" class="active menuTab" data-id="' + dataUrl + '">' + menuName + ' <i class="fa fa-times-circle"></i></a>';
+        window.parent.$('.menuTab').removeClass('active');
+
+        // 添加选项卡对应的iframe
+        var str1 = '<iframe class="RuoYi_iframe" name="iframe" width="100%" height="100%" src="' + dataUrl + '?id=' + objId + '" frameborder="0" data-id="' + dataUrl + '" seamless></iframe>';
+        window.parent.$('.mainContent').find('iframe.RuoYi_iframe').hide().parents('.mainContent').append(str1);
+
+        $.modal.loading("数据加载中，请稍后...");
+
+        window.parent.$('.mainContent iframe:visible').load(function () {
+            $.modal.closeLoading();
+        });
+
+        // 添加选项卡
+        window.parent.$('.menuTabs .page-tabs-content').append(str);
+        scrollToTab(window.parent.$('.menuTab.active'));
+    }
+}
+// 滚动到指定选项卡
+function scrollToTab(element) {
+    var marginLeftVal = calSumWidth($(element).prevAll()),
+    marginRightVal = calSumWidth($(element).nextAll());
+    // 可视区域非tab宽度
+    var tabOuterWidth = calSumWidth(window.parent.$(".content-tabs").children().not(".menuTabs"));
+    //可视区域tab宽度
+    var visibleWidth = window.parent.$(".content-tabs").outerWidth(true) - tabOuterWidth;
+    //实际滚动宽度
+    var scrollVal = 0;
+    if (window.parent.$(".page-tabs-content").outerWidth() < visibleWidth) {
+        scrollVal = 0;
+    } else if (marginRightVal <= (visibleWidth - $(element).outerWidth(true) - $(element).next().outerWidth(true))) {
+        if ((visibleWidth - $(element).next().outerWidth(true)) > marginRightVal) {
+            scrollVal = marginLeftVal;
+            var tabElement = element;
+            while ((scrollVal - $(tabElement).outerWidth()) > (window.parent.$(".page-tabs-content").outerWidth() - visibleWidth)) {
+                scrollVal -= $(tabElement).prev().outerWidth();
+                tabElement = $(tabElement).prev();
+            }
+        }
+    } else if (marginLeftVal > (visibleWidth - $(element).outerWidth(true) - $(element).prev().outerWidth(true))) {
+        scrollVal = marginLeftVal - $(element).prev().outerWidth(true);
+    }
+    window.parent.$('.page-tabs-content').animate({
+        marginLeft: 0 - scrollVal + 'px'
+    }, "fast");
+}
+// 计算元素集合的总宽度
+function calSumWidth(elements) {
+    var width = 0;
+    $(elements).each(function () {
+        width += $(this).outerWidth(true);
+    });
+    return width;
+}
+</script>
+</body>
+</html>

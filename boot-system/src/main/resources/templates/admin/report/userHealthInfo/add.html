@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="admin/include :: header('新增员工健康信息')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal" id="form-userHealthInfo-add">
+            <input name="params[icon]" th:value="${icon}" type="hidden">
+            <div class="form-group">
+                <label class="col-sm-3 control-label label-left">员工姓名：</label>
+                <div class="col-sm-8">
+                    <input name="userName" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label label-left">手机号码：</label>
+                <div class="col-sm-8">
+                    <input name="mobile" class="form-control" type="text" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label label-left">办公方式：</label>
+                <div class="col-sm-8">
+                    <div class="radio-box" th:each="dict : ${@dict.getType('r_work_type')}">
+                        <input type="radio" th:id="${dict.dictCode}" name="workType" th:value="${dict.dictValue}" th:checked="${dict.default}">
+                        <label th:for="${dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label label-left">体&#12288;&#12288;温：</label>
+                <div class="col-sm-8">
+                    <div class="input-group">
+                        <input name="temp" class="form-control" placeholder="请输入体温" type="number" required>
+                        <span class="input-group-addon">℃</span>
+                    </div>
+                    <i class="required-icon">*</i>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label label-left">健康状况：</label>
+                <div class="col-sm-8">
+                    <div class="radio-box" th:each="dict : ${@dict.getType('r_health_status')}">
+                        <input type="radio" th:id="${dict.dictCode}" name="healthStatus" th:value="${dict.dictValue}" th:checked="${dict.default}">
+                        <label th:for="${dict.dictCode}" th:text="${dict.dictLabel}"></label>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="admin/include :: common" />
+    <th:block th:include="admin/include :: form" />
+    <script th:inline="javascript">
+        var prefix = ctx + "admin/report/userHealthInfo";
+
+        $("#form-userHealthInfo-add").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                parent.$.modal.confirm("提交后不可更改，是否提交？",function () {
+                    $.operate.save(prefix + "/doAdd", $('#form-userHealthInfo-add').serialize());
+                });
+            }
+        }
+    </script>
+</body>
+</html>

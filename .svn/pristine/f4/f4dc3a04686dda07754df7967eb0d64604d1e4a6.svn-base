@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+<th:block th:include="admin/include :: header('新增水厂人力资源健康情况信息')" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+	<form class="form-horizontal m" id="form-hrHealthInfo-add">
+		<input name="params[icon]" th:value="${icon}" type="hidden">
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">在职人数：</label>
+			<div class="col-sm-4">
+				<input name="allUserCount" class="form-control" th:value="${totalCount}" readonly="readonly">
+			</div>
+			<label class="col-sm-2 control-label label-left">现场人数：</label>
+			<div class="col-sm-4">
+				<input name="siteUserCount" class="form-control" th:value="${siteCount}" readonly="readonly">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">远程人数：</label>
+			<div class="col-sm-4">
+				<input name="onlineUserCount" class="form-control" th:value="${onlineCount}" readonly="readonly">
+			</div>
+			<label class="col-sm-2 control-label label-left">异常人数：</label>
+			<div class="col-sm-4">
+				<input name="exceptionUserCount" class="form-control" th:value="${exceptionCount}" readonly="readonly">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">健康状况：</label>
+			<div class="col-sm-10">
+				<textarea name="healthInfo" rows="4" class="form-control"
+						maxlength="500" placeholder="请输入健康状况"></textarea>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label is-required label-left">配戴防护用品情况：</label>
+			<div class="col-sm-10">
+				<textarea name="wearInfo" rows="4" class="form-control"
+						maxlength="500" placeholder="请输入配戴防护用品情况" required></textarea>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label is-required label-left">口罩存量：</label>
+			<div class="col-sm-4">
+				<input name="maskCount" class="form-control" placeholder="请输入口罩存量" required
+						type="number" min="0" max="1000000"
+						oninput="autoformart($(this), true)">
+			</div>
+			<label class="col-sm-2 control-label is-required label-left">消毒物品存量：</label>
+			<div class="col-sm-4">
+				<input name="disinfectCount" class="form-control" placeholder="请输入消毒物品存量" required
+						type="number" min="0" max="1000000"
+						oninput="autoformart($(this), true)">
+			</div>
+		</div>
+	</form>
+</div>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: form" />
+<script th:inline="javascript">
+var prefix = ctx + "admin/report/hrHealthInfo";
+
+$("#form-hrHealthInfo-add").validate({
+    focusCleanup: true
+});
+
+function submitHandler() {
+    if ($.validate.form()) {
+        $.operate.save(prefix + "/doAdd", $('#form-hrHealthInfo-add').serialize());
+    }
+}
+
+// input限制
+function autoformart(obj, isInt) {
+    var val = obj.val();
+    if (val == null || val == undefined || val == "") {
+        obj.val("");
+        return;
+    }
+    if (isInt && val.indexOf(".") != -1) { // 整数限制
+    	val = val.slice(0, val.length - 2);
+    }
+    var maxLength = obj.attr("maxLength");
+    if (maxLength != undefined && val.length > maxLength) {
+        obj.val(val.slice(0, maxLength)); // 限制长度
+        return;
+    }
+    var max = obj.attr("max");
+    if (parseFloat(val) > parseFloat(max)) {
+        obj.val(val.slice(0, val.length - 1)); // 限制大小
+        return;
+    }
+    obj.val(parseFloat(val));
+}
+</script>
+</body>
+</html>

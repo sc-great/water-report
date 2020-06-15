@@ -1,0 +1,311 @@
+<!doctype html>
+<html class="no-js" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=ideal viewport, initial-scale=1 user-scalable=0"/>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="0"/>
+    <title>收费情况</title>
+    <link rel="stylesheet" th:href="${'/webapp/css/font-awesome.css?v='+@toolsUtils.version()}">
+    <link rel="stylesheet" th:href="${'/webapp/css/com.css?v='+@toolsUtils.version()}">
+    <link rel="stylesheet" th:href="${'/webapp/css/style.css?v='+@toolsUtils.version()}">
+    <script th:src="${'/webapp/js/jquery.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/pace.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/plugin/layer_mobile/layer.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/common.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/jdate.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/dateUtil.js?v='+@toolsUtils.version()}"></script>
+</head>
+<style>
+* {
+	font-family: "微软雅黑";
+}
+input {
+	border: 0;
+	outline: none;
+	background-color: rgba(0, 0, 0, 0);
+}
+
+input {
+	border: 1px #dcdcdc solid;
+	background: #f9f9f9;
+}
+
+.home_main_form {
+	width: 96%;
+	margin: 2vh auto;
+}
+
+.home_main_form .from_box {
+	width: 100%;
+	border: 1px #1590ee solid;
+	font-size: 1.5rem;
+	background: #fff;
+	margin: 1vh 0;
+}
+
+.home_main_form .other {
+	border-color: #ff7e00;
+}
+
+.home_main_form .from_box .ibox-title {
+	width: 100%;
+	height: 5vh;
+	display: table;
+	text-decoration: none;
+	margin: 1.5vh 0;
+}
+
+.home_main_form .from_box .ibox-title .icon, .home_main_form .from_box .ibox-title .icon_w
+	{
+	height: 100%;
+	width: 10vw;
+	display: table-cell;
+	text-align: center;
+	vertical-align: middle;
+}
+
+.home_main_form .from_box .ibox-title .icon img {
+	height: auto;
+	width: 5vw;
+}
+
+.home_main_form .from_box .ibox-title .icon_w img {
+	height: auto;
+	width: 3.5vw;
+}
+
+.home_main_form .from_box .ibox-title .text {
+	display: table-cell;
+	vertical-align: middle;
+	font-size: 1.4rem;
+	font-weight: bold;
+}
+
+.from_box p {
+	line-height: 5vh;
+	margin-left: 3vh;
+}
+
+.from_box p span {
+	display: inline-block;
+	width: 26%;
+}
+
+.from_box p input {
+	width: 50%;
+	line-height: 3.5vh;
+	padding-left: 0.5vh;
+}
+
+.from_box p b {
+	font-weight: normal;
+	margin-left: 1vh;
+}
+
+.from_box .button_group {
+	width: 80%;
+	margin: 3vh auto;
+}
+
+.from_box .button_group a {
+	display: inline-block;
+	width: 45%;
+	text-align: center;
+	line-height: 3.5ch;
+}
+
+.from_box .button_group .reset {
+	background: #f4f4f4;
+}
+
+.from_box .button_group .submit {
+	background: #1d7bb8;
+	color: #fff;
+	float: right;
+}
+.main {
+   	background: #F9F9F7 url(/webapp/image/home_bg.png) no-repeat center top;
+   	background-size: 100% auto;
+   }
+</style>
+<body>
+<div class="main">
+    <div class="nav">
+        <div class="go-back" onclick="goBack();"><i class="fa fa-chevron-left"></i></div>
+        <div class="date"><span id="check_date">2020-03</span>&nbsp;<i class="fa fa-calendar-check-o"></i></div>
+        <div class="nav-main">
+            <label><span th:text="${areaName}"></span></label>
+        </div>
+    </div>
+	<div class="home_main_form">
+		<div class="from_box">
+			<div class="ibox-title">
+				<div class="icon">
+					<img th:src="@{/webapp/image/icon-ws.png}">
+				</div>
+				<div class="text">财务信息填报</div>
+			</div>
+			<form id="costInfo-form">
+				<input id="costInfo_params" name="params[icon]" th:value="*{costInfo.params[icon]}" type="hidden">
+				<p><span>当年目标</span><input name="thisYear" type="number" th:data-val="*{costInfo.thisYear}" required oninput="autoFormart($(this))"><b>万元</b></p>
+				<p><span>去年目标</span><input name="lastYear" type="number" th:data-val="*{costInfo.lastYear}" required oninput="autoFormart($(this))"><b>万元</b></p>
+				<p><span>本月到账</span><input name="currentEnter" type="number" th:data-val="*{costInfo.currentEnter}" required oninput="autoCurrentTotal()"><b>万元</b></p>
+				<p><span>本月累计</span><input name="currentTotal" type="number" th:data-val="*{costInfo.currentTotal}"><b>万元</b></p>
+			</form>
+			<div class="button_group">
+				<a class="reset" onClick="costInfoReset()">重置</a>
+				<a class="submit" onClick="costInfoSubmit()">提交</a>
+			</div>
+		</div>
+		<div class="content center font-size-14">
+			<table class="cross-color" style="border: 1px solid #c1cbd9">
+				<thead class="bg-color1 color-3">
+					<tr>
+						<th>填报时间</th>
+						<th>到账/累计金额（万元）</th>
+					</tr>
+				</thead>
+				<tbody class="cross-color" id="water_works"></tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: form" />
+<style>
+label.error {
+	position: absolute;
+	right: 24vw;
+	color: #ef392b;
+	font-size: 12px;
+}
+input.error {
+	background-color: #fbe2e2;
+    border-color: #c66161;
+    color: #c00;
+}
+</style>
+<script type="text/javascript">
+var dateTime = getCurDate("yyyy-MM");
+var thisYear_obj = $("#costInfo-form input[name='thisYear']");
+var lastYear_obj = $("#costInfo-form input[name='lastYear']");
+var currentEnter_obj = $("#costInfo-form input[name='currentEnter']");
+var currentTotal_obj = $("#costInfo-form input[name='currentTotal']");
+var currentTotal = 0;
+$(function () {
+    // 日期格式
+    new Jdate({
+        el: '#check_date',
+        format: 'YYYY-MM',
+        beginYear: 2000,
+        endYear: 2100,
+        value: dateTime,
+        confirm: function (date) {
+            loadData(date);
+        }
+    });
+	// 加载input的数据
+    loadInput();
+	// 加载表格的数据
+    loadData(dateTime);
+});
+
+// 加载input的数据
+function loadInput() {
+	var thisYear_obj = $("#costInfo-form input[name='thisYear']");
+	var lastYear_obj = $("#costInfo-form input[name='lastYear']");
+	var currentEnter_obj = $("#costInfo-form input[name='currentEnter']");
+	var currentTotal_obj = $("#costInfo-form input[name='currentTotal']");
+	
+	var thisYear_str = thisYear_obj.attr("data-val");
+	var lastYear_str = lastYear_obj.attr("data-val");
+	var currentEnter_str = currentEnter_obj.attr("data-val");
+	var currentTotal_str = currentTotal_obj.attr("data-val");
+	
+	currentTotal = parseFloat(currentTotal_str);
+	
+	thisYear_obj.val(parseFloat(thisYear_str));
+	lastYear_obj.val(parseFloat(lastYear_str));
+	currentEnter_obj.attr("placeholder", "上笔到账金额：" + parseFloat(currentEnter_str));
+	currentTotal_obj.val(currentTotal);
+}
+
+function loadData(date) {
+	$("#water_works").empty();
+    $.post('/app/costInfoFinanceData', {
+    	date: date
+    }, function (result) {
+        if (result.code == "0") {
+            $.each(result.data, function (index, item) {
+                var html = '<tr>\n' +
+                    '       	<td>' + item.fillTime + '</td>\n' +
+                    '       	<td>\n' +
+                    '       		<span class="color-2">' + item.currentEnter + "/" + item.currentTotal + '</span>\n' +
+                    '       	</td>\n' +
+                    '       </tr>\n';
+                $("#water_works").append(html);
+            });
+        }
+    });
+}
+
+// 重置
+function costInfoReset() {
+	currentEnter_obj.val("");
+	currentTotal_obj.val(currentTotal);
+}
+
+// 当月累计自动计算
+function autoCurrentTotal() {
+	var val = currentEnter_obj.val().replace(/\-/g, ""); // 不能为负数
+	val = val.length > 10 ? val.slice(0, 10) : val; // 限制长度
+	currentEnter_obj.val(val);
+	
+	if (val == null || val == undefined || val == "")
+		return;
+	
+	var currentEnter = 0;
+	try {
+		currentEnter = parseFloat(val);
+	} catch (e) {
+
+	}
+
+	currentTotal_obj.val(doubleAdd(currentEnter, currentTotal));
+}
+
+// 两小数相加解决精度出现的问题
+var doubleAdd = function (num1, num2) { // 要相加的两个数
+    var baseNum,
+    baseNum1,
+    baseNum2;
+    try {
+        baseNum1 = num1.toString().split(".")[1].length;
+    } catch (e) {
+        baseNum1 = 0;
+    }
+    try {
+        baseNum2 = num2.toString().split(".")[1].length;
+    } catch (e) {
+        baseNum2 = 0;
+    }
+    baseNum = Math.pow(10, Math.max(baseNum1, baseNum2));
+    return (Math.round(num1 * baseNum) + Math.round(num2 * baseNum)) / baseNum;
+};
+
+function costInfoSubmit() {
+	if ($.validate.form()) {
+		$.operate.save("costInfoAdd", $("#costInfo-form").serialize());
+	}
+}
+
+function autoFormart(obj) {
+	var val = obj.val().replace(/\-/g, ""); // 不能为负数
+	val = val.length > 10 ? val.slice(0, 10) : val; // 限制长度
+	obj.val(val);
+}
+</script>
+</body>
+</html>

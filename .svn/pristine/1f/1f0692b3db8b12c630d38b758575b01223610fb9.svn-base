@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+	<th:block th:include="admin/include :: header('角色列表')" />
+</head>
+<body class="gray-bg">
+<div class="ui-layout-center">
+	<div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<form id="role-form">
+					<input type="hidden" id="orgId" name="params[orgId]">
+					<div class="select-list">
+						<ul>
+							<li>
+								搜索关键词：<input type="text" name="searchValue"/>
+							</li>
+							<li>
+								状态：<select name="roleStatus" th:with="type=${@dict.getType('role_status')}">
+									<option value="">所有</option>
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+								</select>
+							</li>
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+							    <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+
+	        <div class="col-sm-12 select-table table-striped">
+			    <table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+</div>
+	<th:block th:include="admin/include :: common" />
+	<th:block th:include="admin/include :: layout-latest" />
+	<th:block th:include="admin/include :: table" />
+	<th:block th:include="admin/include :: ztree" />
+	<script th:inline="javascript">
+        var menusScopeFlag = [[${@permission.hasPermi('system:role:menusScope')}]];
+
+		var prefix = ctx + "admin/system/role";
+		$(function() {
+		    var options = {
+		        url: prefix + "/doList",
+		        createUrl: prefix + "/add",
+		        updateUrl: prefix + "/edit/{id}",
+		        removeUrl: prefix + "/doRemove",
+		        sortName: "roleSort",
+		        modalName: "岗位角色",
+		        columns: [
+		        {
+		            field: 'roleName',
+		            title: '岗位角色名称'
+		        },
+				{
+					field: 'roleCode',
+					title: '岗位角色编码'
+				},
+		        // {
+		        //     field: 'roleKey',
+		        //     title: '权限字符'
+		        // },
+		        {
+		            field: 'roleSort',
+		            title: '排序序号',
+					align:'center'
+		        },
+		        {
+					field: 'roleStatus',
+		        	title: '状态',
+		        	align: 'center',
+		        	formatter: function (value, row, index) {
+						if (value ==1) {
+							return '<i class=\"fa fa-toggle-on text-info fa-2x\"></i> ';
+						} else {
+							return '<i class=\"fa fa-toggle-off text-info fa-2x\"></i> ';
+						}
+		        	}
+		        },
+		        {
+		            field: 'createTime',
+		            title: '创建时间',
+                    align: 'center'
+		        },
+		        {
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+		                var actions = [];
+                        actions.push('<a class="btn btn-primary btn-xs ' + menusScopeFlag + '" href="javascript:void(0)" onclick="menusScope(\'' + row.roleId + '\',\''+row.roleName+'\')"><i class="fa fa-sitemap"></i>菜单权限</a> ');
+		                return actions.join('');
+		            }
+		        }
+		        ]
+		    };
+		    $.table.init(options);
+		});
+        /*角色管理-分配菜单权限*/
+		function menusScope(roleId,roleName){
+            var url = prefix + '/menusScope/' + roleId;
+            $.modal.open("岗位："+roleName+"分配菜单权限", url);
+		}
+	</script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!doctype html>
+<html class="no-js" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="viewport" content="width=ideal viewport, initial-scale=1 user-scalable=0"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+<title>中国水环境-登录</title>
+<meta name="description" content="particles.js is a lightweight JavaScript library for creating particles."/>
+<meta name="author" content="Vincent Garreau"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<link rel="stylesheet" th:href="${'/webapp/css/com.css?v='+@toolsUtils.version()}"/>
+<link rel="stylesheet" th:href="${'/webapp/css/login.css?v='+@toolsUtils.version()}"/>
+<link rel="stylesheet" th:href="${'/webapp/css/reset.css?v='+@toolsUtils.version()}"/>
+<script th:src="${'/webapp/js/jquery.min.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/webapp/js/jquery.cookie.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/webapp/js/common.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/webapp/js/plugin/layer_mobile/layer.js?v='+@toolsUtils.version()}"></script>
+<!--json 序列化-->
+<script th:src="${'/js/jquery.serializejson.js?v='+@toolsUtils.version()}"></script>
+<style type="text/css">
+* {
+	font-family: '微软雅黑',"宋体","Arial Narrow",Helvetica,sans-serif;
+}
+.form-center-img {
+    width: 5vw;
+    height: 5vh;
+    margin: 2vh 2vw 0 4vw;
+}
+.form-center-img>img {
+    width: 4vw;
+    height: auto;
+}
+.form-button {
+	height: 7vh;
+    line-height: 7vh;
+    background-color: #00b4ff;
+    margin-top: 6vh;
+    font-weight: normal;
+}
+</style>
+</head>
+<body>
+<div class="main">
+    <div id="particles-js">
+        <div class="form login">
+            <div class="form-top">
+                <div class="logo">
+                    <div id="logo">
+                        <img th:src="@{/webapp/image/login_logo.png}"/>
+                    </div>
+                </div>
+            </div>
+            <form id="login_form" class="form_main">
+                <div  class="center"><label id="showErrorMess"></label></div>
+                <div class="form-center clearfix">
+                    <div class="form-center-img"><img th:src="@{/webapp/image/uid.png}"/></div>
+                    <div class="form-center-input">
+                        <input type="text" name="loginName" id="loginName" th:value="${waterReportUserName}" placeholder="账号"/>
+                        <div class="form-center-input-text">用户名</div>
+                    </div>
+                </div>
+                <div class="form-center clearfix">
+                    <div class="form-center-img"><img th:src="@{/webapp/image/pwd.png}"/></div>
+                    <div class="form-center-input">
+                        <input type="password" name="password" id="password" value="" placeholder="密码"/>
+                        <div class="form-center-input-text">密码</div>
+                    </div>
+                </div>
+                <div class="form-button" id="submit">
+                    	登&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;录
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script th:src="${'/webapp/js/particles.min.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/webapp/js/app.js?v='+@toolsUtils.version()}"></script>
+<script th:inline="javascript">
+$(function () {
+    $("#submit").click(function () {
+        var field = $('#login_form').serializeJSON();
+        if (field["loginName"] == "") {
+            layer.open({
+                content: '请填写登录账号！',
+                btn: '知道了'
+            });
+            $("#loginName").focus();
+            return false;
+        }
+        if (field["password"] == "") {
+            layer.open({
+                content: '请填写登录密码！',
+                btn: '知道了'
+            });
+            $("#password").focus();
+            return false;
+        }
+        req("/app/doLogin", field, function (result) {
+            if (result.code == 0) {
+                if (result.data.url != "login") {
+                    window.top.location.href = "/app/" + result.data.url;
+                } else {
+                    layer.open({
+                        content: result.data.mess,
+                        btn: '知道了'
+                    });
+                }
+            } else {
+                layer.open({
+                    content: result.msg,
+                    btn: '知道了'
+                });
+            }
+        }, "post");
+    });
+});
+</script>
+</body>
+</html>

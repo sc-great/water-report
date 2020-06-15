@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+	<th:block th:include="admin/include :: header('修改岗位角色')" />
+</head>
+<body class="white-bg">
+	<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+		<form class="form-horizontal m" id="form-role-edit" th:object="${role}">
+			<input id="roleId" name="roleId" type="hidden" th:field="*{roleId}"/>
+<!--			<div class="form-group">-->
+<!--				<label class="col-sm-2 control-label ">所属组织机构：</label>-->
+<!--				<div class="col-sm-10">-->
+<!--					<div id="org_div" class="tree-select">-->
+<!--						<div style="line-height: 34px;"><i class="fa fa-spinner fa-spin"></i>正在初始化</div>-->
+<!--					</div>-->
+<!--					<i class="required-icon">*</i>-->
+<!--				</div>-->
+<!--			</div>-->
+			<div class="form-group">
+				<label class="col-sm-2 control-label ">岗位角色名称：</label>
+				<div class="col-sm-10">
+					<input class="form-control" type="text" name="roleName" id="roleName" th:field="*{roleName}" placeholder="请填写岗位角色名称" required>
+					<i class="required-icon">*</i>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label ">岗位角色编码：</label>
+				<div class="col-sm-10">
+					<input class="form-control" type="text" name="roleCode" id="roleCode" th:field="*{roleCode}" placeholder="请填写岗位角色编码" required>
+					<i class="required-icon">*</i>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">权限字符：</label>
+				<div class="col-sm-10">
+					<input class="form-control" type="text" name="roleKey" id="roleKey" th:field="*{roleKey}"  placeholder="请填写权限字符" required>
+					<i class="required-icon">*</i>
+					<span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 控制器中定义的权限字符，如：@RequiresRoles("")</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">显示顺序：</label>
+				<div class="col-sm-10">
+					<input class="form-control" type="number" name="roleSort" id="roleSort" th:field="*{roleSort}" placeholder="请填写权排序序号" required>
+					<i class="required-icon">*</i>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">状态：</label>
+				<div class="col-sm-10">
+					<label class="toggle-switch switch-solid">
+                        <input type="checkbox" id="roleStatus" th:checked="${role.roleStatus == '1' ? true : false}">
+                        <span></span>
+                    </label>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">备注：</label>
+				<div class="col-sm-10">
+					<textarea id="remark" name="remark" class="form-control" th:text="*{remark}"></textarea>
+				</div>
+			</div>
+		</form>
+	</div>
+	<th:block th:include="admin/include :: common" />
+	<th:block th:include="admin/include :: form" />
+	<th:block th:include="admin/include :: custom-plugins" />
+	<script th:inline="javascript">
+	     $(function() {
+             //组织机构
+             /*var default_orgs=[[${ogIds}]];
+             $.ajax({
+                 async:false,
+                 type : "get",
+                 url : ctx + "system/org/getTreeData/0",
+                 success : function(result) {
+                     if(result.code==0){
+                         var params={
+                             sources:result.data,
+                             sourcesType:'tree',
+                             value_filed:'orgId',
+                             text_filed:'orgName',
+                             required:'required',
+                             objId:'org_div',
+                             valueId:'orgIds',
+                             textId:'orgNames',
+                             allOpen:true,
+                             checkbox:true,
+                             checkedMore:true,
+                             parentShowCheckbox:false,
+                             defaultValue:default_orgs
+                         };
+                         tree(params);
+                     }
+                 }
+             });*/
+             //初始化机构
+			 // var orgIds=[[${orgIds}]];
+			 // var orgNames=[[${orgNames}]];
+             // var params={
+             //     url:ctx + "admin/system/org/treeList",
+             //     data:{parentId:0,validStatus:1},
+             //     objId:'org_div',
+             //     checkBox:true,
+             //     lastNodeShowCheckBox:true,
+             //     openLevel:1,
+             //     valueId:'orgIds',
+             //     textId:'orgName',
+             //     value_filed:'orgId',
+             //     text_filed:'orgName',
+             //     placeholder:'请选择所属机构',
+             //     required:'required',
+             //     defaultValue:orgIds,
+             //     defaultText:orgNames,
+             // };
+             // selectTree(params);
+		});
+
+         $("#form-role-edit").validate({
+             rules:{
+                 onkeyup: false,
+                 roleName:{
+                     remote: {
+                         url: ctx + "admin/system/role/count",
+                         type: "get",
+                         dataType: "json",
+                         data: {
+                             'params[notRoleId]':function(){
+                                 return $.common.trim($("#roleId").val());
+							 },
+                             roleName : function() {
+                                 return $.common.trim($("#roleName").val());
+                             }
+                         },
+                         dataFilter: function(data, type) {
+                             var json=eval("("+data+")");
+                             var code=json.code==0?1:0;
+                             return $.validate.unique(code);
+                         }
+                     }
+                 },
+                 roleKey:{
+                     remote: {
+                         url: ctx + "admin/system/role/count",
+                         type: "get",
+                         dataType: "json",
+                         data: {
+                             'params[notRoleId]':function(){
+                                 return $.common.trim($("#roleId").val());
+                             },
+                             roleKey : function() {
+                                 return $.common.trim($("#roleKey").val());
+                             }
+                         },
+                         dataFilter: function(data, type) {
+                             var json=eval("("+data+")");
+                             var code=json.code==0?1:0;
+                             return $.validate.unique(code);
+                         }
+                     }
+                 },
+                 roleSort:{
+                     digits:true
+                 }
+             },
+             messages: {
+                 roleName: {
+                     remote: "岗位角色名称已经存在"
+                 },
+                 roleKey: {
+                     remote: "岗位角色权限已经存在"
+                 }
+             },
+             focusCleanup: true
+         });
+         function submitHandler() {
+             if ($.validate.form()) {
+                 edit();
+             }
+         }
+		function edit() {
+            var filed=$("#form-role-edit").serializeJSON();
+            // filed["params[orgIds]"]=$("input[name='orgIds']").val();
+            filed["roleStatus"]=$("#roleStatus").is(":checked")?1:0;
+			$.ajax({
+				cache : true,
+				type : "POST",
+				url : ctx + "admin/system/role/doEdit",
+				data : filed,
+				async : false,
+				error : function(request) {
+					$.modal.alertError("系统错误");
+				},
+				success : function(data) {
+					$.operate.successCallback(data);
+				}
+			});
+		}
+	</script>
+</body>
+</html>

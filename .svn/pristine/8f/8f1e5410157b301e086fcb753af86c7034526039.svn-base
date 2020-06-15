@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中国水环境集团水厂运维数据填报系统</title>
+    <link th:href="@{/favicon.ico}" rel="stylesheet"/>
+    <link th:href="${'/css/bootstrap.min.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+    <link th:href="${'/css/font-awesome.min.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+    <link th:href="${'/css/main/animate.min.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+    <link th:href="${'/css/style.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+    <link th:href="${'/css/main/index.css?v='+@toolsUtils.version()}" rel="stylesheet"/>
+    <script th:src="${'/js/jquery.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/ajax/libs/layer/layer.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/boot/js/common.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/boot/js/admin.js?v='+@toolsUtils.version()}"></script>
+</head>
+<style>
+.main_rigth .col-sm-2 {
+	width: 32%!important;
+}
+.main_rigth .col-sm-10,.col-sm-9 {
+	width: 68%!important;
+}
+.button_submit_all {
+	float: right;
+    width: 60px;
+}
+</style>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div th:remove="tag" th:if="!${isAdmin} and !${isAccounting}">
+        <div class="col-sm-6 col-md-6" style="width:60%">
+            <div class="row" id="badWaterQualityInfo_div" th:if="${factoryType} == '1'">
+                <div class="col-sm-12 col-md-12">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <h5>污水厂水质信息填报</h5><button class="button_submit_all" id="submit_badWaterQualityInfo">提交</button>
+                        </div>
+                        <div class="ibox-content">
+                            <th:block th:include="admin/report/badWaterQualityInfo/add.html" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="goodWaterHealthInfo_div" th:if="${factoryType} == '2'">
+                <div class="col-sm-12 col-md-12">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <h5>供水厂水质信息填报</h5><button class="button_submit_all" id="submit_goodWaterHealthInfo">提交</button>
+                        </div>
+                        <div class="ibox-content">
+                            <th:block th:include="admin/report/goodWaterHealthInfo/add.html" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12 col-md-12">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <h5>水厂药量统计信息填报</h5><button class="button_submit_all" id="submit_TodayMedicineInfo">提交</button>
+                        </div>
+                        <div class="ibox-content">
+                            <th:block th:include="admin/report/TodayMedicineInfo/add.html" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-6" style="width:40%">
+            <div class="row">
+                <div class="col-sm-12 col-md-12">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <h5>水厂水量信息填报</h5><button class="button_submit_all" id="submit_todayWaterYieldInfo">提交</button>
+                        </div>
+                        <div class="ibox-content">
+                            <th:block th:include="admin/report/todayWaterYieldInfo/add.html" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12 col-md-12">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <h5>水厂电量统计信息填报</h5><button class="button_submit_all" id="submit_todayElectricityInfo">提交</button>
+                        </div>
+                        <div class="ibox-content">
+                            <th:block th:include="admin/report/todayElectricityInfo/add.html" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" th:if="${factoryType} == '1'">
+                <div class="col-sm-12 col-md-12">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <h5>水厂污泥数据填报</h5><button class="button_submit_all" id="submit_mudInfo">提交</button>
+                        </div>
+                        <div class="ibox-content">
+                            <th:block th:include="admin/report/mudInfo/add.html" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="clear-float"></div>
+    </div>
+    <div th:remove="tag" th:if="${isAdmin} or ${isAccounting}">
+        <div style="line-height: 94vh;font-size: 30px;text-align: center">
+            <img th:src="@{/img/logo.png}" alt="logo" style="width: 60px;height: 60px;">
+            <span>中国水环境集团水厂运维数据填报系统</span>
+        </div>
+    </div>
+</div>
+</body>
+<script th:inline="javascript">
+    // 污水
+    $("#submit_badWaterQualityInfo").click(function() {
+    	index_badWaterQualityInfo_submitHandler();
+    });
+    // 自来水
+    $("#submit_goodWaterHealthInfo").click(function() {
+    	index_goodWaterHealthInfo_submitHandler();
+    });
+    // 药耗
+    $("#submit_TodayMedicineInfo").click(function() {
+    	index_todayMedicineInfo_submitHandler();
+    });
+	// 水量
+    $("#submit_todayWaterYieldInfo").click(function() {
+    	index_todayWaterYieldInfo_submitHandler();
+    });
+	// 电量
+    $("#submit_todayElectricityInfo").click(function() {
+    	index_todayElectricityInfo_submitHandler();
+    });
+	// 污泥
+    $("#submit_mudInfo").click(function() {
+    	index_mudInfo_submitHandler();
+    });
+</script>
+</html>

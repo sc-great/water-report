@@ -1,0 +1,61 @@
+package com.boot.report.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Component;
+
+import com.boot.report.domain.TestTapWaterInfo;
+
+/**
+ * 自来水化验数据信息（自来水厂/给水厂）Mapper接口
+ * 
+ * @author yangxiaojun
+ * @date 2020-04-23
+ */
+@Component
+@Mapper
+public interface TestTapWaterInfoMapper {
+    /**
+     * 新增自来水化验数据信息（自来水厂/给水厂）
+     *
+     * @param goodWaterHealthInfo 自来水化验数据信息（自来水厂/给水厂）
+     * @return 结果
+     */
+    public int insert(TestTapWaterInfo testTapWaterInfo);
+    /**
+     * 修改自来水化验数据信息（自来水厂/给水厂）
+     *
+     * @param goodWaterHealthInfo 自来水化验数据信息（自来水厂/给水厂）
+     * @return 结果
+     */
+    public int update(TestTapWaterInfo testTapWaterInfo);
+    /**
+     * 批量删除自来水化验数据信息（自来水厂/给水厂）
+     *
+     * @param goodWaterHealthInfo 删除条件
+     * @return 结果
+     */
+    public int delete(TestTapWaterInfo testTapWaterInfo);
+    /**
+     * 获取自来水化验数据信息（自来水厂/给水厂）数量
+     *
+     * @param goodWaterHealthInfo 查询条件
+     * @return 结果
+     */
+    public int getCount(TestTapWaterInfo testTapWaterInfo);
+    /**
+     * 获取自来水化验数据信息（自来水厂/给水厂）对象
+     * 
+     * @param goodWaterHealthInfo 查询条件
+     * @return 自来水化验数据信息（自来水厂/给水厂）
+     */
+    public TestTapWaterInfo getEntity(TestTapWaterInfo testTapWaterInfo);
+    /**
+     * 查询自来水化验数据信息（自来水厂/给水厂）列表
+     * 
+     * @param goodWaterHealthInfo 查询条件
+     * @return 自来水化验数据信息（自来水厂/给水厂）集合
+     */
+    public List<TestTapWaterInfo> getList(TestTapWaterInfo testTapWaterInfo);
+}

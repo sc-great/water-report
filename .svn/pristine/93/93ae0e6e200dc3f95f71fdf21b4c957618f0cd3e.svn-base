@@ -1,0 +1,142 @@
+<!doctype html>
+<html class="no-js" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=ideal viewport, initial-scale=1 user-scalable=0"/>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="0"/>
+    <title>不合格水质填报分析</title>
+    <link rel="stylesheet" th:href="${'/webapp/css/font-awesome.css?v='+@toolsUtils.version()}">
+    <link rel="stylesheet" th:href="${'/webapp/css/com.css?v='+@toolsUtils.version()}">
+    <link rel="stylesheet" th:href="${'/webapp/css/style.css?v='+@toolsUtils.version()}">
+    <script th:src="${'/webapp/js/jquery.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/pace.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/plugin/layer_mobile/layer.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/common.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/jdate.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/dateUtil.js?v='+@toolsUtils.version()}"></script>
+</head>
+<style>
+.factoryInfo_header {
+    background: #ededed;
+    line-height: 6vh;
+}
+.factoryInfo_header .title {
+    padding-left: 8px;
+    color: #000;
+    font-weight: bold;
+    font-size: 1.6rem;
+}
+.factoryInfo_header .title i {
+    float: left;
+    line-height: 6vh;
+}
+.factoryInfo_header .title span {
+	display: flex;
+    justify-content: center;
+    font-weight: bold;
+}
+</style>
+<body>
+<div class="main">
+	<div class="factoryInfo_header">
+		<div class="title" onclick="goBack();">
+			<i class="fa fa-chevron-left"></i><span></span>
+		</div>
+	</div>
+    <div class="content center font-size-14">
+        <table class="cross-color">
+            <thead class="bg-color1 color-3" id="water_works">
+            <tr>
+                <th style="width: 50%;">
+                    项目
+                </th>
+               
+                <th>
+                   填报日期
+                </th>
+                <th>
+                    数据状态
+                </th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+<script th:inline="javascript">
+    var dateTime=getCurDate("yyyy-MM-dd");
+
+    loadData(dateTime);
+       
+    function loadData(date){
+        $("#water_works").nextAll("tbody").remove();
+        req('/app/waterQualityNotPassData',{date:date},function(result){
+            if(result.code=="0"){
+                var waterWorks=result.data;
+                $.each(waterWorks,function(index,item){
+                 var html = '<tbody class="cross-color">\n';
+                if(item.factoryType=="1"){
+	                var bwqiList = item.params.badWaterQualityInfo.bwqiList;
+	                var rowspan = bwqiList.length;
+	               
+	                if (rowspan > 0) {
+	                    for (var i = 0; i < rowspan; i++) {
+	                        var name = bwqiList[i].fillDate;                       
+	                        var total = '不合格';                    
+	                        if (i == 0) {
+	                            html += '<tr>\n' +
+	                            '        	<th class="left" rowspan="' + rowspan + '">'+ item.orgName + '</th>\n' +
+	                            '           <td class="left">' + name + '</td>\n' +
+	                            '           <td>\n' +
+	                            '           	<span class="color-2">' + total + '</span>\n' +
+	                            '           </td>\n' +
+	                            '        </tr>\n';
+	                        } else {
+	                            html += '<tr>\n' +
+	                            '        	<td class="left">' + name + '</td>\n' +
+	                            '        	<td>\n' +
+	                            '           	<span class="color-2">' + total + '</span>\n' +
+	                            '           </td>\n' +
+	                            '        </tr>\n';
+	                        }
+	                    }
+	                } 
+                }
+                 if(item.factoryType=="2"){
+	                var goodWaterList = item.params.goodWaterHealthInfo.goodWaterList;
+	                var rowspan2 = goodWaterList.length;
+	                if (rowspan2 > 0) {
+	                    for (var i = 0; i < rowspan2; i++) {
+	                        var name = goodWaterList[i].fillDate;                       
+	                        var total = '不合格';                    
+	                        if (i == 0) {
+	                            html += '<tr>\n' +
+	                            '        	<th class="left" rowspan="' + rowspan2 + '">'+ item.orgName + '</th>\n' +
+	                            '           <td class="left">' + name + '</td>\n' +
+	                            '           <td>\n' +
+	                            '           	<span class="color-2">' + total + '</span>\n' +
+	                            '           </td>\n' +
+	                            '        </tr>\n';
+	                        } else {
+	                            html += '<tr>\n' +
+	                            '        	<td class="left">' + name + '</td>\n' +
+	                            '        	<td>\n' +
+	                            '           	<span class="color-2">' + total + '</span>\n' +
+	                            '           </td>\n' +
+	                            '        </tr>\n';
+	                        }
+	                    }
+	                } 
+                }
+                html += '</tbody>';
+                $("#water_works").after(html);
+                });
+            }
+        });
+    }
+
+
+</script>
+</body>
+</html>

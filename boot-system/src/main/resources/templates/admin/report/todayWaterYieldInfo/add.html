@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+<th:block th:include="admin/include :: header('新增水厂水量信息')" />
+</head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content main_rigth">
+	<form class="form-horizontal m" id="form-todayWaterYieldInfo-add">
+		<input id="todayWaterYieldInfo_params" name="params[icon]" th:value="${icon}" type="hidden">
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">当日水量进水：</label>
+			<div class="col-sm-10">
+				<div class="input-group">
+					<input name="todayIn" id="todayIn" class="form-control" placeholder="请输入当日水量进水" 
+							type="number" min="0"  max="100000" maxLength="6" oninput="autoformart($(this));todayWaterYieldInfo_addIn()">
+					<span class="input-group-addon">吨</span>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left is-required">当日水量出水：</label>
+			<div class="col-sm-10">
+				<div class="input-group">
+					<input name="todayOut" id="todayOut" class="form-control" placeholder="请输入当日水量出水" required
+							type="number" min="0"  max="100000" maxLength="6" oninput="autoformart($(this));todayWaterYieldInfo_addOut()">
+					<span class="input-group-addon">吨</span>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left ">累计水量进水：</label>
+			<div class="col-sm-10">
+				<div class="input-group">
+					<input name="totalIn" id="totalIn" class="form-control" placeholder="请输入累计水量进水"
+						 	type="number" readonly="readonly">
+					<span class="input-group-addon">万吨</span>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label label-left">累计水量出水：</label>
+			<div class="col-sm-10">
+				<div class="input-group">
+					<input name="totalOut" id="totalOut" class="form-control" placeholder="请输入累计水量出水"
+							type="number" readonly="readonly">
+					<span class="input-group-addon">万吨</span>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: form" />
+</body>
+<script th:inline="javascript">
+var todayWaterYieldInfo_prefix = ctx + "admin/report/todayWaterYieldInfo";
+
+var totalIn = 0; // 原有当天日期以前的累计进水量
+var totalOut = 0; // 原有当天日期以前的累计出水量
+var old_totalIn = 0;
+var old_totalOut = 0;
+
+$.post(todayWaterYieldInfo_prefix + "/getSumInOut", function (data) {
+    $(".input-group input[name=\"totalIn\"]").val(data.data.totalTodayIn);
+    $(".input-group input[name=\"totalOut\"]").val(data.data.totalTodayOut);
+    totalIn = data.data.totalTodayIn;
+    totalOut = data.data.totalTodayOut;
+});
+
+function todayWaterYieldInfo_addIn() {
+    var a = document.getElementById("todayIn").value;
+    var c = numAdd(Number(a) / 10000, Number(totalIn));
+    document.getElementById("totalIn").value = c;
+    old_totalIn = c;
+}
+function todayWaterYieldInfo_addOut() {
+    var a = document.getElementById("todayOut").value;
+    var c = numAdd(Number(a) / 10000, Number(totalOut));
+    document.getElementById("totalOut").value = c;
+    old_totalOut = c;
+}
+
+// 两小数相加解决精度出现的问题
+var numAdd = function (num1, num2) { // 要相加的两个数
+    var baseNum,
+    baseNum1,
+    baseNum2;
+    try {
+        baseNum1 = num1.toString().split(".")[1].length;
+    } catch (e) {
+        baseNum1 = 0;
+    }
+    try {
+        baseNum2 = num2.toString().split(".")[1].length;
+    } catch (e) {
+        baseNum2 = 0;
+    }
+    baseNum = Math.pow(10, Math.max(baseNum1, baseNum2));
+    return (Math.round(num1 * baseNum) + Math.round(num2 * baseNum)) / baseNum;
+};
+
+$("#form-todayWaterYieldInfo-add").validate({
+    focusCleanup: true
+});
+
+function submitHandler() {
+    if ($.validate.form()) {
+    	var todayIn = Math.round(Number($("#todayIn").val()) * 100) / 100;
+        var todayOut = Math.round(Number($("#todayOut").val()) * 100) / 100;
+        $("#todayIn").val(todayIn);
+        $("#todayOut").val(todayOut);
+        $.operate.save(todayWaterYieldInfo_prefix + "/doAdd", $('#form-todayWaterYieldInfo-add').serialize());
+    }
+}
+
+function index_todayWaterYieldInfo_submitHandler() {
+    if ($.validate.formRequired("form-todayWaterYieldInfo-add")) {
+    	var todayIn = Math.round(Number($("#todayIn").val()) * 100) / 100;
+        var todayOut = Math.round(Number($("#todayOut").val()) * 100) / 100;
+        $("#todayIn").val(todayIn);
+        $("#todayOut").val(todayOut);
+        $.operate.saveModal(todayWaterYieldInfo_prefix + "/doAdd", $('#form-todayWaterYieldInfo-add').serialize());
+    }
+}
+
+$.post(todayWaterYieldInfo_prefix + "/checkIsOver?operateIcon=add", function (data) {
+    if (data.code == web_status.SUCCESS) {
+        $("#todayWaterYieldInfo_params").val("1");
+    } else if (data.code == web_status.FAIL) {
+        $("#todayWaterYieldInfo_params").val("2");
+
+        $(".input-group input[name=\"todayIn\"]").val(data.data.todayIn);
+        $(".input-group input[name=\"todayOut\"]").val(data.data.todayOut);
+        $(".input-group input[name=\"totalIn\"]").val(data.data.totalIn);
+        $(".input-group input[name=\"totalOut\"]").val(data.data.totalOut);
+    }
+});
+
+// input限制
+function autoformart(obj) {
+	var val = obj.val();
+	if (val == null || val == undefined || val == "") {
+		obj.val("");
+		return;
+	}
+	var maxLength = obj.attr("maxLength");
+	var max = obj.attr("max");
+	if (val.length > maxLength) {
+		obj.val(val.slice(0, maxLength)); // 限制长度
+		return;
+	}
+	if (parseFloat(val) > parseFloat(max)) {
+		obj.val(val.slice(0, val.length - 1)); // 限制大小
+		return;
+	}
+	obj.val(parseFloat(val));
+}
+</script>
+</html>

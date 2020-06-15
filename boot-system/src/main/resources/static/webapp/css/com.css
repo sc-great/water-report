@@ -1,0 +1,210 @@
+*{
+    margin: 0;
+    padding: 0;
+    font-family:"Times New Roman",Times,serif;
+   /* font-family:Arial,Helvetica,sans-serif;*/
+}
+html{
+    font-size: 62.5%;
+    width:100vw;
+    height: 100vh;
+    min-height: 568px;
+}
+body{
+    width:100%;
+    height: 100%;
+    color: #333;
+}
+a{
+    color: #333;
+}
+.main {
+    width: 100%;
+    height: 100%;
+    /*position: relative;*/
+    overflow: auto;
+}
+
+.iframe {
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    border: none;
+    position: relative;
+}
+/*进度条*/
+.pace {
+    -webkit-pointer-events: none;
+    pointer-events: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.pace-inactive {
+    display: none;
+}
+.pace .pace-progress {
+    background: #ff0000;
+    position: fixed;
+    z-index: 2000;
+    top: 0;
+    width: 100%;
+    height: 2px;
+}
+/*进度条*/
+/*正在加载*/
+.loading .object{
+    width: 1rem;
+    height:1rem;
+    background-color: #1E9FFF;
+    float: left;
+    margin-right: 1.6rem;
+    -moz-border-radius: 50% 50% 50% 50%;
+    -webkit-border-radius: 50% 50% 50% 50%;
+    border-radius: 50% 50% 50% 50%;
+}
+
+.loading .object:nth-child(1) {
+    -webkit-animation: object 1.5s infinite;
+    animation: object 1.5s infinite;
+    -webkit-animation-delay:0s;
+    animation-delay: 0s;
+}
+.loading .object:nth-child(2) {
+    -webkit-animation: object 1.5s infinite;
+    animation: object 1.5s infinite;
+    -webkit-animation-delay: 0.25s;
+    animation-delay: 0.25s;
+}
+.loading .object:nth-child(3) {
+    -webkit-animation: object 1.5s infinite;
+    animation: object 1.5s infinite;
+    -webkit-animation-delay: 0.5s;
+    animation-delay: 0.5s;
+
+}
+@-webkit-keyframes object {
+    75% { -webkit-transform: scale(0); }
+}
+@keyframes object {
+    75% {
+        transform: scale(0);
+        -webkit-transform: scale(0);
+    }
+}
+/*正在加载*/
+.table{
+    width: 100%;
+    height: 100%;
+    display: table;
+}
+.table .t-row{
+    display: table-row;
+}
+.table .t-cel{
+    display: table-cell;
+}
+.center{
+    text-align: center;
+}
+.right{
+    text-align: right;
+    padding-right:8px !important;
+}
+.left{
+    text-align: left;
+    padding-left:8px !important;
+}
+.middle{
+    vertical-align: middle;
+}
+.inline-block{
+    display: inline-block;
+}
+.blue-color{
+    color:#1E9FFF;
+}
+.hidden{
+    display: none;
+}
+.row,.row-header{
+    width:100%;
+    display: flex;
+}
+.row .cel,.row-header .cel{
+    float: left;
+    padding: 2vh 0 2vh 0;
+}
+.row .cel-1,.row-header .cel-1{
+    width:10%;
+}
+.row .cel-2,.row-header .cel-2{
+    width:20%;
+}
+.row .cel-3,.row-header .cel-3{
+    width:30%;
+}
+.row .cel-4,.row-header .cel-4{
+    width:40%;
+}
+.row .cel-5,.row-header .cel-5{
+    width:50%;
+}
+.row .cel-6,.row-header .cel-6{
+    width:60%;
+}
+.row .cel-7,.row-header .cel-7{
+    width:70%;
+}
+.row .cel-8,.row-header .cel-8{
+    width:80%;
+}
+.row .cel-9,.row-header .cel-9{
+    width:90%;
+}
+.row .cel-10,.row-header .cel-10{
+    width:100%;
+}
+.ibox{
+    width: 100%;
+    background-color: #fff;
+    margin: 2vh 0;
+}
+.ibox .ibox-title{
+    width: 100%;
+    height: 5vh;
+    display: table;
+    text-decoration: none;
+}
+.ibox .ibox-title .icon{
+    height:100%;
+    width: 10vw;
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+}
+.ibox .ibox-title .icon img{
+    height: 3vh;
+    width: auto;
+}
+.ibox .ibox-title .icon_w img{
+    height: auto;
+    width: 5vw;
+}
+.ibox .ibox-title .text{
+    display: table-cell;
+    vertical-align: middle;
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+.ibox .ibox-title .tips{
+    display: table-cell;
+    vertical-align: middle;
+    font-size: 1.4rem;
+}
+.ibox .ibox-content{
+    width: 100%;
+    margin-top: 1vh;
+}
+

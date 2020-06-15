@@ -1,0 +1,46 @@
+package com.boot.system.domain;
+
+import com.boot.common.core.domain.BaseEntity;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+/**
+ * 用户和角色关联 sys_user_role
+ * 
+ * @author epl
+ */
+public class SysUserRole extends BaseEntity
+{
+    /** 用户ID */
+    private String userId;
+    
+    /** 角色ID */
+    private String roleId;
+
+    /**组织机构ID*/
+    private String orgId;
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(String roleId) {
+        this.roleId = roleId;
+    }
+
+    public String getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(String orgId) {
+        this.orgId = orgId;
+    }
+}

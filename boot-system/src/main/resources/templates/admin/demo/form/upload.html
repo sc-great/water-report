@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <th:block th:include="admin/include :: header('文件上传')" />
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>文件上传控件 <small>https://github.com/kartik-v/bootstrap-fileinput</small></h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="form-group">
+                        <label class="font-noraml">导入excel</label>
+                        <div class="file-loading">
+                            <input id="fileinput-demo-2" type="file" name="uploadfile" accept=".xls,.xlsx">
+                        </div>
+                        <table id="bootstrap-table-form"></table>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="font-noraml">多文件上传</label>
+                        <div class="file-loading">
+                            <input id="fileinput-demo-1" type="file" multiple name="uploadfile" accept=".jpg,.jpeg,.gif,.png,.doc,.docx,.xls,.xlsx,.pdf">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button id="getfiles" type="button" class="btn btn-w-m btn-info">获取文件</button>
+                    </div>
+                    <hr>
+                    <div class="form-group">
+                        <label class="font-noraml">相关参数详细信息</label>
+                        <div><a href="http://doc.ruoyi.vip/#/standard/zjwd?id=jasny-bootstrap" target="_blank">http://doc.ruoyi.vip/#/standard/zjwd?id=jasny-bootstrap</a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: fileinput" />
+<th:block th:include="admin/include :: table" />
+<script th:inline="javascript">
+    var file_data=[],file_data2=[];
+    $(document).ready(function () {
+        var params={
+            obj:$("#fileinput-demo-2"),
+            tools:{
+                showPreview:false,
+                overwriteInitial:true,
+                readFileContent:true,
+                readFileTableId:'bootstrap-table-form',
+                readFileUrl:'/admin/project/purchaseApplyMaterialInfo/readFileContent',
+                readFileColumns:[
+                    {
+                        field : 'deviceCode',
+                        title : '设备编号'
+                    }
+                ]
+            }
+        };
+        file_data2=initFileInput(params);
+
+        var params={
+            obj:$("#fileinput-demo-1")
+        };
+        file_data=initFileInput(params);
+
+        $("#getfiles").click(function(){
+            console.log($('#bootstrap-table-form').bootstrapTable('getData'));
+            console.log(file_data);
+            console.log(file_data2);
+        });
+    });
+    function initFileInput(params){
+        var fiels=[];
+        var obj=params.obj;
+        var tools=params.tools;
+        var param={
+            language: 'zh',
+            uploadUrl: '/file/doUpload',
+            deleteUrl:'/file/doDelete',
+            allowedFileExtensions:['jpg','jpeg', 'gif', 'png',"doc","docx","xls","xlsx","pdf"],
+            autoUpload:true,//自定义参数，是否自动上传
+            readFileContent:false,//获取上传文件的内容（只对excel文件有用）
+            readFileUrl:'',//读取文件内容地址
+            readFileColumns:[],//读取文件内容列
+            showCaption:true,//是否显示被选文件的简介
+            showBrowse:true,//是否显示浏览按钮
+            showPreview:true,//是否显示预览区域
+            showRemove:false,//是否显示移除按钮
+            showUpload:false,//是否显示上传按钮
+            showCancel:true,//是否显示取消按钮
+            showClose:false,//是否显示关闭按钮
+            showUploadedThumbs:true,//这个属性是基于这样一个使用方法的：选择若干个文件后点击右下角上传按钮批量上传，待全部完成后再选择一批文件，此时之前上传成功的文件是否要保存。就是这个属性控制的。注意，点击文件缩略图下面的上传按钮不会导致之前的成功上传的文件消失，即使这里设置了true
+            autoReplace:false,//是否自动替换当前图片，设置为true时，再次选择文件， 会将当前的文件替换掉。
+            dropZoneEnabled:true,//是否显示拖拽区域,
+            overwriteInitial: false,//是否要覆盖初始预览内容和标题设置
+        };
+        if(tools!=undefined){
+            $.extend(param, tools);
+        }
+        if($.isArray(param.defaultPreview)){
+            var initialPreview=[];
+            var initialPreviewConfig=[];
+            var defaultPreview=param.defaultPreview;
+            $.each(defaultPreview,function(index,item){
+                fiels.push(item.id);
+                if(item.type=="image"){
+                    initialPreview.push('<img src="'+item.path+'" class="kv-preview-data file-preview-image">');
+                }else{
+                    initialPreview.push('<div class="file-preview-other"><span class="file-other-icon"><i class="glyphicon glyphicon-file"></i></span></div>');
+                }
+                initialPreviewConfig.push({type:item.type,caption: item.name,size: item.size, key: index+1,extra: {id: item.id}});
+            });
+            param["initialPreview"]=initialPreview;
+            param["initialPreviewConfig"]=initialPreviewConfig;
+        }
+        var accept=obj.attr("accept");
+        if(accept!=undefined && accept!=""){
+            var accepts=accept.split(",");
+            var allowedFileExtensions=[];
+            $.each(accepts,function(index,item){
+                allowedFileExtensions.push(item.replace(".",""));
+            });
+            param["allowedFileExtensions"]=allowedFileExtensions;
+        }
+        var multiple=obj.attr("multiple");
+        //单文件
+        if(multiple==undefined){
+            //布尔值，是否在预览窗口中持续显示已经上传的文件缩略图（用于ajax上传），直到按下删除/清除按钮。默认值为true。当设置为false时，下一批选择上传的文件将从预览中清除这些已经上传的文件缩略图。
+            param["showUploadedThumbs"]=false;
+        }
+        obj.fileinput(param).on('fileloaded', function(event, file, previewId, index, reader) {
+            console.log(event);
+            console.log(file);
+            console.log(previewId);
+            console.log(index);
+            console.log(reader);
+            $(".kv-preview-thumb[id='"+previewId+"'] .kv-file-remove").bind("click",function(){
+                console.log('删除');
+                var id= $("#"+previewId).data("fileid");
+                fiels.splice($.inArray(id,fiels),1);
+            });
+        }).on('filedeleted', function(event, key,data) {
+            console.log("filedeleted");
+            //删除初始化文件
+            var result=data.responseJSON;
+            if(result.code==0){
+                var id=result.data;
+                fiels.splice($.inArray(id,fiels),1);
+            }
+        }).on("fileuploaded", function(e, data, previewId, index) {
+            //文件上传成功的回调函数，还有其他的一些回调函数，比如上传之前...
+            var result=data.response;
+            if(result.code==0){
+                var id=result.data;
+                $("#"+previewId).data("fileid",id);
+                if(multiple==undefined){
+                    fiels.splice(0);
+                }
+                fiels.push(id);
+                //读取上传文件内容
+                if(param.readFileContent){
+                    console.log("获取文件内容");
+                    var options = {
+                        id: param.readFileTableId,
+                        url: param.readFileUrl,
+                        showSearch: false,
+                        showRefresh: false,
+                        showToggle: false,
+                        showColumns: false,
+                        queryParams: function(){
+                            return {id:id};
+                        },
+                        columns: param.readFileColumns
+                    };
+                    //销毁原来的table列表
+                    $("#"+param.readFileTableId).bootstrapTable('destroy');
+                    $.table.init(options);
+                }
+            }
+        })/*.on('filesuccessremove', function(event, data) {
+            console.log('filesuccessremove');
+            //删除上传文件
+            var id= $("#"+data).data("fileid");
+            $.ajax({
+                url:param.deleteUrl,
+                type:"post",
+                data:{id:id},
+                success:function(result){
+                    if(result.code==0){
+                        var id=result.data;
+                        fiels.splice($.inArray(id,fiels),1);
+                    }
+                }
+            })
+        })*/;
+        if(param.autoUpload){
+            obj.on("filebatchselected", function(event, files) {
+                $(this).fileinput("upload");
+            });
+        }
+        return fiels;
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="admin/include :: header('用户消息列表')"/>
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            <p>搜索关键词：</p>
+                            <input type="text" name="searchValue"/>
+                        </li>
+                        <li>
+                            <p>消息类型：</p>
+                            <select name="msgType" th:with="type=${@dict.getType('msg_type')}">
+                                <option value="">所有</option>
+                                <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+                                        th:value="${dict.dictValue}"></option>
+                            </select>
+                        </li>
+                        <li>
+                            <p>阅读状态：</p>
+                            <select name="msgState" th:with="type=${@dict.getType('msg_state')}">
+                                <option value="">所有</option>
+                                <option th:each="dict : ${type}" th:text="${dict.dictLabel}"
+                                        th:value="${dict.dictValue}"></option>
+                            </select>
+                        </li>
+                        <li>
+                            <p>接收时间：</p>
+                            <input type="text" name="params[sendTime]" class="time-input" data-type="date" data-format="yyyy-MM-dd"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
+                                    class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i
+                                    class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-primary multiple" onclick="updateRead()" shiro:hasPermission="sysMsg:sysMsg:updateRead">
+                <i class="fa fa-envelope-open"></i>全部标记已读
+            </a>
+            <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()"
+               shiro:hasPermission="sysMsg:sysMsg:delete">
+                <i class="fa fa-remove"></i> 删除
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="admin/include :: common"/>
+<th:block th:include="admin/include :: table"/>
+<script th:inline="javascript">
+    var removeFlag = [[${@permission.hasPermi('sysMsg:sysMsg:delete')}]];
+    var msgType = [[${@dict.getType('msg_type')}]];
+    var prefix = ctx + "admin/system/msg";
+
+    $(function () {
+        var options = {
+            url: prefix + "/doList",
+            detailUrl: prefix + "/info/{id}",
+            removeUrl: prefix + "/delete",
+            modalName: "用户消息",
+            uniqueId:"id",
+            idField:"id",
+            columns: [
+                {
+                    checkbox: true
+                },
+                {
+                    field: 'msgState',
+                    title: '标记',
+                    align:'center',
+                    sortable: true,
+                    formatter:function(value,row,index){
+                        var icon='';
+                        if(value==1){
+                            icon='<i class="fa fa-envelope-open"></i>';
+                        }else{
+                            icon='<i class="fa fa-envelope text-warning"></i>';
+                        }
+                        return icon;
+                    }
+                },
+                {
+                    field: 'msgTitle',
+                    title: '标题'
+                },
+                {
+                    field: 'msgType',
+                    title: '类型',
+                    align:'center',
+                    sortable: true,
+                    formatter:function(value,row,index){
+                        return $.table.selectDictLabel(msgType, value);
+                    }
+                },
+               /* {
+                    field: 'msgContent',
+                    title: '内容'
+                },*/
+                {
+                    field: 'createBy',
+                    title: '发送人',
+                    align:'center',
+                    sortable: true
+                },
+                {
+                    field: 'createTime',
+                    title: '发送时间',
+                    align:'center',
+                    sortable: true
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs" href="javascript:void(0)" onclick="$.operate.detail(\'' + row.id + '\')"><i class="fa fa-eye"></i>查看</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+    });
+    function updateRead(){
+        var rows =$("#bootstrap-table").bootstrapTable('getSelections');
+        var ids=[];
+        if (rows.length == 0) {
+            $.modal.alertWarning("请至少选择一条记录");
+            return;
+        }
+        $.each(rows,function(index,item){
+           ids.push(item.id);
+        });
+        $.modal.confirm("确认要标记" + rows.length + "条数据为已读消息?", function() {
+            var url = prefix + "/updateRead";
+            var data = { "ids": ids.join(",") };
+            $.operate.submit(url, "post", "json", data,function(){
+                //调用顶层框架消息刷新方法
+                //判断方法是否存在
+                if(typeof window.top.myMsg=="function"){
+                    window.top.myMsg();
+                }
+            });
+        });
+    }
+    function goAudit(id,type){
+        $.table.refresh();
+        $.modal.closeAll();
+        if(type=="20"){
+            var url=ctx + "admin/flow/task/taskInfo/"+id;
+            $.modal.openTab("抄送任务",url);
+        }else{
+            $.ajax({
+                url:ctx+"admin/flow/runFlow/checkFlowNode",
+                type:"get",
+                data:{id:id},
+                dataType:"json",
+                success:function(result){
+                    if(result.code==0){
+                        var url=ctx+"admin/flow/runFlow/audit/"+id;
+                        $.modal.openTab("流程审批",url);
+                    }else{
+                        $.modal.confirm("该任务流程节点已经处理过，是否去查看？",function(){
+                            var url=ctx + "admin/flow/task/taskInfo/"+id;
+                            $.modal.openTab("经办任务",url);
+                        });
+                    }
+                }
+            });
+        }
+
+    }
+</script>
+</body>
+</html>

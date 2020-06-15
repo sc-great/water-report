@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.system.mapper.SysFactoryInfoMapper">
+	<resultMap type="SysFactoryInfo" id="resultMapping">
+		<result property="factId"    column="fact_id"    />
+        <result property="orgId"    column="org_id"    />
+        <result property="areaId"    column="area_id"    />
+        <result property="factName"    column="fact_name"    />
+        <result property="finiDate"    column="fini_date"    />
+        <result property="startDate"    column="start_date"    />
+        <result property="ton"    column="ton"    />
+        <result property="personNum"    column="person_num"    />
+        <result property="technology"    column="technology"    />
+        <result property="standard"    column="standard"    />
+        <result property="price"    column="price"    />
+        <result property="codInMinBad"    column="COD_in_min_bad"    />
+        <result property="codInMaxBad"    column="COD_in_max_bad"    />
+        <result property="codOutMinBad"    column="COD_out_min_bad"    />
+        <result property="codOutMaxBad"    column="COD_out_max_bad"    />
+        <result property="nh3NInMinBad"    column="NH3_N_in_min_bad"    />
+        <result property="nh3NInMaxBad"    column="NH3_N_in_max_bad"    />
+        <result property="nh3NOutMinBad"    column="NH3_N_out_min_bad"    />
+        <result property="nh3NOutMaxBad"    column="NH3_N_out_max_bad"    />
+        <result property="ssInMinBad"    column="SS_in_min_bad"    />
+        <result property="ssInMaxBad"    column="SS_in_max_bad"    />
+        <result property="ssOutMinBad"    column="SS_out_min_bad"    />
+        <result property="ssOutMaxBad"    column="SS_out_max_bad"    />
+        <result property="phInMinBad"    column="PH_in_min_bad"    />
+        <result property="phInMaxBad"    column="PH_in_max_bad"    />
+        <result property="phOutMinBad"    column="PH_out_min_bad"    />
+        <result property="phOutMaxBad"    column="PH_out_max_bad"    />
+        <result property="tpInMinBad"    column="TP_in_min_bad"    />
+        <result property="tpInMaxBad"    column="TP_in_max_bad"    />
+        <result property="tpOutMinBad"    column="TP_out_min_bad"    />
+        <result property="tpOutMaxBad"    column="TP_out_max_bad"    />
+        <result property="tnInMinBad"    column="TN_in_min_bad"    />
+        <result property="tnInMaxBad"    column="TN_in_max_bad"    />
+        <result property="tnOutMinBad"    column="TN_out_min_bad"    />
+        <result property="tnOutMaxBad"    column="TN_out_max_bad"    />
+        <result property="phInMinGood"    column="PH_in_min_good"    />
+        <result property="phInMaxGood"    column="PH_in_max_good"    />
+        <result property="phOutMinGood"    column="PH_out_min_good"    />
+        <result property="phOutMaxGood"    column="PH_out_max_good"    />
+        <result property="col2OutMinGood"    column="COL2_out_min_good"    />
+        <result property="col2OutMaxGood"    column="COL2_out_max_good"    />
+        <result property="germOutMinGood"    column="germ_out_min_good"    />
+        <result property="germOutMaxGood"    column="germ_out_max_good"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+	</resultMap>
+
+	<insert id="insert" parameterType="SysFactoryInfo">
+		<selectKey keyProperty="factId" resultType="String" order="BEFORE">
+			select replace(uuid(),'-','') from dual
+		</selectKey>
+		insert into sys_factory_info
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                        <if test="factId != null ">fact_id,</if>
+                                <if test="orgId != null ">org_id,</if>
+                                <if test="areaId != null ">area_id,</if>
+                                <if test="factName != null ">fact_name,</if>
+                                <if test="finiDate != null ">fini_date,</if>
+                                <if test="startDate != null ">start_date,</if>
+                                <if test="ton != null ">ton,</if>
+                                <if test="personNum != null ">person_num,</if>
+                                <if test="technology != null ">technology,</if>
+                                <if test="standard != null ">standard,</if>
+                                <if test="price != null ">price,</if>
+                                <if test="codInMinBad != null ">COD_in_min_bad,</if>
+                                <if test="codInMaxBad != null ">COD_in_max_bad,</if>
+                                <if test="codOutMinBad != null ">COD_out_min_bad,</if>
+                                <if test="codOutMaxBad != null ">COD_out_max_bad,</if>
+                                <if test="nh3NInMinBad != null ">NH3_N_in_min_bad,</if>
+                                <if test="nh3NInMaxBad != null ">NH3_N_in_max_bad,</if>
+                                <if test="nh3NOutMinBad != null ">NH3_N_out_min_bad,</if>
+                                <if test="nh3NOutMaxBad != null ">NH3_N_out_max_bad,</if>
+                                <if test="ssInMinBad != null ">SS_in_min_bad,</if>
+                                <if test="ssInMaxBad != null ">SS_in_max_bad,</if>
+                                <if test="ssOutMinBad != null ">SS_out_min_bad,</if>
+                                <if test="ssOutMaxBad != null ">SS_out_max_bad,</if>
+                                <if test="phInMinBad != null ">PH_in_min_bad,</if>
+                                <if test="phInMaxBad != null ">PH_in_max_bad,</if>
+                                <if test="phOutMinBad != null ">PH_out_min_bad,</if>
+                                <if test="phOutMaxBad != null ">PH_out_max_bad,</if>
+                                <if test="tpInMinBad != null ">TP_in_min_bad,</if>
+                                <if test="tpInMaxBad != null ">TP_in_max_bad,</if>
+                                <if test="tpOutMinBad != null ">TP_out_min_bad,</if>
+                                <if test="tpOutMaxBad != null ">TP_out_max_bad,</if>
+                                <if test="tnInMinBad != null ">TN_in_min_bad,</if>
+                                <if test="tnInMaxBad != null ">TN_in_max_bad,</if>
+                                <if test="tnOutMinBad != null ">TN_out_min_bad,</if>
+                                <if test="tnOutMaxBad != null ">TN_out_max_bad,</if>
+                                <if test="phInMinGood != null ">PH_in_min_good,</if>
+                                <if test="phInMaxGood != null ">PH_in_max_good,</if>
+                                <if test="phOutMinGood != null ">PH_out_min_good,</if>
+                                <if test="phOutMaxGood != null ">PH_out_max_good,</if>
+                                <if test="col2OutMinGood != null ">COL2_out_min_good,</if>
+                                <if test="col2OutMaxGood != null ">COL2_out_max_good,</if>
+                                <if test="germOutMinGood != null ">germ_out_min_good,</if>
+                                <if test="germOutMaxGood != null ">germ_out_max_good,</if>
+                                <if test="createBy != null ">create_by,</if>
+                                <if test="createTime != null ">create_time,</if>
+                                <if test="updateBy != null ">update_by,</if>
+                                <if test="updateTime != null ">update_time,</if>
+                    </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                        <if test="factId != null ">#{factId},</if>
+                                <if test="orgId != null ">#{orgId},</if>
+                                <if test="areaId != null ">#{areaId},</if>
+                                <if test="factName != null ">#{factName},</if>
+                                <if test="finiDate != null ">#{finiDate},</if>
+                                <if test="startDate != null ">#{startDate},</if>
+                                <if test="ton != null ">#{ton},</if>
+                                <if test="personNum != null ">#{personNum},</if>
+                                <if test="technology != null ">#{technology},</if>
+                                <if test="standard != null ">#{standard},</if>
+                                <if test="price != null ">#{price},</if>
+                                <if test="codInMinBad != null ">#{codInMinBad},</if>
+                                <if test="codInMaxBad != null ">#{codInMaxBad},</if>
+                                <if test="codOutMinBad != null ">#{codOutMinBad},</if>
+                                <if test="codOutMaxBad != null ">#{codOutMaxBad},</if>
+                                <if test="nh3NInMinBad != null ">#{nh3NInMinBad},</if>
+                                <if test="nh3NInMaxBad != null ">#{nh3NInMaxBad},</if>
+                                <if test="nh3NOutMinBad != null ">#{nh3NOutMinBad},</if>
+                                <if test="nh3NOutMaxBad != null ">#{nh3NOutMaxBad},</if>
+                                <if test="ssInMinBad != null ">#{ssInMinBad},</if>
+                                <if test="ssInMaxBad != null ">#{ssInMaxBad},</if>
+                                <if test="ssOutMinBad != null ">#{ssOutMinBad},</if>
+                                <if test="ssOutMaxBad != null ">#{ssOutMaxBad},</if>
+                                <if test="phInMinBad != null ">#{phInMinBad},</if>
+                                <if test="phInMaxBad != null ">#{phInMaxBad},</if>
+                                <if test="phOutMinBad != null ">#{phOutMinBad},</if>
+                                <if test="phOutMaxBad != null ">#{phOutMaxBad},</if>
+                                <if test="tpInMinBad != null ">#{tpInMinBad},</if>
+                                <if test="tpInMaxBad != null ">#{tpInMaxBad},</if>
+                                <if test="tpOutMinBad != null ">#{tpOutMinBad},</if>
+                                <if test="tpOutMaxBad != null ">#{tpOutMaxBad},</if>
+                                <if test="tnInMinBad != null ">#{tnInMinBad},</if>
+                                <if test="tnInMaxBad != null ">#{tnInMaxBad},</if>
+                                <if test="tnOutMinBad != null ">#{tnOutMinBad},</if>
+                                <if test="tnOutMaxBad != null ">#{tnOutMaxBad},</if>
+                                <if test="phInMinGood != null ">#{phInMinGood},</if>
+                                <if test="phInMaxGood != null ">#{phInMaxGood},</if>
+                                <if test="phOutMinGood != null ">#{phOutMinGood},</if>
+                                <if test="phOutMaxGood != null ">#{phOutMaxGood},</if>
+                                <if test="col2OutMinGood != null ">#{col2OutMinGood},</if>
+                                <if test="col2OutMaxGood != null ">#{col2OutMaxGood},</if>
+                                <if test="germOutMinGood != null ">#{germOutMinGood},</if>
+                                <if test="germOutMaxGood != null ">#{germOutMaxGood},</if>
+                                <if test="createBy != null ">#{createBy},</if>
+                                <if test="createTime != null ">#{createTime},</if>
+                                <if test="updateBy != null ">#{updateBy},</if>
+                                <if test="updateTime != null ">#{updateTime},</if>
+                    </trim>
+    </insert>
+
+    <update id="update" parameterType="SysFactoryInfo">
+        update sys_factory_info
+        <trim prefix="SET" suffixOverrides=",">
+                                    <if test="orgId != null ">org_id = #{orgId},</if>
+                                <if test="areaId != null ">area_id = #{areaId},</if>
+                                <if test="factName != null ">fact_name = #{factName},</if>
+                                <if test="finiDate != null ">fini_date = #{finiDate},</if>
+                                <if test="startDate != null ">start_date = #{startDate},</if>
+                                <if test="ton != null ">ton = #{ton},</if>
+                                <if test="personNum != null ">person_num = #{personNum},</if>
+                                <if test="technology != null ">technology = #{technology},</if>
+                                <if test="standard != null ">standard = #{standard},</if>
+                                <if test="price != null ">price = #{price},</if>
+                                <if test="codInMinBad != null ">COD_in_min_bad = #{codInMinBad},</if>
+                                <if test="codInMaxBad != null ">COD_in_max_bad = #{codInMaxBad},</if>
+                                <if test="codOutMinBad != null ">COD_out_min_bad = #{codOutMinBad},</if>
+                                <if test="codOutMaxBad != null ">COD_out_max_bad = #{codOutMaxBad},</if>
+                                <if test="nh3NInMinBad != null ">NH3_N_in_min_bad = #{nh3NInMinBad},</if>
+                                <if test="nh3NInMaxBad != null ">NH3_N_in_max_bad = #{nh3NInMaxBad},</if>
+                                <if test="nh3NOutMinBad != null ">NH3_N_out_min_bad = #{nh3NOutMinBad},</if>
+                                <if test="nh3NOutMaxBad != null ">NH3_N_out_max_bad = #{nh3NOutMaxBad},</if>
+                                <if test="ssInMinBad != null ">SS_in_min_bad = #{ssInMinBad},</if>
+                                <if test="ssInMaxBad != null ">SS_in_max_bad = #{ssInMaxBad},</if>
+                                <if test="ssOutMinBad != null ">SS_out_min_bad = #{ssOutMinBad},</if>
+                                <if test="ssOutMaxBad != null ">SS_out_max_bad = #{ssOutMaxBad},</if>
+                                <if test="phInMinBad != null ">PH_in_min_bad = #{phInMinBad},</if>
+                                <if test="phInMaxBad != null ">PH_in_max_bad = #{phInMaxBad},</if>
+                                <if test="phOutMinBad != null ">PH_out_min_bad = #{phOutMinBad},</if>
+                                <if test="phOutMaxBad != null ">PH_out_max_bad = #{phOutMaxBad},</if>
+                                <if test="tpInMinBad != null ">TP_in_min_bad = #{tpInMinBad},</if>
+                                <if test="tpInMaxBad != null ">TP_in_max_bad = #{tpInMaxBad},</if>
+                                <if test="tpOutMinBad != null ">TP_out_min_bad = #{tpOutMinBad},</if>
+                                <if test="tpOutMaxBad != null ">TP_out_max_bad = #{tpOutMaxBad},</if>
+                                <if test="tnInMinBad != null ">TN_in_min_bad = #{tnInMinBad},</if>
+                                <if test="tnInMaxBad != null ">TN_in_max_bad = #{tnInMaxBad},</if>
+                                <if test="tnOutMinBad != null ">TN_out_min_bad = #{tnOutMinBad},</if>
+                                <if test="tnOutMaxBad != null ">TN_out_max_bad = #{tnOutMaxBad},</if>
+                                <if test="phInMinGood != null ">PH_in_min_good = #{phInMinGood},</if>
+                                <if test="phInMaxGood != null ">PH_in_max_good = #{phInMaxGood},</if>
+                                <if test="phOutMinGood != null ">PH_out_min_good = #{phOutMinGood},</if>
+                                <if test="phOutMaxGood != null ">PH_out_max_good = #{phOutMaxGood},</if>
+                                <if test="col2OutMinGood != null ">COL2_out_min_good = #{col2OutMinGood},</if>
+                                <if test="col2OutMaxGood != null ">COL2_out_max_good = #{col2OutMaxGood},</if>
+                                <if test="germOutMinGood != null ">germ_out_min_good = #{germOutMinGood},</if>
+                                <if test="germOutMaxGood != null ">germ_out_max_good = #{germOutMaxGood},</if>
+                                <if test="createBy != null ">create_by = #{createBy},</if>
+                                <if test="createTime != null ">create_time = #{createTime},</if>
+                                <if test="updateBy != null ">update_by = #{updateBy},</if>
+                                <if test="updateTime != null ">update_time = #{updateTime},</if>
+                    </trim>
+        where fact_id = #{factId}
+    </update>
+
+
+	<sql id="where">
+		<where>
+			<if test="factId != null and factId != ''">
+				and t.fact_id=#{factId}
+			</if>
+			<if test="orgId != null and orgId != ''">
+				and t.org_id = #{orgId}
+			</if>
+			<if test="areaId != null and areaId != ''">
+				and t.area_id = #{areaId}
+			</if>
+			<if test="factName != null and factName != ''">
+				and t.fact_name like concat('%', #{factName}, '%')
+			</if>
+			<if test="finiDate != null and finiDate != ''">
+				and t.fini_date = #{finiDate}
+			</if>
+			<if test="startDate != null and startDate != ''">
+				and t.start_date = #{startDate}
+			</if>
+			<if test="ton != null">
+				and t.ton = #{ton}
+			</if>
+			<if test="personNum != null">
+				and t.person_num = #{personNum}
+			</if>
+			<if test="technology != null and technology != ''">
+				and t.technology = #{technology}
+			</if>
+			<if test="standard != null and standard != ''">
+				and t.standard = #{standard}
+			</if>
+			<if test="price != null">
+				and t.price = #{price}
+			</if>
+			<if test="params.ids != null">
+				and t.fact_id in
+				<foreach collection="params.ids" item="id" open="(" separator="," close=")">
+					#{id}
+				</foreach>
+			</if>
+			<if test="params.areaIds != null and params.areaIds != ''">
+				and FIND_IN_SET(t.area_id,'${params.areaIds}')
+			</if>
+			<!-- 数据范围过滤 -->
+			${params.dataScope}
+		</where>
+	</sql>
+
+	<delete id="delete" parameterType="SysFactoryInfo">
+		delete t from sys_factory_info t
+		<include refid="where" />
+	</delete>
+
+	<select id="getCount" parameterType="SysFactoryInfo" resultType="int">
+		select count(*) from sys_factory_info t
+		<include refid="where" />
+	</select>
+	<!--手机端首页：水厂注册职人数或区域累计职工数 -->
+	<select id="getCountByAppFactoryPersonNum" parameterType="SysFactoryInfo" resultType="int">
+		select IFNULL(SUM(person_num),0) from sys_factory_info t
+		<include refid="where" />
+	</select>
+
+	<!-- 手机端设计处理能力累计 -->
+	<select id="getCountByApp" parameterType="SysFactoryInfo" resultType="Long">
+		select IFNULL(SUM(t.ton),0) from sys_factory_info t
+		<include refid="where" />
+	</select>
+
+	<sql id="select">
+		select t.* from sys_factory_info t
+	</sql>
+
+	<select id="getEntity" parameterType="SysFactoryInfo" resultMap="resultMapping">
+		<include refid="select" />
+		<include refid="where" />
+		LIMIT 1
+	</select>
+
+	<select id="getList" parameterType="SysFactoryInfo" resultMap="resultMapping">
+		<include refid="select" />
+		<include refid="where" />
+	</select>
+</mapper>

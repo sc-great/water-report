@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+<th:block th:include="admin/include :: header('修改物品')" />
+</head>
+<style>
+#form-consumableType-edit .col-sm-9 {
+	float: right;
+	width: 76%;
+}
+#form-consumableType-edit .col-sm-9 .input-group{
+	width: 100%;
+}
+</style>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-consumableType-edit" th:object="${type}">
+        <input name="id" th:field="*{id}" type="hidden">
+        <div class="form-group">
+            <label class="col-sm-2 control-label label-left is-required">物品名称：</label>
+            <div class="col-sm-9">
+                <div class="input-group">
+                    <input name="name" class="form-control" th:value="*{name}" placeholder="请输入物品名称" type="text" required/>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">    
+            <label class="col-sm-2 control-label label-left is-required">物品单位：</label>
+            <div class="col-sm-9">
+                <div class="input-group">
+                    <input name="unit" class="form-control" th:value="*{unit}" type="text" maxlength="8" required/>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">    
+            <label class="col-sm-2 control-label label-left">型号规格：</label>
+            <div class="col-sm-9">
+                <div class="input-group">
+                    <input name="model" class="form-control" th:value="*{model}" type="text"/>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">    
+            <label class="col-sm-2 control-label label-left">其他信息：</label>
+            <div class="col-sm-9">
+                <div class="input-group">
+                    <input name="info" class="form-control" th:value="*{info}" type="text"/>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">    
+            <label class="col-sm-2 control-label label-left">备注信息：</label>
+            <div class="col-sm-9">
+                <div class="input-group">
+                    <input name="note" class="form-control" th:value="*{note}" type="text"/>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: form" />
+</body>
+<script th:inline="javascript" th:value="*{name}">
+var consumableType_edit_prefix = ctx + "admin/materialControl/consumable";
+
+$("#form-consumableType-edit").validate({
+    focusCleanup: true
+});
+
+function submitHandler() {
+	var id = $("#form-consumableType-edit input[name=\"id\"]");
+	var name = $("#form-consumableType-edit .input-group input[name=\"name\"]");
+	var model = $("#form-consumableType-edit .input-group input[name=\"model\"]");
+    if ($.validate.form()) {
+    	var param = {"id": id.val(), "name": name.val(), "model": model.val()};
+    	$.post(consumableType_edit_prefix + "/checkTypeName", param, function(data) {
+    		if (data.data != undefined && data.data != "") {
+    			$.modal.alertWarning(data.data);
+    			return;
+    		}
+        	$.operate.save(consumableType_edit_prefix + "/doTypeEdit", $('#form-consumableType-edit').serialize(), null, "put");
+    	})
+    }
+}
+</script>
+</html>

@@ -1,0 +1,187 @@
+<!doctype html>
+<html class="no-js" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=ideal viewport, initial-scale=1 user-scalable=0"/>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="0"/>
+    <title>全国各区域用药分析</title>
+    <link rel="stylesheet" th:href="${'/webapp/css/font-awesome.css?v='+@toolsUtils.version()}">
+    <link rel="stylesheet" th:href="${'/webapp/css/com.css?v='+@toolsUtils.version()}">
+    <link rel="stylesheet" th:href="${'/webapp/css/style.css?v='+@toolsUtils.version()}">
+    <script th:src="${'/webapp/js/jquery.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/pace.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/plugin/layer_mobile/layer.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/common.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/jdate.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/dateUtil.js?v='+@toolsUtils.version()}"></script>
+</head>
+<body>
+<div class="main">
+    <div class="map">
+        <div class="line-row">
+            <div class="line-cel go-back" onclick="goBack();"><i class="fa fa-chevron-left"></i></div>
+            <div class="date line-cel"><span id="date">2020.03.23</span><i class="fa fa-calendar-check-o"></i></div>
+            <div class="line-cel" th:each="item:${areaTypes}" th:onclick="companys([[${item.key}]]);" th:text="${item.value}"></div>
+        </div>
+        <div id="beijing" class="item" onclick="companys('beijing');">北京</div>
+        <div id="qingdao" class="item" onclick="companys('qingdao');">青岛</div>
+        <div id="ankang" class="item" onclick="companys('ankang');">安康</div>
+        <div id="anhui" class="item" onclick="companys('anhui');">安徽</div>
+        <div id="sichuang" class="item" onclick="companys('sichuang');">四川</div>
+        <div id="ezhou" class="item" onclick="companys('ezhou');">鄂州</div>
+        <div id="huadong" class="item" onclick="companys('huadong');">华东</div>
+        <div id="guizhou" class="item" onclick="companys('guizhou');">贵州</div>
+        <div id="fujian" class="item" onclick="companys('fujian');">福建</div>
+        <div id="dali" class="item" onclick="companys('dali');">大理</div>
+        <div id="guangxi" class="item" onclick="companys('guangxi');">广西</div>
+    </div>
+    <div class="content center font-size-14">
+        <table class="cross-color">
+            <thead class="bg-color1 color-3" id="area_list">
+                <tr>
+                    <th style="width: 30%;">
+                        区域
+                    </th>
+                    <th>
+                        药品类型
+                    </th>
+                    <th>
+                        当日/累计
+                    </th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+<script th:inline="javascript">
+    var dateTime=getCurDate("yyyy-MM-dd");
+    var areaTypes=[[${areaTypes}]];
+    $(function () {
+        // 日期格式
+        new Jdate({
+            el: '#date',
+            format: 'YYYY-MM-DD',
+            beginYear: 2000,
+            endYear: 2100,
+            value: dateTime,
+            confirm: function(date) {
+                loadData(date);
+            }
+        });
+        loadData(dateTime);
+        var map_height=$(".map").outerHeight();
+        //滚动条事件
+        $('.main').scroll(function(){
+            var top_height = $(this).scrollTop();
+            var $this=$("#area_list");
+            if(top_height+$this.outerHeight()>map_height){
+                if(!$this.hasClass("top")){
+                    var width_1=$this.next("tbody").find("tr:eq(0) th").outerWidth();
+                    var width_2=$this.next("tbody").find("tr:eq(0) td:eq(0)").outerWidth();
+                    var width_3=$this.next("tbody").find("tr:eq(0) td:eq(1)").outerWidth();
+                    $this.find("th").eq(0).width(width_1);
+                    $this.find("th").eq(1).width(width_2);
+                    $this.find("th").eq(2).width(width_3);
+                    $this.next("tbody").find("tr:eq(0) th").width(width_1);
+                    $this.next("tbody").find("tr:eq(0) td:eq(0)").width(width_2);
+                    $this.next("tbody").find("tr:eq(0) td:eq(1)").width(width_3);
+                    $this.addClass("top");
+                }
+            }else{
+                if($this.hasClass("top")){
+                    $this.removeClass("top");
+                }
+            }
+        });
+    });
+    function loadData(date){
+        $("#area_list").nextAll("tbody").remove();
+        req('/app/medicationAreaData',{date:date},function(result){
+            if(result.code=="0"){
+                var areaList=result.data;
+                $.each(areaList,function(index,item){
+                    $("#area_list").after('<tbody class="cross-color">\n' +
+                        '                <tr>\n' +
+                        '                    <th class="left" rowspan="10">\n' +
+                        '                        <a href="/app/medicationCompany/'+item.areaId+'">'+item.areaName+'</a>\n' +
+                        '                    </th>\n' +
+                        '                    <td class="left">PAC</td>\n' +
+                        '                    <td>\n' +
+                        '                        <span class="color-2">'+item.params.sumMedicine.sumTodayPAC+'</span>/<span class="color-1">'+item.params.sumMedicine.sumTotalPAC+'</span>\n' +
+                        '                    </td>\n' +
+                        '                </tr>\n' +
+                        '                <tr>\n' +
+                        '                    <td class="left">PAM阴离子</td>\n' +
+                        '                    <td>\n' +
+                        '                        <span class="color-2">'+item.params.sumMedicine.sumTodayPAMYin+'</span>/<span class="color-1">'+item.params.sumMedicine.sumTotalPAMYin+'</span>\n' +
+                        '                    </td>\n' +
+                        '                </tr>\n' +
+                        '                <tr>\n' +
+                        '                    <td class="left">PAM阳离子</td>\n' +
+                        '                    <td>\n' +
+                        '                        <span class="color-2">'+item.params.sumMedicine.sumTodayPAMYang+'</span>/<span class="color-1">'+item.params.sumMedicine.sumTotalPAMYang+'</span>\n' +
+                        '                    </td>\n' +
+                        '                </tr>\n' +
+                        '                <tr>\n' +
+                        '                    <td class="left">复核除磷剂</td>\n' +
+                        '                    <td>\n' +
+                        '                        <span class="color-2">'+item.params.sumMedicine.sumTodayPhosphorus+'</span>/<span class="color-1">'+item.params.sumMedicine.sumTotalPhosphorus+'</span>\n' +
+                        '                    </td>\n' +
+                        '                </tr>\n' +
+                        '                <tr>\n' +
+                        '                    <td class="left">葡萄糖</td>\n' +
+                        '                    <td>\n' +
+                        '                        <span class="color-2">'+item.params.sumMedicine.sumTodayGlucose+'</span>/<span class="color-1">'+item.params.sumMedicine.sumTotalGlucose+'</span>\n' +
+                        '                    </td>\n' +
+                        '                </tr>\n' +
+                        '                <tr>\n' +
+                        '                    <td class="left">NaCLO</td>\n' +
+                        '                    <td>\n' +
+                        '                        <span class="color-2">'+item.params.sumMedicine.sumTodayNaCLO+'</span>/<span class="color-1">'+item.params.sumMedicine.sumTotalNaCLO+'</span>\n' +
+                        '                    </td>\n' +
+                        '                </tr>\n' +
+                        '                <tr>\n' +
+                        '                    <td class="left">HCL</td>\n' +
+                        '                    <td>\n' +
+                        '                        <span class="color-2">'+item.params.sumMedicine.sumTodayHCL+'</span>/<span class="color-1">'+item.params.sumMedicine.sumTotalHCL+'</span>\n' +
+                        '                    </td>\n' +
+                        '                </tr>\n' +
+                        '                <tr>\n' +
+                        '                    <td class="left">乙酸钠</td>\n' +
+                        '                    <td>\n' +
+                        '                        <span class="color-2">'+item.params.sumMedicine.sumTodaySA+'</span>/<span class="color-1">'+item.params.sumMedicine.sumTotalSA+'</span>\n' +
+                        '                    </td>\n' +
+                        '                </tr>\n' +
+                        '                <tr>\n' +
+                        '                    <td class="left">石灰</td>\n' +
+                        '                    <td>\n' +
+                        '                        <span class="color-2">'+item.params.sumMedicine.sumTodayLime+'</span>/<span class="color-1">'+item.params.sumMedicine.sumTotalLime+'</span>\n' +
+                        '                    </td>\n' +
+                        '                </tr>\n' +
+                        '                <tr>\n' +
+                        '                    <td class="left">氯酸钠</td>\n' +
+                        '                    <td>\n' +
+                        '                        <span class="color-2">'+item.params.sumMedicine.sumTodaySC+'</span>/<span class="color-1">'+item.params.sumMedicine.sumTotalSC+'</span>\n' +
+                        '                    </td>\n' +
+                        '                </tr>\n' +
+                        '            </tbody>');
+                });
+            }
+        });
+    }
+
+    function companys(type){
+        if(areaTypes.hasOwnProperty(type)){
+            window.location.href='/app/medicationCompanys/'+type;
+        }else{
+            layer.open({
+                content: "对不起，该区域您没有查看权限！",
+                btn: '知道了'
+            });
+        }
+    }
+</script>
+</body>
+</html>

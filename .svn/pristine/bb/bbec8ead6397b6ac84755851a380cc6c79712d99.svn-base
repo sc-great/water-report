@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="admin/include :: header('当月费用填报')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content main_rigth">
+        <form class="form-horizontal m" id="form-costInfo-add">
+            <input id="costInfo_params" name="params[icon]" th:value="${icon}" type="hidden">
+            <div class="form-group">
+                <label class="col-sm-2 control-label label-left is-required">当年目标：</label>
+                <div class="col-sm-9">
+                    <div class="input-group">
+                        <input name="thisYear" class="form-control" placeholder="请输入当年目标"  type="text" required  maxlength="6"   onkeyup="num(this)" >
+                        <span class="input-group-addon">万元</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-2 control-label label-left is-required">去年目标：</label>
+                <div class="col-sm-9">
+                    <div class="input-group">
+                        <input name="lastYear" class="form-control" value="0" type="text" required  maxlength="6"    onkeyup="num(this)"  />
+                        <span class="input-group-addon">万元</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-2 control-label label-left is-required">本月到账：</label>
+                <div class="col-sm-9">
+                    <div class="input-group">
+                        <input name="currentEnter" class="form-control" placeholder="请输入本月到账" type="text" required  oninput="autoCurrentTotal()" maxlength="5"    onkeyup="num(this)" />
+                        <span class="input-group-addon">万元</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-2 control-label label-left is-required">本月累计：</label>
+                <div class="col-sm-9">
+                    <div class="input-group">
+                        <input name="currentTotal" class="form-control" value="0" type="number" readonly="readonly">
+                        <span class="input-group-addon">万元</span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="admin/include :: common" />
+    <th:block th:include="admin/include :: form" />
+</body>
+<script th:inline="javascript">
+var form_costInfo_add_prefix = ctx + "admin/materialControl/costInfo";
+
+$("#form-costInfo-add").validate({
+    focusCleanup: true
+});
+
+function submitHandler() {
+    if ($.validate.form()) {
+        $.operate.save(form_costInfo_add_prefix + "/doAdd", $('#form-costInfo-add').serialize());
+    }
+}
+
+var thisYear_input = $("#form-costInfo-add .input-group input[name=\"thisYear\"]");
+var lastYear_input = $("#form-costInfo-add .input-group input[name=\"lastYear\"]");
+var currentEnter_input = $("#form-costInfo-add .input-group input[name=\"currentEnter\"]");
+var currentTotal_input = $("#form-costInfo-add .input-group input[name=\"currentTotal\"]");
+
+$.post(form_costInfo_add_prefix + "/checkIsOver?operateIcon=add", function (data) {
+    if (data.code == web_status.SUCCESS) { // 本月无填报
+        $("#costInfo_params").val("1");
+    	if (data.msg == "OK") {
+    		// 赋值
+            currentTotal_his = data.data.currentTotal;
+            thisYear_input.val(data.data.thisYear);
+            lastYear_input.val(data.data.lastYear);
+            currentTotal_input.val(currentTotal_his);
+    	}
+    } else if (data.code == web_status.FAIL) { // 本月有填报
+        $("#costInfo_params").val("2");
+        // 赋值
+        currentEnter_his = data.data.currentEnter;
+        currentTotal_his = data.data.currentTotal;
+        thisYear_input.val(data.data.thisYear);
+        lastYear_input.val(data.data.lastYear);
+        currentEnter_input.attr("placeholder", "上笔到账金额：" + currentEnter_his);
+        currentTotal_input.val(currentTotal_his);
+    }
+});
+
+var currentTotal_his = 0;
+
+function autoCurrentTotal() {
+	var currentEnter = 0;
+	try {
+		currentEnter = parseFloat(currentEnter_input.val());
+	} catch (e) {
+			
+	}
+	currentTotal_input.val(doubleAdd(currentTotal_his, currentEnter));
+}
+
+// 两小数相加解决精度出现的问题
+var doubleAdd = function (num1, num2) { // 要相加的两个数
+    var baseNum,
+    baseNum1,
+    baseNum2;
+    try {
+        baseNum1 = num1.toString().split(".")[1].length;
+    } catch (e) {
+        baseNum1 = 0;
+    }
+    try {
+        baseNum2 = num2.toString().split(".")[1].length;
+    } catch (e) {
+        baseNum2 = 0;
+    }
+    baseNum = Math.pow(10, Math.max(baseNum1, baseNum2));
+    return (Math.round(num1 * baseNum) + Math.round(num2 * baseNum)) / baseNum;
+};
+
+
+function num(obj){
+	obj.value = obj.value.replace(/[^\d.]/g,""); 
+	obj.value = obj.value.replace(/^\./g,""); 
+	obj.value = obj.value.replace(/\.{2,}/g,"."); 
+	obj.value = obj.value.replace(".","$#$").replace(/\./g,"").replace("$#$",".");
+	obj.value = obj.value.replace(/^(\-)*(\d+)\.(\d\d).*$/,'$1$2.$3'); 
+}
+</script>
+</html>

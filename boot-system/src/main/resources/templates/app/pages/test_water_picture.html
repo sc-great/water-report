@@ -1,0 +1,417 @@
+<!doctype html>
+<html class="no-js" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=ideal viewport, initial-scale=1 user-scalable=0"/>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="0"/>
+    <title>各公司水质化验分析</title>
+    <link rel="stylesheet" th:href="${'/webapp/css/font-awesome.css?v='+@toolsUtils.version()}">
+    <link rel="stylesheet" th:href="${'/webapp/css/com.css?v='+@toolsUtils.version()}">
+    <link rel="stylesheet" th:href="${'/webapp/css/style.css?v='+@toolsUtils.version()}">
+    <script th:src="${'/webapp/js/jquery.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/pace.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/plugin/layer_mobile/layer.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/common.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/jdate.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/dateUtil.js?v='+@toolsUtils.version()}"></script>
+</head>
+<body>
+<div class="main">
+    <input type="hidden" id="areaGroupTypeId" th:value="${areaGroupTypeId}">
+    <input type="hidden" id="areaIds" th:value="${areaIds}">
+    <input type="hidden" id="areaGroupName" th:value="${areaGroupName}">
+    <div class="content center font-size-14">
+        <table class="cross-color">
+            <thead class="bg-color1 color-3" id="water_works">
+            <tr>
+                <th style="width: 30%;">
+                    项目
+                </th>
+                <th>
+                    在线数据
+                </th>
+                <th>
+                    进水
+                </th>
+                <th>
+                    出水
+                </th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+</body>
+<script th:inline="javascript">
+    var dateTime=getCurDate("yyyy-MM-dd");
+    $(function () {
+        loadData(dateTime);
+        navControler(dateTime);
+        var nav_height=$(".nav").outerHeight();
+        //滚动条事件
+        $('.main').scroll(function(){
+            var top_height = $(this).scrollTop();
+            var $this=$("#water_works");
+            if(top_height+$this.outerHeight()>nav_height){
+                if(!$this.hasClass("top")){
+                    var width_1=$this.next("tbody").find("tr:eq(0) th").outerWidth();
+                    var width_2=$this.next("tbody").find("tr:eq(0) td:eq(0)").outerWidth();
+                    var width_3=$this.next("tbody").find("tr:eq(0) td:eq(1)").outerWidth();
+                    var width_4=$this.next("tbody").find("tr:eq(0) td:eq(2)").outerWidth();
+                    $this.find("th").eq(0).width(width_1);
+                    $this.find("th").eq(1).width(width_2);
+                    $this.find("th").eq(2).width(width_3);
+                    $this.find("th").eq(3).width(width_4);
+                    $this.next("tbody").find("tr:eq(0) th").width(width_1);
+                    $this.next("tbody").find("tr:eq(0) td:eq(0)").width(width_2);
+                    $this.next("tbody").find("tr:eq(0) td:eq(1)").width(width_3);
+                    $this.next("tbody").find("tr:eq(0) td:eq(2)").width(width_4);
+                    $this.addClass("top");
+                }
+            }else{
+                if($this.hasClass("top")){
+                    $this.removeClass("top");
+                }
+            }
+        });
+    });
+    //导航控件
+    function navControler(dateTime){
+        var groupType=$("#areaGroupTypeId").val();
+        var areaGroupName=$("#areaGroupName").val();
+        var html='<div class="nav">\n' +
+                '<div class="line-cel go-back" onclick="goBack();"><i class="fa fa-chevron-left"></i></div>'+
+            '        <div class="date"><span id="check_date">'+dateTime+'</span>&nbsp;<i class="fa fa-calendar-check-o"></i></div>\n' +
+            '        <div class="select" id="area">'+areaGroupName+' <i class="fa fa-angle-right"></i></div>\n' +
+            '    </div>';
+        var objHTML=$(html);
+        $(".main").prepend(objHTML);
+        // 日期格式
+        new Jdate({
+            el: '#check_date',
+            format: 'YYYY-MM-DD',
+            beginYear: 2000,
+            endYear: 2100,
+            value: dateTime,
+            confirm: function(date) {
+                loadData(date);
+            }
+        });
+        $("#area").bind("click",function(){
+            var $this=$(this);
+            $this.closest(".nav").toggleClass("active");
+            if($this.closest(".nav").hasClass("active")){
+                $this.find(".fa").addClass("fa-angle-down").removeClass("fa-angle-right");
+                req("/app/getAreaList",{groupType:groupType},function (result) {
+                    if(result.code=="0"){
+                        var html='<div class="modal">\n' +
+                            '            <div class="tree_list">\n' +
+                            '                <div class="p_list">\n';
+                        var areaList=result.data;
+                        var areaId="";
+                        $.each(areaList,function(index,item){
+                            if(index==0){
+                                areaId=item.areaId;
+                            }
+                            html+= '                    <div class="item '+(areaId==item.areaId?"active":"")+'" data-value="'+item.areaId+'">'+item.areaName+'</div>\n';
+                        });
+                        html+=   '                </div>\n' +
+                            '                <div class="s_list">\n' +
+                            '                    <div class="item">全部</div>\n';
+                        req("/app/getCompanyList",{areaId:areaId},function (result) {
+                            if(result.code=="0"){
+                                var companyList=result.data;
+                                $.each(companyList,function(index,item){
+                                    html+='                    <a class="item" href="/app/waterQualityWaterWorks/'+item.orgId+'">'+item.orgName+'</a>\n';
+                                })
+                            }
+                        },"get",false);
+                        html+='                </div>\n' +
+                            '            </div>\n' +
+                            '        </div>';
+                        var objHTML=$(html);
+                        objHTML.find(".p_list .item").bind("click",function(){
+                            $(this).addClass("active").siblings().removeClass("active");
+                            objHTML.find(".s_list").empty();
+                            var areaId=$(this).data("value");
+                            var html= '                    <div class="item">全部</div>\n';
+                            req("/app/getCompanyList",{areaId:areaId},function (result) {
+                                if(result.code=="0"){
+                                    var companyList=result.data;
+                                    $.each(companyList,function(index,item){
+                                        html+='                    <a class="item" href="/app/waterQualityWaterWorks/'+item.orgId+'">'+item.orgName+'</a>\n';
+                                    })
+                                }
+                            },"get",false);
+                            objHTML.find(".s_list").append(html);
+                        });
+                        $this.after(objHTML);
+                    }
+                },"get",false);
+            }else{
+                $this.closest(".nav").find(".modal").remove();
+                $this.find(".fa").addClass("fa-angle-right").removeClass("fa-angle-down");
+            }
+
+        });
+    }
+    function loadData(date){
+        $("#water_works").nextAll("tbody").remove();
+        var areaIds=$("#areaIds").val();
+        req('/app/testWaterPictureData',{areaIds:areaIds,date:date},function(result){
+            if(result.code=="0"){
+                var waterWorks=result.data;
+                $.each(waterWorks,function(index,item){
+                    var html='';
+                    //污水厂/排水厂
+                    if(item.factoryType=="1"){
+                         html='<tbody class="cross-color">\n' +
+                            '                <tr>\n' +
+                            '                    <th class="left" rowspan="15">'+item.orgName+'</th>\n' +
+                            '                    <td class="left">pH值</td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-2">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.phIn!=null)?item.params.testBadWaterInfo.phIn:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-1">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.phOut!=null)?item.params.testBadWaterInfo.phOut:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                </tr>\n' +
+                            '                <tr>\n' +
+                            '                    <td class="left">氨氮(mg/L)</td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-2">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.adanIn!=null)?item.params.testBadWaterInfo.adanIn:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-1">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.adanOut!=null)?item.params.testBadWaterInfo.adanOut:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                </tr>\n' +
+                            '                <tr>\n' +
+                            '                    <td class="left">总氮(mg/L)</td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-2">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.zdanIn!=null)?item.params.testBadWaterInfo.zdanIn:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-1">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.zdanOut!=null)?item.params.testBadWaterInfo.zdanOut:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                </tr>\n' +
+                            '                <tr>\n' +
+                            '                    <td class="left">总磷(mg/L)</td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-2">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.zlinIn!=null)?item.params.testBadWaterInfo.zlinIn:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-1">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.zlinOut!=null)?item.params.testBadWaterInfo.zlinOut:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                </tr>\n' +
+                            '                <tr>\n' +
+                            '                    <td class="left">化学需氧量</td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-2">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.codIn!=null)?item.params.testBadWaterInfo.codIn:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-1">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.codOut!=null)?item.params.testBadWaterInfo.codOut:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                </tr>\n' +
+                            '                <tr>\n' +
+                            '                    <td class="left">五日生化需氧量</td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-2">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.bod5In!=null)?item.params.testBadWaterInfo.bod5In:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-1">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.bod5Out!=null)?item.params.testBadWaterInfo.bod5Out:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                </tr>\n' +
+                            '                <tr>\n' +
+                            '                    <td class="left">总悬浮物</td>\n' +
+                            '                    <td>\n' +
+                            '                       <span class="color-2">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.xfuIn!=null)?item.params.testBadWaterInfo.xfuIn:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                    <td>\n' +
+                            '                      <span class="color-1">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.xfuOut!=null)?item.params.testBadWaterInfo.xfuOut:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                </tr>\n' +
+                            '                <tr>\n' +
+                            '                    <td class="left">温度</td>\n' +
+                            '                    <td>\n' +
+                            '                       <span class="color-2">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.tempIn!=null)?item.params.testBadWaterInfo.tempIn:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                    <td>\n' +
+                            '                       <span class="color-1">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.tempOut!=null)?item.params.testBadWaterInfo.tempOut:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                </tr>\n' +
+                             '                <tr>\n' +
+                            '                    <td class="left">粪大肠菌</td>\n' +
+                            '                    <td class="right">\n' +
+                            '                     <span class="color-2">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.fengJun!=null)?item.params.testBadWaterInfo.fengJun:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            /*'                    <td>\n' +
+                            '                        <span class="color-1">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.sv30Out!=null)?item.params.testBadWaterInfo.sv30Out:"")+'</span>\n' +
+                            '                    </td>\n' +*/
+                            '                </tr>\n' +
+                              '                <tr>\n' +
+                            '                    <td class="left">SV30</td>\n' +
+                            '                    <td class="right">\n' +
+                            '                        <span class="color-2">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.sv30!=null)?item.params.testBadWaterInfo.sv30:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            /*'                    <td>\n' +
+                            '                        <span class="color-1">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.sv30Out!=null)?item.params.testBadWaterInfo.sv30Out:"")+'</span>\n' +
+                            '                    </td>\n' +*/
+                            '                </tr>\n' +
+                              '                <tr>\n' +
+                            '                    <td class="left">SVI</td>\n' +
+                            '                    <td class="right">\n' +
+                            '                        <span class="color-2">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.svt!=null)?item.params.testBadWaterInfo.svt:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            /*'                    <td>\n' +
+                            '                        <span class="color-1">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.sv30Out!=null)?item.params.testBadWaterInfo.sv30Out:"")+'</span>\n' +
+                            '                    </td>\n' +*/
+                            '                </tr>\n' +
+                             '                <tr>\n' +
+                            '                    <td class="left">MLSS</td>\n' +
+                            '                    <td class="right">\n' +
+                            '                        <span class="color-2">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.mlss!=null)?item.params.testBadWaterInfo.mlss:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            /*'                    <td>\n' +
+                            '                        <span class="color-1">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.sv30Out!=null)?item.params.testBadWaterInfo.sv30Out:"")+'</span>\n' +
+                            '                    </td>\n' +*/
+                            '                </tr>\n' +
+                             '                <tr>\n' +
+                            '                    <td class="left">MLVSS</td>\n' +
+                            '                    <td class="right">\n' +
+                            '                        <span class="color-2">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.mlvss!=null)?item.params.testBadWaterInfo.mlvss:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            /*'                    <td>\n' +
+                            '                        <span class="color-1">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.sv30Out!=null)?item.params.testBadWaterInfo.sv30Out:"")+'</span>\n' +
+                            '                    </td>\n' +*/
+                            '                </tr>\n' +
+                            '                <tr>\n' +
+                            '                    <td class="left">DO</td>\n' +
+                            '                    <td class="right">\n' +
+                            '                        <span class="color-2">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.testDo!=null)?item.params.testBadWaterInfo.testDo:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            /*'                    <td>\n' +
+                            '                        <span class="color-1">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.sv30Out!=null)?item.params.testBadWaterInfo.sv30Out:"")+'</span>\n' +
+                            '                    </td>\n' +*/
+                            '                </tr>\n' +
+                            '                <tr>\n' +
+                            '                    <td class="left">污泥含水率</td>\n' +
+                            '                    <td class="right">\n' +
+                            '                        <span class="color-2">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.waterSludge!=null)?item.params.testBadWaterInfo.waterSludge:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            /*'                    <td>\n' +
+                            '                        <span class="color-1">'+((item.params.testBadWaterInfo!=null && item.params.testBadWaterInfo.sv30Out!=null)?item.params.testBadWaterInfo.sv30Out:"")+'</span>\n' +
+                            '                    </td>\n' +*/
+                            '                </tr>\n' +
+                            '            </tbody>';
+                    }
+                    //自来水厂/给水厂
+                    else if(item.factoryType=="2"){
+                         html='<tbody class="cross-color">\n' +
+                            '                <tr>\n' +
+                            '                    <th class="left" rowspan="11">'+item.orgName+'</th>\n' +
+                            '                    <td class="left">浊度</td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-2">'+((item.params.testTapWaterInfo!=null && item.params.testTapWaterInfo.ntuIn!=null)?item.params.testTapWaterInfo.ntuIn:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-1">'+((item.params.testTapWaterInfo!=null && item.params.testTapWaterInfo.ntuOut!=null)?item.params.testTapWaterInfo.ntuOut:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                </tr>\n' +
+                            '                <tr>\n' +
+                            '                    <td class="left">色度</td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-2">'+((item.params.testTapWaterInfo!=null && item.params.testTapWaterInfo.colourIn!=null)?item.params.testTapWaterInfo.colourIn:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-1">'+((item.params.testTapWaterInfo!=null && item.params.testTapWaterInfo.colourOut!=null)?item.params.testTapWaterInfo.colourOut:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                </tr>\n' +
+                            '                <tr>\n' +
+                            '                    <td class="left">臭和味</td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-2">'+((item.params.testTapWaterInfo!=null && item.params.testTapWaterInfo.cwIn!=null)?item.params.testTapWaterInfo.cwIn:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-1">'+((item.params.testTapWaterInfo!=null && item.params.testTapWaterInfo.cwOut!=null)?item.params.testTapWaterInfo.cwOut:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                </tr>\n' +
+                            '                <tr>\n' +
+                            '                    <td class="left">肉眼可见物</td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-2">'+((item.params.testTapWaterInfo!=null && item.params.testTapWaterInfo.eyeIn!=null)?item.params.testTapWaterInfo.eyeIn:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-1">'+((item.params.testTapWaterInfo!=null && item.params.testTapWaterInfo.eyeOut!=null)?item.params.testTapWaterInfo.eyeOut:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                </tr>\n' +
+                            '                <tr>\n' +
+                            '                    <td class="left">耗氧量(mg/L)</td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-2">'+((item.params.testTapWaterInfo!=null && item.params.testTapWaterInfo.hyIn!=null)?item.params.testTapWaterInfo.hyIn:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-1">'+((item.params.testTapWaterInfo!=null && item.params.testTapWaterInfo.hyOut!=null)?item.params.testTapWaterInfo.hyOut:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                </tr>\n' +
+                            '                <tr>\n' +
+                            '                    <td class="left">氨氮(mg/L)</td>\n' +                          
+                            '                    <td>\n' +
+                            '                        <span class="color-1">'+((item.params.testTapWaterInfo!=null && item.params.testTapWaterInfo.adanIn!=null)?item.params.testTapWaterInfo.adanIn:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                    <td>\\</td>\n' +
+                            '                </tr>\n' +
+                             '                <tr>\n' +
+                            '                    <td class="left">细菌总数(CFU/ml)</td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-2">'+((item.params.testTapWaterInfo!=null && item.params.testTapWaterInfo.xjzsIn!=null)?item.params.testTapWaterInfo.xjzsIn:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-1">'+((item.params.testTapWaterInfo!=null && item.params.testTapWaterInfo.xjzsOut!=null)?item.params.testTapWaterInfo.xjzsOut:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                </tr>\n' +
+                             '                <tr>\n' +
+                            '                    <td class="left">总大肠菌群(CFU/ml)</td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-2">'+((item.params.testTapWaterInfo!=null && item.params.testTapWaterInfo.zdjIn!=null)?item.params.testTapWaterInfo.zdjIn:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-1">'+((item.params.testTapWaterInfo!=null && item.params.testTapWaterInfo.zdjOut!=null)?item.params.testTapWaterInfo.zdjOut:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                </tr>\n' +
+                             '                <tr>\n' +
+                            '                    <td class="left">耐热大肠菌群(CFU/ml)</td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-2">'+((item.params.testTapWaterInfo!=null && item.params.testTapWaterInfo.nrjIn!=null)?item.params.testTapWaterInfo.nrjIn:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-1">'+((item.params.testTapWaterInfo!=null && item.params.testTapWaterInfo.nrjOut!=null)?item.params.testTapWaterInfo.nrjOut:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                </tr>\n' +
+                             '                <tr>\n' +
+                            '                    <td class="left">二氧化氯mg/L</td>\n' +
+                            '                    <td>\\</td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-1">'+((item.params.testTapWaterInfo!=null && item.params.testTapWaterInfo.twoOut!=null)?item.params.testTapWaterInfo.twoOut:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                </tr>\n' +
+                             '                <tr>\n' +
+                            '                    <td class="left">温度</td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-2">'+((item.params.testTapWaterInfo!=null && item.params.testTapWaterInfo.tempIn!=null)?item.params.testTapWaterInfo.tempIn:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                    <td>\n' +
+                            '                        <span class="color-1">'+((item.params.testTapWaterInfo!=null && item.params.testTapWaterInfo.tempOut!=null)?item.params.testTapWaterInfo.tempOut:"")+'</span>\n' +
+                            '                    </td>\n' +
+                            '                </tr>\n' +
+                            
+                            '            </tbody>';
+                    }
+                    $("#water_works").after(html);
+                });
+            }
+        });
+    }
+</script>
+</html>

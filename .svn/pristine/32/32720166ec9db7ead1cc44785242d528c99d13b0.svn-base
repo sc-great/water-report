@@ -1,0 +1,71 @@
+package com.boot.report.service;
+
+import com.boot.report.domain.BadWaterQualityInfo;
+import java.util.List;
+
+/**
+ * 水厂水质数据信息(污水处理厂/排水厂)Service接口
+ * 
+ * @author EPL
+ * @date 2020-03-24
+ */
+public interface IBadWaterQualityInfoService {
+	/**
+	 * 新增水厂水质数据信息(污水处理厂/排水厂)
+	 *
+	 * @param badWaterQualityInfo 水厂水质数据信息(污水处理厂/排水厂)
+	 * @return 结果
+	 */
+	public int add(BadWaterQualityInfo badWaterQualityInfo, String alarmNote);
+
+	/**
+	 * 修改水厂水质数据信息(污水处理厂/排水厂)
+	 *
+	 * @param badWaterQualityInfo 水厂水质数据信息(污水处理厂/排水厂)
+	 * @return 结果
+	 */
+	public int update(BadWaterQualityInfo badWaterQualityInfo, String alarmNote);
+
+	/**
+	 * 批量删除水厂水质数据信息(污水处理厂/排水厂)
+	 *
+	 * @param ids 需要删除的数据ID
+	 * @return 结果
+	 */
+	public int deleteByIds(String ids);
+
+	/**
+	 * 查询水厂水质数据信息(污水处理厂/排水厂)数量
+	 *
+	 * @param badWaterQualityInfo 查询条件
+	 * @return 水厂水质数据信息(污水处理厂/排水厂)数量
+	 */
+	public int getCount(BadWaterQualityInfo badWaterQualityInfo);
+
+	/**
+	 * 获取水厂水质数据信息(污水处理厂/排水厂)实体对象
+	 * 
+	 * @param id 水厂水质数据信息(污水处理厂/排水厂)ID
+	 * @return 水厂水质数据信息(污水处理厂/排水厂)
+	 */
+	public BadWaterQualityInfo getEntityById(String id);
+
+	public BadWaterQualityInfo getEntity(BadWaterQualityInfo badWaterQualityInfo);
+
+	/**
+	 * 查询水厂水质数据信息(污水处理厂/排水厂)列表
+	 * 
+	 * @param badWaterQualityInfo 水厂水质数据信息(污水处理厂/排水厂)
+	 * @return 水厂水质数据信息(污水处理厂/排水厂)集合
+	 */
+	public List<BadWaterQualityInfo> getList(BadWaterQualityInfo badWaterQualityInfo);
+
+	/**
+	 * 查询超标天数
+	 * @param badWaterQualityInfo
+	 * @return
+	 */
+	public int getOverNorm(BadWaterQualityInfo badWaterQualityInfo);
+
+	public int append(BadWaterQualityInfo badWaterQualityInfo, String alarmNote);
+}

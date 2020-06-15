@@ -1,0 +1,32 @@
+<!doctype html>
+<html class="no-js" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=ideal viewport, initial-scale=1 user-scalable=0"/>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="0"/>
+    <title>404</title>
+    <link rel="stylesheet" th:href="${'/webapp/css/font-awesome.css?v='+@toolsUtils.version()}">
+    <link rel="stylesheet" th:href="${'/webapp/css/com.css?v='+@toolsUtils.version()}">
+    <link rel="stylesheet" th:href="${'/webapp/css/style.css?v='+@toolsUtils.version()}">
+    <script th:src="${'/webapp/js/jquery.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/common.js?v='+@toolsUtils.version()}"></script>
+</head>
+<body>
+<div class="main">
+    <div class="header">
+        <div class="go-back" onclick="goBack();">
+            <i class="fa fa-chevron-left fa-2x"></i>
+        </div>
+        <div class="title">404</div>
+    </div>
+    <div class="content">
+        <div class="panel msg">
+            <i class="fa fa-exclamation-triangle"></i>
+            <span th:text="${msg}"></span>
+        </div>
+    </div>
+</div>
+</body>
+</html>

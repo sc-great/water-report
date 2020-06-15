@@ -1,0 +1,144 @@
+<!doctype html>
+<html class="no-js" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=ideal viewport, initial-scale=1 user-scalable=0"/>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="0"/>
+    <title>全国各区域备品备件</title>
+    <link rel="stylesheet" th:href="${'/webapp/css/font-awesome.css?v='+@toolsUtils.version()}">
+    <link rel="stylesheet" th:href="${'/webapp/css/com.css?v='+@toolsUtils.version()}">
+    <link rel="stylesheet" th:href="${'/webapp/css/style.css?v='+@toolsUtils.version()}">
+    <script th:src="${'/webapp/js/jquery.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/pace.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/plugin/layer_mobile/layer.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/common.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/jdate.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/dateUtil.js?v='+@toolsUtils.version()}"></script>
+</head>
+<body>
+<div class="main">
+    <div class="map">
+        <div class="line-row">
+            <div class="line-cel go-back" onclick="goBack();"><i class="fa fa-chevron-left"></i></div>
+            <div class="line-cel" th:each="item:${areaTypes}" th:onclick="companys([[${item.key}]]);" th:text="${item.value}"></div>
+        </div>
+        <div id="beijing" class="item" onclick="companys('beijing');">北京</div>
+        <div id="qingdao" class="item" onclick="companys('qingdao');">青岛</div>
+        <div id="ankang" class="item" onclick="companys('ankang');">安康</div>
+        <div id="anhui" class="item" onclick="companys('anhui');">安徽</div>
+        <div id="sichuang" class="item" onclick="companys('sichuang');">四川</div>
+        <div id="ezhou" class="item" onclick="companys('ezhou');">鄂州</div>
+        <div id="huadong" class="item" onclick="companys('huadong');">华东</div>
+        <div id="guizhou" class="item" onclick="companys('guizhou');">贵州</div>
+        <div id="fujian" class="item" onclick="companys('fujian');">福建</div>
+        <div id="dali" class="item" onclick="companys('dali');">大理</div>
+        <div id="guangxi" class="item" onclick="companys('guangxi');">广西</div>
+    </div>
+    <div class="content center font-size-14">
+        <table class="cross-color">
+            <thead class="bg-color1 color-3" id="area_list">
+	            <tr class="font-size-12">
+	                <th style="width:30%;">区域</th>
+	                <th>物品名称</th>
+	                <th>库存</th>
+	            </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+</body>
+<script th:inline="javascript">
+var dateTime = getCurDate("yyyy-MM-dd");
+var areaTypes = [[${areaTypes}]];
+$(function () {
+    loadData(dateTime);
+    var map_height = $(".map").outerHeight();
+    // 滚动条事件
+    $('.main').scroll(function () {
+        var top_height = $(this).scrollTop();
+        var $this = $("thead");
+        if (top_height + $this.outerHeight() > map_height) {
+            if (!$this.hasClass("top")) {
+                var width_1 = $this.next("tbody").find("tr:eq(0) td:eq(0)").outerWidth();
+                var width_2 = $this.next("tbody").find("tr:eq(0) td:eq(1)").outerWidth();
+                var width_3 = $this.next("tbody").find("tr:eq(0) td:eq(2)").outerWidth();
+                $this.find("th").eq(0).width(width_1);
+                $this.find("th").eq(1).width(width_2);
+                $this.find("th").eq(2).width(width_3);
+                $this.next("tbody").find("tr:eq(0) td:eq(0)").width(width_1);
+                $this.next("tbody").find("tr:eq(0) td:eq(1)").width(width_2);
+                $this.next("tbody").find("tr:eq(0) td:eq(2)").width(width_3);
+                $this.addClass("top");
+            }
+        } else {
+            if ($this.hasClass("top")) {
+                $this.removeClass("top");
+            }
+        }
+    });
+});
+
+function loadData(date) {
+    req('/app/consumableData', {
+        date: date
+    }, function (result) {
+        if (result.code == "0") {
+            var areaList = result.data;
+            $.each(areaList, function (index, item) {
+                var sumConsumable = item.params.sumConsumable;
+                var rowspan = sumConsumable.length;
+                var html = '<tbody class="cross-color">\n';
+                if (rowspan > 0) {
+                    for (var i = 0; i < rowspan; i++) {
+                        var name = sumConsumable[i].name;
+                        var model = sumConsumable[i].model;
+                        var total = sumConsumable[i].total;
+                        var unit = sumConsumable[i].unit;
+                        name += ((model != null && model != undefined && model != "") ? ("（" + model + "）") : "");
+                        if (i == 0) {
+                            html += '<tr>\n' +
+                            '        	<th class="left" rowspan="' + rowspan + '"><a href="/app/consumableCompanys/' + item.areaId + '">' + item.areaName + '</a></th>\n' +
+                            '           <td class="left">' + name + '</td>\n' +
+                            '           <td>\n' +
+                            '           	<span class="color-2">' + total + '（' + unit + '）' + '</span>\n' +
+                            '           </td>\n' +
+                            '        </tr>\n';
+                        } else {
+                            html += '<tr>\n' +
+                            '        	<td class="left">' + name + '</td>\n' +
+                            '        	<td>\n' +
+                            '           	<span class="color-2">' + total + '（' + unit + '）' + '</span>\n' +
+                            '           </td>\n' +
+                            '        </tr>\n';
+                        }
+                    }
+                } else {
+                    html += '<tr>\n' +
+                    '        	<th class="left">' + item.areaName + '</th>\n' +
+                    '           <td class="left"></td>\n' +
+                    '           <td>\n' +
+                    '             	<span class="color-2"></span>\n' +
+                    '           </td>\n' +
+                    '       </tr>\n';
+                }
+                html += '</tbody>';
+                $("#area_list").after(html);
+            });
+        }
+    });
+}
+
+function companys(type) {
+    if (areaTypes.hasOwnProperty(type)) {
+        window.location.href = '/app/consumableArea/' + type;
+    } else {
+        layer.open({
+            content: "对不起，该区域您没有查看权限！",
+            btn: '知道了'
+        });
+    }
+}
+</script>
+</html>

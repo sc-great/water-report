@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boot.system.mapper.SysFilesMapper">
+    
+    <resultMap type="SysFiles" id="SysFilesResult">
+        <result property="id"    column="id"    />
+        <result property="type"    column="type"    />
+        <result property="name"    column="name"    />
+        <result property="size"    column="size"    />
+        <result property="path"    column="path"    />
+        <result property="suffix" column="suffix"/>
+    </resultMap>
+
+    <sql id="selectSysFilesVo">
+        select * from sys_files
+    </sql>
+
+    <select id="selectSysFilesList" parameterType="SysFiles" resultMap="SysFilesResult">
+        <include refid="selectSysFilesVo"/>
+        <where>  
+            <if test="type != null  and type != ''"> and type = #{type}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="size != null "> and size = #{size}</if>
+            <if test="path != null  and path != ''"> and path = #{path}</if>
+            <if test="suffix != null  and suffix != ''"> and suffix = #{suffix}</if>
+        </where>
+    </select>
+    
+    <select id="selectSysFilesById" parameterType="String" resultMap="SysFilesResult">
+        <include refid="selectSysFilesVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectSysFilesByIds" parameterType="String" resultMap="SysFilesResult">
+        <include refid="selectSysFilesVo"/>
+        where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+    <insert id="insertSysFiles" parameterType="SysFiles">
+        <selectKey keyProperty="id" resultType="String" order="BEFORE">
+            select replace(uuid(),'-','') from dual
+        </selectKey>
+        insert into sys_files
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null ">id,</if>
+            <if test="type != null">type,</if>
+            <if test="name != null">name,</if>
+            <if test="size != null ">size,</if>
+            <if test="path != null">path,</if>
+            <if test="suffix != null">suffix,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="type != null">#{type},</if>
+            <if test="name != null">#{name},</if>
+            <if test="size != null">#{size},</if>
+            <if test="path != null">#{path},</if>
+            <if test="suffix != null">#{suffix},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSysFiles" parameterType="SysFiles">
+        update sys_files
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="type != null">type = #{type},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="size != null">size = #{size},</if>
+            <if test="path != null">path = #{path},</if>
+            <if test="suffix != null">suffix = #{suffix},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSysFilesByIds" parameterType="String">
+        delete from sys_files where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

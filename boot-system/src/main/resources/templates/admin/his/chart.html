@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+<th:block th:include="admin/include :: header('水厂历史数据统计')" />
+<script th:src="${'/webapp/js/chart/echarts.min.js'}"></script>
+<script th:src="${'/webapp/js/chart/myCharts.js'}"></script>
+</head>
+<style>
+.tree .node .node-text label {
+    width: 85%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#orgNames {
+	width: 250px;
+}
+
+.select-list li p {
+	margin-right: 0;
+}
+.btn-export {
+	background-color: #337ab7;
+    border-color: #337ab7;
+}
+.btn-export:hover {
+	background-color: #3c8cd0;
+    border-color: #3c8cd0;
+}
+</style>
+<body class="gray-bg">
+<div class="container-div">
+	<div class="row">
+		<div class="col-sm-12 search-collapse">
+			<form id="formId">
+				<div class="select-list">
+					<ul>
+						<li>
+							<p>开始：</p>
+							<input type="text" id="dateSta" name="dateSta" data-type="date" data-format="yyyy-MM-dd" />
+						</li>
+						<li>
+							<p>结束：</p>
+							<input type="text" id="dateEnd" name="dateEnd" data-type="date" data-format="yyyy-MM-dd" />
+						</li>
+						<li id="shuiChangYongHuBuXuYao">
+							<p>水厂：</p>
+							<input id="orgType" name="orgType" hidden="hidden" />
+							<input id="orgId" name="orgId" hidden="hidden" />
+							<div class="col-sm-10" style="width: auto;">
+								<div id="orgs_div" class="tree-select">
+									<div style="line-height: 34px;">
+										<i class="fa fa-spinner fa-spin"></i>正在初始化
+									</div>
+								</div>
+							</div>
+						</li>
+						<li>
+							<a class="btn btn-primary btn-rounded btn-sm" onclick="loadChart()">
+								<i class="fa fa-search"></i>&nbsp;查询
+							</a>
+							<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()">
+								<i class="fa fa-refresh"></i>&nbsp;重置
+							</a>
+						</li>
+					</ul>
+				</div>
+			</form>
+		</div>
+		<div class="col-sm-12 select-table table-striped table-bordered table-groupheader">
+			<div id="medication_panel">
+				<div id="todayMedication" style="width: 100%; height: 200px;">正在加载</div>
+				<div id="totalMedication" style="width: 100%; height: 200px;">正在加载</div>
+			</div>
+			<div id="waterYield_panel">
+				<div id="todayWaterYield" style="width: 100%; height: 200px;">正在加载</div>
+				<div id="totalWaterYield" style="width: 100%; height: 200px;">正在加载</div>
+			</div>
+			<div id="electricity_panel">
+				<div id="todayElectricity" style="width: 100%; height: 200px;">正在加载</div>
+				<div id="totalElectricity" style="width: 100%; height: 200px;">正在加载</div>
+			</div>
+			<div id="mud_panel">
+				<div id="todayMud" style="width: 100%; height: 200px;">正在加载</div>
+				<div id="totalMud" style="width: 100%; height: 200px;">正在加载</div>
+			</div>
+		</div>
+	</div>
+</div>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: table" />
+<th:block th:include="admin/include :: custom-plugins" />
+<script type="text/javascript">
+// 得到当前时间
+var dateNow = getCurDate("yyyy-MM-dd");
+// laydate 时间控件绑定
+layui.use("laydate", function () {
+    var laydate = layui.laydate;
+    var startDate = laydate.render({
+        elem: "#dateSta",
+        max: $("#dateEnd").val(),
+        theme: "molv",
+        trigger: "click",
+        done: function (value, date) {
+            // 结束时间大于开始时间
+            if (value !== "") {
+                endDate.config.min.year = date.year;
+                endDate.config.min.month = date.month - 1;
+                endDate.config.min.date = date.date;
+            } else {
+                endDate.config.min.year = "";
+                endDate.config.min.month = "";
+                endDate.config.min.date = "";
+            }
+        }
+    });
+    var endDate = laydate.render({
+        elem: "#dateEnd",
+        min: $("#dateSta").val(),
+        max: dateNow,
+        theme: "molv",
+        trigger: "click",
+        done: function (value, date) {
+            // 开始时间小于结束时间
+            if (value !== "") {
+                startDate.config.max.year = date.year;
+                startDate.config.max.month = date.month - 1;
+                startDate.config.max.date = date.date;
+            } else {
+                startDate.config.max.year = "";
+                startDate.config.max.month = "";
+                startDate.config.max.date = "";
+            }
+        }
+    });
+});
+</script>
+<script th:inline="javascript">
+var org_id = [[${orgId}]];
+$(function () {
+	var type = [[${orgType}]];
+	if (type == "3") { // 水厂用户就别选了，只能导自己水厂的数据
+		var orgName = [[${orgName}]];
+		$("#orgId").val(org_id);
+		$("#shuiChangYongHuBuXuYao").hide();
+	} else {
+		if (org_id == "1") {
+			loadOrgTree(0);
+		} else {
+			loadOrgTree("MARK" + org_id);
+		}
+	}
+	loadChart();
+});
+
+function loadOrgTree(pId) {
+    var params = {
+        url: ctx + "admin/system/org/treeListArea",
+        data: {
+            parentId: pId,
+            validStatus: 1
+        },
+        objId: 'orgs_div',
+        openLevel: 1,
+        valueId: 'orgIds',
+        textId: 'orgNames',
+        value_filed: 'orgId',
+        text_filed: 'orgName',
+        placeholder: '请选择所属机构',
+        required: 'required',
+        callback: function (values) {
+            if ($.common.isNotEmpty(values)) {
+                $.ajax({
+                    type: "get",
+                    url: ctx + "admin/system/org/get/" + values,
+                    dataType: 'json',
+                    data: {},
+                    success: function (r) {
+                        if (r.code == 0) {
+                            $("#orgId").val(r.data.orgId);
+                        } else {
+                            $.modal.msgWarning(r.msg);
+                        }
+                    }
+                });
+            }
+        }
+    };
+    selectTree(params);
+}
+</script>
+<script type="text/javascript">
+// 指定图表的配置项和数据
+var option = {
+    title: {
+        text: "",
+        textStyle: {
+            // 文字颜色
+            color: '#000',
+            // 字体风格,'normal','italic','oblique'
+            fontStyle: 'normal',
+            // 字体粗细 'normal','bold','bolder','lighter',100 | 200 | 300 | 400...
+            fontWeight: 'bold',
+            // 字体系列
+            fontFamily: 'sans-serif',
+            // 字体大小
+            fontSize: 14
+        }
+    },
+    tooltip: {
+        trigger: 'axis'
+    },
+    legend: {
+        top: "8%",
+        data: []
+    },
+    grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+    },
+	toolbox: {
+		feature: {
+			saveAsImage: {}
+		}
+	},
+    xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: []
+    },
+    yAxis: {
+        type: 'value',
+        name: ""
+    },
+    series: []
+};
+
+function loadChart() {
+	$.modal.loading("正在查询数据，请稍后...");
+	
+	var dateSta = $("#dateSta").val();
+	var dateEnd = $("#dateEnd").val();
+	dateEnd = dateEnd == undefined || dateEnd == "" ? dateNow : dateEnd;
+	dateSta = dateSta == undefined || dateSta == "" ? addDateDay(dateEnd, -7) : dateSta;
+	var orgId = $("#orgId").val();
+	orgId = orgId == undefined || orgId == "" ? org_id : orgId;
+	var param = {
+		    dateSta: dateSta,
+		    dateEnd: dateEnd,
+		    orgId: orgId
+		};
+	// 药量统计
+	$.post("/admin/his/medicineAreaDataToday", param, function (data) {
+	    var myChart_todayMedication = echarts.init(document.getElementById("todayMedication"));
+	    var option_todayMedication = option;
+	    option_todayMedication.title.text = "当日药量统计";
+	    option_todayMedication.legend.data = ["PAC", "PAM阴离子", "PAM阳离子", "复核除磷剂", "NaCLO", "石灰", "葡萄糖", "氯酸钠", "乙酸钠", "氯化氢"];
+	    option_todayMedication.xAxis.data = data.data.date;
+	    option_todayMedication.yAxis.name = "KG";
+	    var todayPac = {
+	        name: "PAC",
+	        type: 'line',
+	        data: data.data.data.todayPac
+	    };
+	    var todayPamYin = {
+	        name: "PAM阴离子",
+	        type: 'line',
+	        data: data.data.data.todayPamYin
+	    };
+	    var todayPamYang = {
+	        name: "PAM阳离子",
+	        type: 'line',
+	        data: data.data.data.todayPamYang
+	    };
+	    var todayPhosphorus = {
+	        name: "复核除磷剂",
+	        type: 'line',
+	        data: data.data.data.todayPhosphorus
+	    };
+	    var todayNaclo = {
+	        name: "NaCLO",
+	        type: 'line',
+	        data: data.data.data.todayNaclo
+	    };
+	    var todayLime = {
+	        name: "石灰",
+	        type: 'line',
+	        data: data.data.data.todayLime
+	    };
+	    var todayGlucose = {
+	        name: "葡萄糖",
+	        type: 'line',
+	        data: data.data.data.todayGlucose
+	    };
+	    var todaySc = {
+	        name: "氯酸钠",
+	        type: 'line',
+	        data: data.data.data.todaySc
+	    };
+	    var todaySa = {
+	        name: "乙酸钠",
+	        type: 'line',
+	        data: data.data.data.todaySa
+	    };
+	    var todayHCL = {
+	        name: "氯化氢",
+	        type: 'line',
+	        data: data.data.data.todayHCL
+	    };
+
+	    option_todayMedication.series = [todayPac, todayPamYin, todayPamYang, todayPhosphorus, todayNaclo, todayLime, todayGlucose, todaySc, todaySa, todayHCL];
+	    // 使用刚指定的配置项和数据显示图表。
+	    myChart_todayMedication.setOption(option_todayMedication);
+	}, "json");
+	
+	// 累计药量统计
+	$.post("/admin/his/medicineAreaDataTotal", param, function (data) {
+		var myChart_totalMedication = echarts.init(document.getElementById("totalMedication"));
+	    var option_totalMedication = option;
+	    option_totalMedication.title.text = "累计药量统计";
+	    option_totalMedication.legend.data = ["PAC", "PAM阴离子", "PAM阳离子", "复核除磷剂", "NaCLO", "石灰", "葡萄糖", "氯酸钠", "乙酸钠", "氯化氢"];
+	    option_totalMedication.xAxis.data = data.data.date;
+	    option_totalMedication.yAxis.name = "KG";
+	    var totalPac = {
+	        name: "PAC",
+	        type: 'line',
+	        data: data.data.data.totalPac
+	    };
+	    var totalPamYin = {
+	        name: "PAM阴离子",
+	        type: 'line',
+	        data: data.data.data.totalPamYin
+	    };
+	    var totalPamYang = {
+	        name: "PAM阳离子",
+	        type: 'line',
+	        data: data.data.data.totalPamYang
+	    };
+	    var totalPhosphorus = {
+	        name: "复核除磷剂",
+	        type: 'line',
+	        data: data.data.data.totalPhosphorus
+	    };
+	    var totalNaclo = {
+	        name: "NaCLO",
+	        type: 'line',
+	        data: data.data.data.totalNaclo
+	    };
+	    var totalLime = {
+	        name: "石灰",
+	        type: 'line',
+	        data: data.data.data.totalLime
+	    };
+	    var totalGlucose = {
+	        name: "葡萄糖",
+	        type: 'line',
+	        data: data.data.data.totalGlucose
+	    };
+	    var totalSc = {
+	        name: "氯酸钠",
+	        type: 'line',
+	        data: data.data.data.totalSc
+	    };
+	    var totalSa = {
+	        name: "乙酸钠",
+	        type: 'line',
+	        data: data.data.data.totalSa
+	    };
+	    var totalHCL = {
+	        name: "氯化氢",
+	        type: 'line',
+	        data: data.data.data.totalHCL
+	    };
+
+	    option_totalMedication.series = [totalPac, totalPamYin, totalPamYang, totalPhosphorus, totalNaclo, totalLime, totalGlucose, totalSc, totalSa, totalHCL];
+	    // 使用刚指定的配置项和数据显示图表。
+	    myChart_totalMedication.setOption(option_totalMedication);
+	}, "json");
+
+	// 水量当日统计
+	$.post("/admin/his/waterYieldAreaDataToday", param, function (data) {
+	    var myChart_todaywaterYield = echarts.init(document.getElementById('todayWaterYield'));
+	    var option_todaywaterYield = option;
+	    option_todaywaterYield.title.text = "当日水量统计";
+	    option_todaywaterYield.legend.data = ["进水总量", "出水总量"];
+	    option_todaywaterYield.xAxis.data = data.data.date;
+	    option_todaywaterYield.yAxis.name = "KWH";
+	    var todaywaterYieldIn = {
+	        name: "进水总量",
+	        type: 'line',
+	        data: data.data.data.todayIn
+	    };
+	    var todaywaterYieldOut = {
+	        name: "出水总量",
+	        type: 'line',
+	        data: data.data.data.todayOut
+	    };
+	    option_todaywaterYield.series = [todaywaterYieldIn, todaywaterYieldOut];
+	    // 使用刚指定的配置项和数据显示图表。
+	    myChart_todaywaterYield.setOption(option_todaywaterYield);
+	}, "json");
+
+	// 水量累计统计
+	$.post("/admin/his/waterYieldAreaDataTotal", param, function (data) {
+	    var myChart_totalWaterYield = echarts.init(document.getElementById('totalWaterYield'));
+	    var option_totalWaterYield = option;
+	    option_totalWaterYield.title.text = "累计水量统计";
+	    option_totalWaterYield.legend.data = ["进水总量", "出水总量"];
+	    option_totalWaterYield.xAxis.data = data.data.date;
+	    option_totalWaterYield.yAxis.name = "万吨";
+	    var totalWaterYieldIn = {
+	        name: "进水总量",
+	        type: 'line',
+	        data: data.data.data.totalIn
+	    };
+	    var totalWaterYieldOut = {
+	        name: "出水总量",
+	        type: 'line',
+	        data: data.data.data.totalOut
+	    };
+	    option_totalWaterYield.series = [totalWaterYieldIn, totalWaterYieldOut];
+	    // 使用刚指定的配置项和数据显示图表。
+	    myChart_totalWaterYield.setOption(option_totalWaterYield);
+	}, "json");
+
+	// 电量当日统计
+	$.post("/admin/his/electricQuantityAreaDataToday", param, function (data) {
+	    var myChart_todayElectricity = echarts.init(document.getElementById('todayElectricity'));
+	    var option_todayElectricity = option;
+	    option_todayElectricity.title.text = "当日电耗统计";
+	    option_todayElectricity.legend.data = ["水厂电耗", "泵站电耗"];
+	    option_todayElectricity.xAxis.data = data.data.date;
+	    option_todayElectricity.yAxis.name = "KWH";
+	    var todayElectricity = {
+	        name: "水厂电耗",
+	        type: 'line',
+	        data: data.data.data.todayElectricity
+	    };
+	    var todayPumpEletricity = {
+	        name: "泵站电耗",
+	        type: 'line',
+	        data: data.data.data.todayPumpEletricity
+	    };
+	    option_todayElectricity.series = [todayElectricity, todayPumpEletricity];
+	    // 使用刚指定的配置项和数据显示图表。
+	    myChart_todayElectricity.setOption(option_todayElectricity);
+	}, "json");
+
+	// 电量累计统计
+	$.post("/admin/his/electricQuantityAreaDataTotal", param, function (data) {
+	    var myChart_totalElectricity = echarts.init(document.getElementById('totalElectricity'));
+	    var option_totalElectricity = option;
+	    option_totalElectricity.title.text = "累计电耗统计";
+	    option_totalElectricity.legend.data = ["水厂电耗", "泵站电耗"];
+	    option_totalElectricity.xAxis.data = data.data.date;
+	    option_totalElectricity.yAxis.name = "KWH";
+	    var totalElectricity = {
+	        name: "水厂电耗",
+	        type: 'line',
+	        data: data.data.data.totalElectricity
+	    };
+	    var totalPumpEletricity = {
+	        name: "泵站电耗",
+	        type: 'line',
+	        data: data.data.data.totalPumpEletricity
+	    };
+	    option_totalElectricity.series = [totalElectricity, totalPumpEletricity];
+	    // 使用刚指定的配置项和数据显示图表。
+	    myChart_totalElectricity.setOption(option_totalElectricity);
+	}, "json");
+
+	// 污泥当日统计分析
+	$.post("/admin/his/sludgeChartToday", param, function (data) {
+	    var myChart_todayMud = echarts.init(document.getElementById('todayMud'));
+	    var option_todayMud = option;
+	    option_todayMud.title.text = "当日污泥统计";
+	    option_todayMud.legend.data = ["污泥日产量", "绝干污泥量"];
+	    option_todayMud.xAxis.data = data.data.date;
+	    option_todayMud.yAxis.name = "吨";
+	    var todayMud = {
+	        name: "污泥日产量",
+	        type: 'line',
+	        data: data.data.data.todayMud
+	    };
+	    var dryMud = {
+	        name: "绝干污泥量",
+	        type: 'line',
+	        data: data.data.data.dryMud
+	    };
+	    option_todayMud.series = [todayMud, dryMud];
+	    // 使用刚指定的配置项和数据显示图表。
+	    myChart_todayMud.setOption(option_todayMud);
+	}, "json");
+
+	// 污泥累计统计分析
+	$.post("/admin/his/sludgeChartDataTotal", param, function (data) {
+	    var myChart_totalMud = echarts.init(document.getElementById('totalMud'));
+	    var option_totalMud = option;
+	    option_totalMud.title.text = "累计污泥统计";
+	    option_totalMud.legend.data = ["污泥累计量", "绝干污泥累计量"];
+	    option_totalMud.xAxis.data = data.data.date;
+	    option_totalMud.yAxis.name = "吨";
+	    var totalMud = {
+	        name: "污泥累计量",
+	        type: 'line',
+	        data: data.data.data.totalMud
+	    };
+	    var dryMudTotal = {
+	        name: "绝干污泥累计量",
+	        type: 'line',
+	        data: data.data.data.dryMudTotal
+	    };
+	    option_totalMud.series = [totalMud, dryMudTotal];
+	    $("#totalMud").css("width", "100%");
+	    // 使用刚指定的配置项和数据显示图表。
+	    myChart_totalMud.setOption(option_totalMud);
+	}, "json");
+	
+	$.modal.closeLoading();
+}
+</script>
+</body>
+</html>

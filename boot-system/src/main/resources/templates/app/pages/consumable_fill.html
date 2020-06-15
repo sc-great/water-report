@@ -1,0 +1,393 @@
+<!doctype html>
+<html class="no-js" lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=ideal viewport, initial-scale=1 user-scalable=0" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<title>备品备件</title>
+<link rel="stylesheet" th:href="${'/webapp/css/font-awesome.css?v='+@toolsUtils.version()}">
+<link rel="stylesheet" th:href="${'/webapp/css/com.css?v='+@toolsUtils.version()}">
+<link rel="stylesheet" th:href="${'/webapp/css/style.css?v='+@toolsUtils.version()}">
+<script th:src="${'/webapp/js/jquery.min.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/webapp/js/pace.min.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/webapp/js/plugin/layer_mobile/layer.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/webapp/js/common.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/webapp/js/jdate.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/webapp/js/dateUtil.js?v='+@toolsUtils.version()}"></script>
+<script th:src="${'/webapp/js/chart/echarts.min.js'}"></script>
+<script th:src="${'/webapp/js/chart/myCharts.js'}"></script>
+</head>
+<body>
+<div class="factoryInfo_header">
+	<div class="title" onclick="goBack();">
+		<i class="fa fa-chevron-left"></i><span id="consumableTitle">备品备件</span>
+	</div>
+</div>
+<div class="factoryInfo_buttonBox font-size-14">
+	<div onclick="loadOtherPanel('get')"><img th:src="${'/webapp/image/get.png'}" width="18rem" height="18rem">物品领用&nbsp;</div>
+<div onclick="loadOtherPanel('set')"><img th:src="${'/webapp/image/set.png'}" width="18rem" height="18rem">物品添加</div>
+</div>
+<div class="factoryInfo_formBox" id="factoryInfo_formBox_set" hidden="hidden"></div>
+<div class="factoryInfo_formBox" id="factoryInfo_formBox_get" hidden="hidden"></div>
+<div class="content center font-size-14">
+    <table class="cross-color">
+        <thead class="bg-color1 color-3">
+         <tr class="font-size-12">
+             <th>物品名称</th>
+             <th>库存</th>
+             <th>动态</th>
+         </tr>
+        </thead>
+        <tbody id="consumable_list" class="cross-color"></tbody>
+    </table>
+</div>
+</body>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: form" />
+<style>
+.factoryInfo_formBox div p {
+	position: relative;
+}
+label.error {
+	position: absolute;
+	right: 15vw;
+	color: #ef392b;
+	font-size: 12px;
+	top: 0.5vw;
+}
+input.error {
+	background-color: #fbe2e2;
+    border-color: #c66161;
+    color: #c00;
+}
+</style>
+<style>
+.factoryInfo_header {
+    background: #ededed;
+    line-height: 6vh;
+}
+.factoryInfo_header .title {
+    padding-left: 8px;
+    color: #000;
+    font-weight: bold;
+    font-size: 1.6rem;
+}
+.factoryInfo_header .title i {
+    float: left;
+    line-height: 6vh;
+}
+.factoryInfo_header .title span {
+	display: flex;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.factoryInfo_formBox {
+	font-size: 1.5rem;
+}
+.factoryInfo_formBox div {
+	line-height: 6vh;
+	margin-left: 3vh;
+}
+.factoryInfo_formBox div p {
+	display: inline-block;
+	border: 1px #dcdcdc solid;
+	background: #f9f9f9;
+	width: 65%;
+	line-height: 4vh;
+}
+.factoryInfo_formBox div span {
+	display: inline-block;
+	width: 26%;
+}
+input, select {
+	border: 0;
+	outline: none;
+	background-color: rgba(0, 0, 0, 0);
+}
+.factoryInfo_formBox form {
+	margin-top: 3vh;
+}
+.factoryInfo_formBox div p input, .factoryInfo_formBox div p select {
+	width: 56%;
+	line-height: 4vh;
+	padding-left: 0.5vh;
+	width: 98%;
+}
+.factoryInfo_formBox .youDanWei p input {
+	width: 78%;
+}
+.factoryInfo_formBox div p b {
+	margin: 0 1vh;
+	font-style: normal;
+	float: right;
+	font-weight: normal;
+	position: absolute;
+    top: 0;
+    right: 0;
+}
+.factoryInfo_formBox .button_group {
+	width: 80%;
+	margin: 3vh auto;
+	height: 10vh;
+}
+.factoryInfo_formBox .button_group a {
+	display: inline-block;
+    width: 45%;
+    text-align: center;
+    line-height: 4ch;
+    font-size: 1.6rem;
+    margin-top: 2vh;
+}
+.factoryInfo_formBox .button_group .reset {
+	background: #f4f4f4;
+	float: left;
+}
+.factoryInfo_formBox .button_group .submit {
+	background: #1d7bb8;
+    color: #fff;
+    float: right;
+}
+
+.factoryInfo_buttonBox {
+	line-height: 6vh;
+	height: 6vh;
+}
+.factoryInfo_buttonBox div {
+	float: right;
+	width: 24%;
+	text-align: right;
+	height: 6vh;
+}
+.factoryInfo_buttonBox div img {
+	margin: 1.4vh 0 0 1vh;
+	float: left;
+}
+.factoryInfo_buttonBox div span {
+	float: right;
+	padding-right: 3vw;
+}
+</style>
+<script>
+var object_p = $(".factoryInfo_formBox .youDanWei p");
+object_p.find("i").click(function() {
+	object_p.find("input").focus();
+});
+
+$(function() {
+	$("#consumable_list").html("");
+	$.post("/app/consumableFactoryData", function(data) {
+		if (data.code != 0)
+			return;
+		var consumableList = data.data;
+		if (consumableList == null || consumableList == undefined || consumableList.length <= 0)
+			return;
+		var html, name, model, total, unit, info, lastSetTime, lastGetTime = "";
+		var isGet = false;
+		for (var i = 0; i < consumableList.length; i ++) {
+			name = consumableList[i].name;
+			model = consumableList[i].model;
+			name = name + (model == null || model == undefined || model == "" ? "" : ("（" + model + "）"));
+			total = consumableList[i].total;
+			unit = consumableList[i].unit;
+			total = total + "（" + unit + "）";
+			
+			lastSetTime = consumableList[i].lastSetTime;
+			lastGetTime = consumableList[i].lastGetTime;
+			
+			isGet = false;
+			if (lastGetTime != null && lastGetTime != undefined && lastGetTime != "" && (new Date(lastGetTime) > new Date(lastSetTime)))
+				isGet = true;
+			
+			if (isGet)
+				info = consumableList[i].lastGetUserName + " 领用 " + consumableList[i].lastGetNum;
+			else
+				info = consumableList[i].lastSetUserName + " 添加 " + consumableList[i].lastSetNum;	
+			
+			html += '<tr ' + (consumableList[i].total <= 3 ? 'style="background:yellow;"' : '') + '>\n' +
+            '        	<td>' + name + '</td>\n' +
+            '           <td>' + total + '</td>\n' +
+            '           <td>\n' + info + '</td>\n' +
+            '        </tr>\n';
+		}
+		$("#consumable_list").append(html);
+	})
+})
+
+// 打开添加、领用物品窗口
+function loadOtherPanel(type) {
+	if (type == "set")
+		$("#consumableTitle").html("添加物品");
+	if (type == "get")
+		$("#consumableTitle").html("物品领用");
+	$.post("loadOption", function(data) {
+		if (data.code != 0)
+			return;
+		
+		$("#factoryInfo_formBox_" + type).html("");
+		if (type == "set")
+			$("#factoryInfo_formBox_" + type).html(consumable_form_set);
+		if (type == "get")
+			$("#factoryInfo_formBox_" + type).html(consumable_form_get);
+		
+		$("#consumableNameSelect_" + type).html("");
+		var option = "";
+		for (var i = 0; i < data.data.length; i ++) {
+			var name = data.data[i].name;
+			var model = data.data[i].model;
+			name +=  (model != null && model != undefined && model != "" ? ("（" + model + "）") : "");
+			option = "<option value=\"" + data.data[i].id + "\" data-unit=\"" + data.data[i].unit + "\">" + name + "</option>";
+			$("#consumableNameSelect_" + type).append(option);
+		}
+		// 总量的自动计算
+		autoLoadTotal(type);
+		
+		$(".factoryInfo_buttonBox").hide(100);
+		$("#factoryInfo_formBox_" + type).show(100);
+	});
+}
+
+function consumableReset() {
+	$("#consumableTitle").html("备品备件");
+	$(".factoryInfo_buttonBox").show(100);
+	$(".factoryInfo_formBox").hide(100);
+	
+	$("#factoryInfo_formBox_set").html("");
+	$("#factoryInfo_formBox_get").html("");
+}
+
+var total = 0;
+
+// 总量的自动加载计算
+function autoLoadTotal(type) {
+	$("#consumableTotal_" + type).val("0");
+	$("#lastSetNum_" + type).val("");
+	var type_id = $("#consumableNameSelect_" + type).val();
+	if (type_id == null || type_id == undefined || type_id == "")
+		return;
+	$.post("getConsumableByTypeId?typeId=" + type_id, function(data) {
+		if (data.code != 0)
+			return;
+		if (data.data == null || data.data == undefined)
+			return;
+		total = data.data.total
+		$("#consumableTotal_" + type).val(total);
+		
+		var unit = data.data.type.unit;
+		if (unit == null || unit == undefined || undefined == "") 
+			return;
+		$(".consumable-unit").html(unit);
+	});
+}
+// 自动计算
+function autoCountTotal(type) {
+	var val = $("#lastSetNum_" + type).val();
+	if (val == null || val == undefined)
+		return;
+	
+	val = val.replace(/\-/g, ""); // 不能为负数
+	val = val.length > 10 ? val.slice(0, 10) : val; // 限制长度
+	
+	$("#lastSetNum_" + type).val(val);
+	
+	if (type = "set")
+		$("#consumableTotal_" + type).val(total + Number(val));
+	if (type = "get") {
+		var t = total - Number(val);
+		$("#consumableTotal_" + type).attr("date-val", t);
+		if (t < 0)
+			t = 0;
+		$("#consumableTotal_" + type).val(t);
+	}
+}
+
+function consumableSubmit(type) {
+	if ($.validate.form()) {
+		var form_val = $("#lastSetNum_" + type).val();
+		if (form_val == "" || form_val == "0" || form_val == 0) {
+			$.modal.alertWarning("对不起，请输入有效数量！");
+			return;
+		}
+			
+		if (type == "get" && Number($("#consumableTotal_" + type).attr("date-val")) < 0) {
+			$.modal.alertWarning("对不起，现有数量不足以领用！");
+			return;
+		}
+		$.operate.save("consumable" + type, $("#consumable-form-" + type).serialize());
+	}
+}
+
+var consumable_form_set = '<form id="consumable-form-set">' + 
+						'		<div>' + 
+						'			<span>物品名称</span>' + 
+						'			<p>' + 
+						'				<select name="typeId" id="consumableNameSelect_set" onChange="autoLoadTotal(\'set\')"></select>' + 
+						'			</p>' + 
+						'		</div>' + 
+						'		<div>' + 
+						'			<span>现有库存</span>' + 
+						'			<p>' + 
+						'				<input name="total" id="consumableTotal_set" type="number" min="0" max="999999999" readonly>' + 
+						'				<b class="consumable-unit">PCS</b>' + 
+						'			</p>' + 
+						'		</div>' + 
+						'		<div>' + 
+						'			<span>入库数量</span>' + 
+						'			<p>' + 
+						'				<input id="lastSetNum_set" name="lastSetNum" type="text"  maxlength="5" onkeyup="NumberCheck(this)"  required oninput="autoCountTotal(\'set\')"   >' + 
+						'				<b class="consumable-unit">PCS</b>' + 
+						'			</p>' + 
+						'		</div>' + 
+						'	</form>' + 
+						'	<div class="button_group">' + 
+						'		<a class="reset" onclick="consumableReset()">取消</a>' + 
+						'		<a class="submit" onclick="consumableSubmit(\'set\')">提交</a>' + 
+						'	</div>';
+var consumable_form_get = '<form id="consumable-form-get">' + 
+						'		<div>' + 
+						'			<span>物品名称</span>' + 
+						'			<p>' + 
+						'				<select name="typeId" id="consumableNameSelect_get" onChange="autoLoadTotal(\'get\')"></select>' + 
+						'			</p>' + 
+						'		</div>' + 
+						'		<div>' + 
+						'			<span>现有库存</span>' + 
+						'			<p>' + 
+						'				<input name="total" id="consumableTotal_get" type="number" readonly>' + 
+						'				<b class="consumable-unit">PCS</b>' + 
+						'			</p>' + 
+						'		</div>' + 
+						'		<div>' + 
+						'			<span>领用数量</span>' + 
+						'			<p>' + 
+						'				<input id="lastSetNum_get" name="lastGetNum"  type="text"  maxlength="5" onkeyup="NumberCheck(this)"  required oninput="autoCountTotal(\'get\')">' + 
+						'				<b class="consumable-unit">PCS</b>' + 
+						'			</p>' + 
+						'		</div>' + 
+						'		<div>' + 
+						'			<span>领用人员</span>' + 
+						'			<p>' + 
+						'				<input name="lastGetUserName" type="text" onkeyup="userNameLimit(this)"  maxlength="10" required>' + 
+						'			</p>' + 
+						'		</div>' + 
+						'	</form>' + 
+						'	<div class="button_group">' + 
+						'		<a class="reset" onclick="consumableReset()">取消</a>' + 
+						'		<a class="submit" onclick="consumableSubmit(\'get\')">提交</a>' + 
+						'	</div>';
+						
+function NumberCheck(t) {
+    var num = t.value;
+    var re = /^\d*$/;
+    if (!re.test(num)) {
+        isNaN(parseInt(num)) ? t.value = 0 : t.value = parseInt(num);
+    }
+}
+// 限制输入特殊字符
+function userNameLimit(t) {
+    t.value = t.value.replace(/[ `~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、]/g, '')
+}
+</script>
+</html>

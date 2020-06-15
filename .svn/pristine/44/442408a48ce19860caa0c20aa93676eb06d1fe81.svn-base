@@ -1,0 +1,145 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" class="no-js" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=ideal viewport, initial-scale=1 user-scalable=0"/>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>信息填报</title>
+    <link rel="stylesheet" th:href="${'/webapp/css/font-awesome.css?v='+@toolsUtils.version()}">
+    <link rel="stylesheet" th:href="${'/webapp/css/com.css?v='+@toolsUtils.version()}">
+    <link rel="stylesheet" th:href="${'/webapp/css/style.css?v='+@toolsUtils.version()}">
+    <script th:src="${'/webapp/js/jquery.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/pace.min.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/common.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/plugin/layer_mobile/layer.js?v='+@toolsUtils.version()}"></script>
+    <script th:src="${'/webapp/js/lrz.all.bundle.js?v='+@toolsUtils.version()}"></script>
+    <!--json 序列化-->
+    <script th:src="${'/js/jquery.serializejson.js?v='+@toolsUtils.version()}"></script>
+    <style type="text/css">
+        .form .form-group .checkbox:first-child{
+            margin-left: 4vw;
+        }
+    </style>
+</head>
+<body>
+<div class="main" style="background-color: #F9F9F7;">
+    <div class="header">
+        <div class="title">水厂人员健康填报</div>
+    </div>
+    <form id="form" class="form">
+        <input type="hidden" name="areaId" th:value="${areaId}">
+        <input type="hidden" name="factoryId" th:value="${factoryId}">
+        <div class="content">
+            <div class="form-group">
+                <label class="control-label">姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名</label>
+                <div class="form-control">
+                    <input type="text" placeholder="请输入您的真实姓名" id="userName" name="userName"  maxlength="20">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label">手机号码</label>
+                <div class="form-control">
+                    <input type="text" placeholder="请输入您的手机号码" id="mobile" name="mobile" maxlength="11" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" >
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="form-control">
+                    <div class="checkbox" th:each="dict: ${@dict.getType('r_work_type')}">
+                        <label>
+                            <input type="radio" name="workType" th:id="${dict.dictCode}" th:value="${dict.dictValue}" th:checked="${dict.default}">
+                            <span th:text="${dict.dictLabel}"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label">体&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;温</label>
+                <div class="form-control">
+                    <input type="text" placeholder="请输入您的当前体温" id="temp" name="temp"  maxlength="5" onkeyup="this.value= this.value.match(/\d+(\.\d{0,2})?/) ? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''" >
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label">当前健康状况</label>
+            </div>
+            <div class="form-group">
+                <div class="form-control">
+                    <div class="checkbox" th:each="dict : ${@dict.getType('r_health_status')}">
+                        <label>
+                            <input type="radio" name="healthStatus" th:id="${dict.dictCode}" th:value="${dict.dictValue}" th:checked="${dict.default}">
+                            <span th:text="${dict.dictLabel}"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="option">
+            <div class="btn-block" id="submit">提交</div>
+        </div>
+    </form>
+</div>
+<script th:inline="javascript">
+    $(function () {
+        $("#submit").click(function () {
+            var field = $('#form').serializeJSON();
+            if (field["userName"] == "") {
+                layer.open({
+                    content: '请输入您的真实姓名！',
+                    btn: '知道了'
+                });
+                $("#userName").focus();
+                return false;
+            }
+            if (field["mobile"] == "") {
+                layer.open({
+                    content: '请输入您的手机号码！',
+                    btn: '知道了'
+                });
+                $("#mobile").focus();
+                return false;
+            }
+            if (field["workType"] == "") {
+                layer.open({
+                    content: '请选择现场办公类型！',
+                    btn: '知道了'
+                });
+                return false;
+            }
+            if (field["temp"] == "") {
+                layer.open({
+                    content: '请输入您的当前体温！',
+                    btn: '知道了'
+                });
+                $("#temp").focus();
+                return false;
+            }
+            if (field["healthStatus"] == "") {
+                layer.open({
+                    content: '请选择当前健康状况！',
+                    btn: '知道了'
+                });
+                return false;
+            }
+            req("/app/doVisitor",field, function (result) {
+                if (result.code == 0) {
+                    layer.open({
+                        content: field["userName"]+"您好，信息填报成功！",
+                        btn: '知道了',
+                        yes: function(index){
+                            $("input[type='text'],input[type='number']").val("");
+                            layer.close(index);
+                        }
+                    });
+                } else {
+                    layer.open({
+                        content: result.msg,
+                        btn: '知道了'
+                    });
+                }
+            }, "post");
+        });
+    });
+</script>
+</body>
+</html>

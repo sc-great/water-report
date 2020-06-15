@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+<th:block th:include="admin/include :: header('添加耗材')" />
+</head>
+<style>
+#form-consumableType-add .col-sm-9 {
+	float: right;
+	width: 76%;
+}
+#form-consumableType-add .col-sm-9 .input-group{
+	width: 100%;
+}
+</style>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content main_rigth">
+    <form class="form-horizontal m" id="form-consumableType-add">
+        <div class="form-group">
+            <label class="col-sm-2 control-label label-left is-required">物品名称：</label>
+            <div class="col-sm-9">
+                <div class="input-group">
+                    <input name="name" class="form-control" placeholder="请输入物品名称" type="text" maxlength="40" required/>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">    
+            <label class="col-sm-2 control-label label-left is-required">物品单位：</label>
+            <div class="col-sm-9">
+                <div class="input-group">
+                    <input name="unit" class="form-control" type="text" maxlength="8" required/>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">    
+            <label class="col-sm-2 control-label label-left">型号规格：</label>
+            <div class="col-sm-9">
+                <div class="input-group">
+                    <input name="model" class="form-control" type="text" maxlength="80"/>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">    
+            <label class="col-sm-2 control-label label-left">其他信息：</label>
+            <div class="col-sm-9">
+                <div class="input-group">
+                    <input name="info" class="form-control" type="text" maxlength="100"/>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">    
+            <label class="col-sm-2 control-label label-left">备注信息：</label>
+            <div class="col-sm-9">
+                <div class="input-group">
+                    <input name="note" class="form-control" type="text" maxlength="100"/>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<th:block th:include="admin/include :: common" />
+<th:block th:include="admin/include :: form" />
+</body>
+<script th:inline="javascript">
+var form_consumableType_add_prefix = ctx + "admin/materialControl/consumable";
+
+$("#form-consumableType-add").validate({
+    focusCleanup: true
+});
+
+function submitHandler() {
+	var name = $("#form-consumableType-add .input-group input[name=\"name\"]");
+	var model = $("#form-consumableType-add .input-group input[name=\"model\"]");
+	$.modal.loading("正在处理中，请稍后...");
+	$.modal.disable();
+	
+	if ($.validate.form()) {
+    	var param = {"name": name.val(), "model": model.val()};
+    	$.post(form_consumableType_add_prefix + "/checkTypeName", param, function(data) {
+    		if (data.data != undefined && data.data != "") {
+    			$.modal.alertWarning(data.data);
+    			return;
+    		}
+	        $.operate.save(form_consumableType_add_prefix + "/doTypeAdd", $('#form-consumableType-add').serialize());
+	        $.modal.closeLoading();
+			$.modal.disable();
+    	})
+    }
+}
+</script>
+</html>
